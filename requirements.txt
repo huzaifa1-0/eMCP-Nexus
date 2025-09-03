@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+sqlalchemy
+databases
+pydantic
+python-dotenv
+google-cloud-bigquery
+google-cloud-aiplatform
+transformers
+pinecone-client
+stripe
+requests
