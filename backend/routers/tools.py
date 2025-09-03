@@ -14,3 +14,14 @@ tools_table = sqlalchemy.Table(
     sqlalchemy.Column("cost", sqlalchemy.Float)
 )
 
+
+@router.post("/", response_model=Tool)
+async def create_tool(tool: ToolCreate):
+    query = tools_table.insert().values(
+        name = tool.name,
+        description = tool.description,
+        cost = tool.cost
+    )
+    tool_id = await database.execute(query)
+    return {**tool.dict(), "id": tool_id}
+
