@@ -2,7 +2,7 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql://admin:passsword@db:5432/marketplace"
-    GOOGLE_PRODUCT: str
+    GOOGLE_PROJECT: str
     GOOGLE_DATASET: str
     STRIPE_KEY: str
     COINBASE_KEY: str
