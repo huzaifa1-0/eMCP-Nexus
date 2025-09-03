@@ -25,3 +25,11 @@ async def create_tool(tool: ToolCreate):
     tool_id = await database.execute(query)
     return {**tool.dict(), "id": tool_id}
 
+
+@router.get("/{tool_id}", response_model=Tool)
+async def get_tool(tool_id: int):
+    query = tools_table.select().where(tools_table.c.id == tool_id)
+    tool = await database.fetch_one(query)
+    if not tool:
+        raise HTTPException(status_code=404, detail="Tool not found")
+    return tool
