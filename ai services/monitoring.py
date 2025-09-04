@@ -12,3 +12,10 @@ def log_tool_usage(tool_id: int, user_id: int):
         "user_id": user_id,
         "timestamp": datetime.datetime.utcnow().isoformat()
     })
+
+
+def get_tool_usage(tool_id: int):
+    """
+    Returns usage history for a given tool.
+    """
+    return usage_stats.get(tool_id, [])
