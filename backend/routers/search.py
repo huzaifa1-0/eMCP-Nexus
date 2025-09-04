@@ -1,23 +1,18 @@
 from fastapi import APIRouter, Query
-from google.cloud import bigquery
-from backend.config import settings
 from ai_services.search_engine import search_tools
 
-
 router = APIRouter()
-client = bigquery.Client(project=settings.GOOGLE_PROJECT)
 
-
-
-@router.get("/")
-async def semantic_search(q: str = Query(...)):
-    query = f"""
-        SELECT name, description, cost
-        FROM `{settings.GOOGLE_PROJECT}.{settings.GOOGLE_DATASET}.tools`
-        WHERE VECTOR_SEARCH(description, '{q}') LIMIT 5
+@router.get("/search")
+async def semantic_search(
+    query: str = Query(..., description="Search query for AI tools"),
+    k: int = Query(5, description="Number of results to return")
+):
     """
-
-    results = client.query(query).result()
-    return [dict(row) for row in results]
-
-
+    Semantic search for tools using embeddings + vector DB (BigQuery or FAISS fallback).
+    """
+    results = await search_tools(query, k=k)
+    return {
+        "query": query,
+        "results": results
+    }
