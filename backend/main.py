@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from backend.routers import tools, payments, search, auth, monitoring, reputation
+from .routers import tools, payments, search, auth, monitoring, reputation
 from backend.db import init_db
 
 app = FastAPI(title="eMCP Nexus Backend")
