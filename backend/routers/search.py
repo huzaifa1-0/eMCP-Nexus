@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Query
 from google.cloud import bigquery
 from backend.config import settings
+from ai_services.search_engine import search_tools
 
 
 router = APIRouter()
