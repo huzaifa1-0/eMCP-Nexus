@@ -30,5 +30,19 @@ async def search_tools(query: str, k: int = 5) -> List[Dict]:
          d = len(query_embedding)
          index = faiss.IndexFlatL2(d)
          vectors = np.array([v for _, v in tools_db.values()]).astype("float32")
-         
+         index.add(vectors)
+
+         query_vec = np.array(query_embedding).astype("float32").reshape(1, -1)
+         distances, indices = index.search(query_vec, k)
+
+         results = []
+
+         for idx, dist in zip(indices[0], distances[0]):
+             tool_id = list(tools_db.keys())[idx]
+             tool_name = tools_db[tool_id][0]
+             results.append({"id": tool_id, "name": tool_name, "score": float(1 - dist)})
+         return results
+
+
+
      
