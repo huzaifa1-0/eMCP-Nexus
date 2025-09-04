@@ -10,3 +10,12 @@ class PaymentRequest(BaseModel):
     amount: float
     currency: str = "USD"
     method: str = "crypto" or "stripe"
+
+
+@router.post("/pay")
+async def process_payment(request: PaymentRequest):
+    try:
+        tx = await payments.handle_payment(request)
+        return {"status": "success", "transaction": tx}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
