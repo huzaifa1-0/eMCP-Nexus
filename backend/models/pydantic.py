@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 
-# --- Tool Models ---
+
 class ToolBase(BaseModel):
     name: str
     description: str
@@ -11,10 +11,33 @@ class ToolBase(BaseModel):
     url: str
 
 class ToolCreate(ToolBase):
-    pass # For creating a new tool, no extra fields needed
+    pass 
 
 class ToolResponse(ToolBase):
     id: int
     owner_id: int
-    # This config is essential to convert SQLAlchemy ORM objects to Pydantic models
+    
     model_config = ConfigDict(from_attributes=True) 
+
+
+class UserBase(BaseModel):
+    username: str
+    email: str
+
+class UserCreate(UserBase):
+    password: str # 
+
+class UserResponse(UserBase):
+    id: int
+    model_config = ConfigDict(from_attributes=True) 
+
+
+class TransactionResponse(BaseModel):
+    id: int
+    tool_id: int
+    user_id: int
+    amount: float
+    currency: str
+    method: str
+    timestamp: datetime
+    model_config = ConfigDict(from_attributes=True)

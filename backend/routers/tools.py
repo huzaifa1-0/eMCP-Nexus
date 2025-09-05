@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends
-from backend.models.tool import Tool, ToolCreate
+from backend.models.db import DBTool, DBUser
+from backend.models.pydantic import ToolCreate, ToolResponse
 from backend.db import get_async_session
 import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-import backend.models.tool
 
 router = APIRouter()
 
@@ -17,19 +17,24 @@ tools_table = sqlalchemy.Table(
 )
 
 
-@router.post("/", response_model=Tool)
-async def create_tool(tool: ToolCreate, session: AsyncSession = Depends(get_async_session)):
-    db_tool = backend.models.tool.Tool(**tool.dict())
+@router.post("/", response_model=ToolResponse)
+async def create_tool(tool_data: ToolCreate, 
+                      user: DBUser = Depends(get_current_user), # Assumes you have auth
+                      session: AsyncSession = Depends(get_async_session)):
+    
+    
+    db_tool = DBTool(**tool_data.dict(), owner_id=user.id)
     session.add(db_tool)
     await session.commit()
     await session.refresh(db_tool)
+    
+    
     return db_tool
 
 
-@router.get("/{tool_id}", response_model=Tool)
+@router.get("/{tool_id}", response_model=ToolResponse)
 async def get_tool(tool_id: int, session: AsyncSession = Depends(get_async_session)):
-    
-    query = select(backend.models.tool.Tool).where(backend.models.tool.Tool.id == tool_id)
+    query = select(DBTool).where(DBTool.id == tool_id)
     result = await session.execute(query)
     tool = result.scalars().first()
     if not tool:
