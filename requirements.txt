@@ -1,8 +1,8 @@
 fastapi
 uvicorn
 sqlalchemy
-databases
 pydantic
+pydantic-settings
 python-dotenv
 google-cloud-bigquery
 google-cloud-aiplatform
