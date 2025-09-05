@@ -1,6 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-from typing import Optional
+
 
 
 
@@ -13,7 +13,7 @@ class ToolBase(BaseModel):
 class ToolCreate(ToolBase):
     pass 
 
-class ToolResponse(ToolBase):
+class Tool(ToolBase):
     id: int
     owner_id: int
     
@@ -25,19 +25,25 @@ class UserBase(BaseModel):
     email: str
 
 class UserCreate(UserBase):
-    password: str # 
+    password: str 
 
-class UserResponse(UserBase):
+class User(UserBase):
     id: int
     model_config = ConfigDict(from_attributes=True) 
 
 
-class TransactionResponse(BaseModel):
-    id: int
-    tool_id: int
-    user_id: int
+class TransactionBase(BaseModel):
     amount: float
     currency: str
     method: str
+    tool_id: int
+
+class TransactionCreate(TransactionBase):
+    pass
+
+class Transaction(TransactionBase):
+    id: int
+    user_id: int
     timestamp: datetime
+    
     model_config = ConfigDict(from_attributes=True)

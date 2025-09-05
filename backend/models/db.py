@@ -1,14 +1,14 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
-from sqlalchemy.orm import relationship, Mapped, mapped_column, DeclarativeBase
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship, Mapped, mapped_column, declarative_base
+
 
 
 Base = declarative_base()
 
 class DBUser(Base):
     __tablename__ = "users"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     username: Mapped[str] = mapped_column(String, unique=True, index=True)
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String)
@@ -19,7 +19,7 @@ class DBUser(Base):
 
 class DBTool(Base):
     __tablename__ = "tools"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String, index=True)
     description: Mapped[str] = mapped_column(String)
     cost: Mapped[float] = mapped_column(Float)
@@ -34,7 +34,7 @@ class DBTool(Base):
 
 class DBTransaction(Base):
     __tablename__ = "transactions"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     amount: Mapped[float] = mapped_column(Float)
     currency: Mapped[str] = mapped_column(String)
     method: Mapped[str] = mapped_column(String)
