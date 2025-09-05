@@ -56,4 +56,17 @@ class DBTransaction(Base):
 class DBRating(Base):
     """Database model for a Rating."""
     __tablename__ = "ratings"
+    __table_args__ = (
+        CheckConstraint('rating >= 0 AND rating <= 5', name='rating_range'),
+        UniqueConstraint('tool_id', 'user_id', name='unique_tool_user_rating'),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    rating: Mapped[int] = mapped_column(Integer)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    tool_id: Mapped[int] = mapped_column(ForeignKey("tools.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+
+    tool: Mapped["DBTool"] = relationship(back_populates="ratings")
+    user: Mapped["DBUser"] = relationship(back_populates="ratings")
     
