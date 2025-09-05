@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
+from backend.models.pydantic import RatingBase
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from ..services import payments
 from ai_services.monitoring import log_tool_usage
+from backend.services.logging import log_event
 from ai_services.reputation import calculate_reputation
 from backend.db import get_async_session
 from backend.models.db import DBTransaction, DBRating, DBUser
@@ -40,26 +42,25 @@ async def process_payment(
         session.add(db_tx)
         await session.commit()
         await session.refresh(db_tx)
+        log_event(f"Payment processed for tool {request.tool_id} by user {request.user_id}")
         return {"status": "success", "transaction": tx}
     except Exception as e:
         await session.rollback()
-        # Optionally log the error here
+        log_event(f"Payment failed for tool {request.tool_id} by user {request.user_id}: {str(e)}")
         raise HTTPException(status_code=400, detail=f"Payment failed: {str(e)}")
 
 @router.post("/rate/{tool_id}")
 async def rate_tool(
     tool_id: int,
-    rating: int,
+    rating_req: RatingBase,
     session: AsyncSession = Depends(get_async_session),
     user: DBUser = Depends(get_current_active_user)
 ) -> dict:
     """
     Allows users to rate tools (0-5). Requires authentication.
     """
-    if rating < 0 or rating > 5:
-        raise HTTPException(status_code=400, detail="Rating must be between 0 and 5")
     db_rating = DBRating(
-        rating=rating,
+        rating=rating_req.rating,
         tool_id=tool_id,
         user_id=user.id
     )
@@ -67,10 +68,13 @@ async def rate_tool(
         session.add(db_rating)
         await session.commit()
         await session.refresh(db_rating)
-        return {"status": "success", "tool_id": tool_id, "rating": rating}
+        log_event(f"User {user.id} rated tool {tool_id} with {rating_req.rating}")
+        return {"status": "success", "tool_id": tool_id, "rating": rating_req.rating}
     except Exception as e:
         await session.rollback()
-        # Optionally log the error here
+        log_event(f"Rating failed for tool {tool_id} by user {user.id}: {str(e)}")
+        if "unique_tool_user_rating" in str(e):
+            raise HTTPException(status_code=400, detail="You have already rated this tool.")
         raise HTTPException(status_code=400, detail=f"Rating failed: {str(e)}")
 
 @router.get("/reputation/{tool_id}", response_model=ReputationResponse)
