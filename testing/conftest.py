@@ -1,7 +1,14 @@
+import sys
+import os
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+
+# Add the project's root directory to the Python path
+# This allows pytest to find the 'backend' module
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from backend.main import app
 from backend.db import get_async_session, Base
 
@@ -16,9 +23,6 @@ async def override_get_db():
         yield session
 
 app.dependency_overrides[get_async_session] = override_get_db
-
-
-
 
 @pytest.fixture(scope="module")
 async def async_client():
