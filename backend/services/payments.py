@@ -1,5 +1,5 @@
 from datetime import datetime
-from ..models.transaction import Transaction
+from ..models.pydantic import Transaction
 
 async def handle_payment(request) -> dict:
     """
@@ -16,4 +16,4 @@ async def handle_payment(request) -> dict:
         timestamp=datetime.utcnow()
     )
 
-    return tx.dict()
+    return tx.model_dump()

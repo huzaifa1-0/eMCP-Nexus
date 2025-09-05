@@ -27,8 +27,8 @@ async def test_login_for_access_token(async_client: AsyncClient):
 
     # Now, attempt to log in using the correct form data format
     response = await async_client.post(
-        "/auth/token",
-        data={"username": "loginuser", "password": "password123"},
+        "/auth/login",
+        json={"email": "login@example.com", "password": "password123"},
     )
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
@@ -43,8 +43,8 @@ async def test_create_tool_with_auth(async_client: AsyncClient):
         json={"username": "tooluser", "email": "tool@example.com", "password": "password123"},
     )
     login_response = await async_client.post(
-        "/auth/token",
-        data={"username": "tooluser", "password": "password123"},
+        "/auth/login",
+        json={"email": "tool@example.com", "password": "password123"},
     )
     token = login_response.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
