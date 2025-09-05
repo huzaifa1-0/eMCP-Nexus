@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     GOOGLE_DATASET: str
     STRIPE_KEY: str
     COINBASE_KEY: str
+    SECRET_KEY: str = "your-secret-key"  
+    ALGORITHM: str = "HS256"  
 
 
     class Config:
