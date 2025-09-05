@@ -1,8 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from backend.models.tool import Tool, ToolCreate
-from backend.db import database
+from backend.db import get_async_session
 import sqlalchemy
-
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+import backend.models.tool
 
 router = APIRouter()
 
@@ -16,20 +18,20 @@ tools_table = sqlalchemy.Table(
 
 
 @router.post("/", response_model=Tool)
-async def create_tool(tool: ToolCreate):
-    query = tools_table.insert().values(
-        name = tool.name,
-        description = tool.description,
-        cost = tool.cost
-    )
-    tool_id = await database.execute(query)
-    return {**tool.dict(), "id": tool_id}
+async def create_tool(tool: ToolCreate, session: AsyncSession = Depends(get_async_session)):
+    db_tool = backend.models.tool.Tool(**tool.dict())
+    session.add(db_tool)
+    await session.commit()
+    await session.refresh(db_tool)
+    return db_tool
 
 
 @router.get("/{tool_id}", response_model=Tool)
-async def get_tool(tool_id: int):
-    query = tools_table.select().where(tools_table.c.id == tool_id)
-    tool = await database.fetch_one(query)
+async def get_tool(tool_id: int, session: AsyncSession = Depends(get_async_session)):
+    
+    query = select(backend.models.tool.Tool).where(backend.models.tool.Tool.id == tool_id)
+    result = await session.execute(query)
+    tool = result.scalars().first()
     if not tool:
         raise HTTPException(status_code=404, detail="Tool not found")
     return tool

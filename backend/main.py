@@ -1,8 +1,21 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from .routers import tools, payments, search, auth, monitoring, reputation
-from backend.db import init_db
+from backend.db import init_db, database
 
-app = FastAPI(title="eMCP Nexus Backend")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    
+    print("Connecting to database...")
+    await database.connect()
+    
+    print("Connection successful!")
+    yield
+    
+    print("Disconnecting from database...")
+    await database.disconnect()
+
+app = FastAPI(title="eMCP Nexus Backend" , lifespan=lifespan)
 
 app.include_router(tools.router, prefix="/tools", tags=["Tools"])
 app.include_router(payments.router, prefix="/payments", tags=["Payments"])
@@ -11,9 +24,6 @@ app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(monitoring.router, prefix="/monitoring", tags=["Monitoring"])
 app.include_router(reputation.router, prefix="/reputation", tags=["Reputation"])
 
-@app.on_event("startup")
-async def startup_event():
-    await init_db()
 
 
 @app.get("/")
