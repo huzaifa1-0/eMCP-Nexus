@@ -4,7 +4,7 @@ from ai_services import monitoring
 router = APIRouter()
 
 @router.post("/log")
-async def log_tool_usage(tool_id: int, user_id: int):
+async def log_tool_usage(tool_id: int, user_id: int) -> dict:
     """
     Log usage of a tool by a user.
     """
@@ -12,7 +12,7 @@ async def log_tool_usage(tool_id: int, user_id: int):
     return {"message": f"Usage logged for tool {tool_id} by user {user_id}"}
 
 @router.get("/usage/{tool_id}")
-async def get_tool_usage(tool_id: int):
+async def get_tool_usage(tool_id: int) -> dict:
     """
     Get usage history for a given tool.
     """

@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column, declarative_base
 
 
@@ -47,3 +47,33 @@ class DBTransaction(Base):
     
     tool: Mapped["DBTool"] = relationship("DBTool", back_populates="transactions")
     user: Mapped["DBUser"] = relationship("DBUser", back_populates="transactions")
+
+
+class DBRating(Base):
+    """Database model for a Rating."""
+    __tablename__ = "ratings"
+    __table_args__ = (
+        CheckConstraint('rating >= 0 AND rating <= 5', name='rating_range'),
+        # Unique constraint to ensure one rating per user per tool
+        {'sqlite_autoincrement': True},
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    rating: Mapped[int] = mapped_column(Integer)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    tool_id: Mapped[int] = mapped_column(ForeignKey("tools.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+
+    __table_args__ = (
+        CheckConstraint('rating >= 0 AND rating <= 5', name='rating_range'),
+        # Unique constraint to ensure one rating per user per tool
+        UniqueConstraint('tool_id', 'user_id', name='unique_tool_user_rating'),
+    )
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+
+    tool: Mapped["DBTool"] = relationship(back_populates="ratings")
+    user: Mapped["DBUser"] = relationship(back_populates="ratings")
+    
+    __table_args__ = (
+        CheckConstraint('rating >= 0 AND rating <= 5', name='rating_check'),
+    )

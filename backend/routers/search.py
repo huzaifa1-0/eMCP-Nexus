@@ -7,7 +7,7 @@ router = APIRouter()
 async def semantic_search(
     query: str = Query(..., description="Search query for AI tools"),
     k: int = Query(5, description="Number of results to return")
-):
+) -> dict:
     """
     Semantic search for tools using embeddings + vector DB (BigQuery or FAISS fallback).
     """

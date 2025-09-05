@@ -14,7 +14,7 @@ class AnomalyRequest(BaseModel):
 
 
 @router.post("/calculate")
-async def calculate_reputation(request: ReputationRequest):
+async def calculate_reputation(request: ReputationRequest) -> dict:
     """
     Calculate reputation score based on payments + ratings.
     """
@@ -23,7 +23,7 @@ async def calculate_reputation(request: ReputationRequest):
 
 
 @router.post("/anomalies")
-async def detect_anomalies(request: AnomalyRequest):
+async def detect_anomalies(request: AnomalyRequest) -> dict:
     """
     Detect anomalies in usage logs.
     """

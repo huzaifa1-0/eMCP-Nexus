@@ -3,13 +3,9 @@ from sqlalchemy.future import select
 from backend.models.db import DBUser, DBTool, DBTransaction
 from backend.models.pydantic import ToolCreate, UserCreate, TransactionCreate
 
-# A placeholder for a password hashing utility
-def get_password_hash(password: str) -> str:
-    # In a real application, use a library like passlib
-    # For example: from passlib.context import CryptContext
-    # pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    # return pwd_context.hash(password)
-    return password + "_hashed"
+
+# Use the real password hashing utility from security.py
+from backend.security import get_password_hash
 
 # ==================================
 # CRUD for Users

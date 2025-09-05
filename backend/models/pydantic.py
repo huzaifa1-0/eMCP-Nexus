@@ -4,10 +4,12 @@ from datetime import datetime
 
 
 
+from pydantic import field_validator, Field
+
 class ToolBase(BaseModel):
     name: str
     description: str
-    cost: float
+    cost: float = Field(..., gt=0, description="Tool cost must be positive")
     url: str
 
 class ToolCreate(ToolBase):
@@ -33,9 +35,14 @@ class User(UserBase):
 
 
 class TransactionBase(BaseModel):
-    amount: float
+    amount: float = Field(..., gt=0, description="Transaction amount must be positive")
     currency: str
     method: str
+    tool_id: int
+
+# Add a rating model for validation
+class RatingBase(BaseModel):
+    rating: int = Field(..., ge=0, le=5, description="Rating must be between 0 and 5")
     tool_id: int
 
 class TransactionCreate(TransactionBase):
