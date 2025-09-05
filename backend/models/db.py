@@ -17,6 +17,8 @@ class DBUser(Base):
     tools: Mapped[list["DBTool"]] = relationship("DBTool", back_populates="owner")
     transactions: Mapped[list["DBTransaction"]] = relationship("DBTransaction", back_populates="user")
 
+    ratings: Mapped[list["DBRating"]] = relationship("DBRating", back_populates="user")
+
 class DBTool(Base):
     __tablename__ = "tools"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
@@ -31,6 +33,8 @@ class DBTool(Base):
     
     owner: Mapped["DBUser"] = relationship("DBUser", back_populates="tools")
     transactions: Mapped[list["DBTransaction"]] = relationship("DBTransaction", back_populates="tool")
+
+    ratings: Mapped[list["DBRating"]] = relationship("DBRating", back_populates="tool")
 
 class DBTransaction(Base):
     __tablename__ = "transactions"
@@ -52,28 +56,4 @@ class DBTransaction(Base):
 class DBRating(Base):
     """Database model for a Rating."""
     __tablename__ = "ratings"
-    __table_args__ = (
-        CheckConstraint('rating >= 0 AND rating <= 5', name='rating_range'),
-        # Unique constraint to ensure one rating per user per tool
-        {'sqlite_autoincrement': True},
-    )
-
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    rating: Mapped[int] = mapped_column(Integer)
-    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    tool_id: Mapped[int] = mapped_column(ForeignKey("tools.id"))
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-
-    __table_args__ = (
-        CheckConstraint('rating >= 0 AND rating <= 5', name='rating_range'),
-        # Unique constraint to ensure one rating per user per tool
-        UniqueConstraint('tool_id', 'user_id', name='unique_tool_user_rating'),
-    )
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-
-    tool: Mapped["DBTool"] = relationship(back_populates="ratings")
-    user: Mapped["DBUser"] = relationship(back_populates="ratings")
     
-    __table_args__ = (
-        CheckConstraint('rating >= 0 AND rating <= 5', name='rating_check'),
-    )
