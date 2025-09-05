@@ -4,12 +4,7 @@ from backend.models.db import DBUser, DBTool, DBTransaction
 from backend.models.pydantic import ToolCreate, UserCreate, TransactionCreate
 
 
-# Use the real password hashing utility from security.py
-from backend.security import get_password_hash
 
-# ==================================
-# CRUD for Users
-# ==================================
 
 async def get_user(db: AsyncSession, user_id: int):
     """Fetch a single user by their ID."""
@@ -23,6 +18,7 @@ async def get_user_by_username(db: AsyncSession, username: str):
 
 async def create_user(db: AsyncSession, user: UserCreate):
     """Create a new user in the database."""
+    from backend.security import get_password_hash
     hashed_password = get_password_hash(user.password)
     db_user = DBUser(
         username=user.username,
