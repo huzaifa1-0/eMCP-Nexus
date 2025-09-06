@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from .routers import tools, payments, search, auth, monitoring, reputation
+from .routers import tools, payments, search, auth, monitoring, reputation, monetization
 from backend.db import init_db
 
 @asynccontextmanager
@@ -30,6 +30,7 @@ app.include_router(search.router, prefix="/search", tags=["Search"])
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(monitoring.router, prefix="/monitoring", tags=["Monitoring"])
 app.include_router(reputation.router, prefix="/reputation", tags=["Reputation"])
+app.include_router(monetization.router, prefix="/monetization", tags=["Monetization"]) 
 
 
 
