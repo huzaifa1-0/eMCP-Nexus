@@ -69,4 +69,19 @@ class DBRating(Base):
 
     tool: Mapped["DBTool"] = relationship(back_populates="ratings")
     user: Mapped["DBUser"] = relationship(back_populates="ratings")
+
+
+
+class DBUsageLog(Base):
+    __tablename__ = "usage_logs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    tool_id: Mapped[int] = mapped_column(Integer, ForeignKey("tools.id"))
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    success: Mapped[bool] = mapped_column(default=True)
+    processing_time: Mapped[float] = mapped_column(Float)
+
+    tool: Mapped["DBTool"] = relationship()
+    user: Mapped["DBUser"] = relationship()
     

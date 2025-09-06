@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from backend.models.db import DBTool, DBUser
 from backend.models.pydantic import ToolCreate, Tool
 from backend.security import get_current_active_user 
@@ -7,8 +7,15 @@ import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from ai_services.search_engine import add_tool_to_bigquery
+from ai_services.monitoring import log_tool_usage
+import random 
+import time
 
 router = APIRouter()
+
+async def get_tool(tool_id: int, session: AsyncSession):
+    result = await session.execute(select(DBTool).where(DBTool.id == tool_id))
+    return result.scalar_one_or_none()
 
 
 
@@ -35,11 +42,38 @@ async def create_tool(
     return db_tool
 
 
-@router.get("/{tool_id}", response_model=Tool)
-async def get_tool(tool_id: int, session: AsyncSession = Depends(get_async_session)) -> DBTool:
-    query = select(DBTool).where(DBTool.id == tool_id)
-    result = await session.execute(query)
-    tool = result.scalars().first()
+@router.post("/use/{tool_id}", tags=["Tools"])
+async def use_tool(
+    tool_id: int, 
+    background_tasks: BackgroundTasks,
+    user: DBUser = Depends(get_current_active_user),
+    session: AsyncSession = Depends(get_async_session)
+):
+    """Simulates a user using a tool, and logs its performance."""
+    
+    # Check if tool exists
+    tool = await get_tool(tool_id, session)
     if not tool:
         raise HTTPException(status_code=404, detail="Tool not found")
-    return tool
+
+    # 1. Simulate the tool's execution
+    start_time = time.time()
+    # In a real-world scenario, you would call the tool's actual API here
+    success = random.choice([True, False]) # Placeholder for actual success status
+    processing_time = time.time() - start_time
+
+    # 2. Log the performance in the background
+    background_tasks.add_task(
+        log_tool_usage,
+        db=session,
+        tool_id=tool_id,
+        user_id=user.id,
+        success=success,
+        processing_time=processing_time
+    )
+    
+    return {
+        "status": "success" if success else "failure",
+        "message": f"Tool {tool.name} executed.",
+        "processing_time": processing_time
+    }

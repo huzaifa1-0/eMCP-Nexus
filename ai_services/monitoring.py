@@ -1,23 +1,31 @@
 from collections import defaultdict
 import datetime
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from backend.models.db import DBUsageLog
 
 usage_stats = defaultdict(list)
 
 
-def log_tool_usage(tool_id: int, user_id: int, success: bool, processing_time: float):
+async def log_tool_usage(db: AsyncSession, tool_id: int, user_id: int, success: bool, processing_time: float):
     """
     Records usage events for analytics.
     """
-    usage_stats[tool_id].append({
-        "user_id": user_id,
-        "timestamp": datetime.datetime.utcnow().isoformat(),
-        "success": success,
-        "processing_time": processing_time
-    })
+    db_log = DBUsageLog(
+        tool_id=tool_id,
+        user_id=user_id,
+        success=success,
+        processing_time=processing_time
+    )
+    db.add(db_log)
+    await db.commit()
+    await db.refresh(db_log)
+    return db_log
 
 
-def get_tool_usage(tool_id: int):
-    """
-    Returns usage history for a given tool.
-    """
-    return usage_stats.get(tool_id, [])
+async def get_tool_usage(db: AsyncSession, tool_id: int) -> list:
+    """Returns usage history for a given tool from the database."""
+    result = await db.execute(
+        select(DBUsageLog).where(DBUsageLog.tool_id == tool_id)
+    )
+    return result.scalars().all()
