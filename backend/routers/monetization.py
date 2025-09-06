@@ -20,8 +20,8 @@ async def dynamic_price(tool_id: int, session: AsyncSession = Depends(get_async_
     txs = [row[0] for row in txs_result.all()]
     ratings_result = await session.execute(select(DBRating.rating).where(DBRating.tool_id == tool_id))
     ratings = [row[0] for row in ratings_result.all()]
-    usage_logs = get_tool_usage(tool_id)
-    
+    usage_logs = await get_tool_usage(session, tool_id)
+
     # For a more complete implementation, you'd also fetch success_rate and avg_processing_time
     # For now, we'll use placeholder values
     reputation_score = calculate_reputation(txs, ratings, usage_logs, success_rate=0.95, avg_processing_time=1.5)
