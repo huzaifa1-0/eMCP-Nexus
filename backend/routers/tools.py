@@ -21,7 +21,8 @@ async def get_tool(tool_id: int, session: AsyncSession):
 
 @router.post("/", response_model=Tool)
 async def create_tool(
-    tool_data: ToolCreate, 
+    tool_data: ToolCreate,
+    background_tasks: BackgroundTasks, 
     user: DBUser = Depends(get_current_active_user),
     session: AsyncSession = Depends(get_async_session)
 ) -> DBTool:
@@ -32,7 +33,8 @@ async def create_tool(
     await session.commit()
     await session.refresh(db_tool)
 
-    add_tool_to_bigquery(
+    background_tasks.add_task(
+        add_tool_to_bigquery,
         tool_id=db_tool.id,
         name=db_tool.name,
         description=db_tool.description
