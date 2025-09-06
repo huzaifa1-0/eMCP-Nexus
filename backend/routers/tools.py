@@ -6,6 +6,7 @@ from backend.db import get_async_session
 import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from ai_services.search_engine import add_tool_to_bigquery
 
 router = APIRouter()
 
@@ -23,6 +24,12 @@ async def create_tool(
     session.add(db_tool)
     await session.commit()
     await session.refresh(db_tool)
+
+    add_tool_to_bigquery(
+        tool_id=db_tool.id,
+        name=db_tool.name,
+        description=db_tool.description
+    )
     
     
     return db_tool

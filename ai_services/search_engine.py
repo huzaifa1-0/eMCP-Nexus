@@ -10,6 +10,29 @@ table_id = "tools_with_embeddings"
 client = bigquery.Client(project=project_id)
 
 
+def add_tool_to_bigquery(tool_id: int, name: str, description: str):
+    """
+    Generates an embedding and inserts the tool into BigQuery.
+    """
+    embedding = get_embedding(f"{name}: {description}")
+    
+    rows_to_insert = [{
+        "id": tool_id,
+        "name": name,
+        "description": description,
+        "embedding": embedding
+    }]
+    
+    try:
+        errors = client.insert_rows_json(f"{project_id}.{dataset_id}.{table_id}", rows_to_insert)
+        if errors == []:
+            print("New tool added to BigQuery successfully.")
+        else:
+            print(f"Errors while adding tool to BigQuery: {errors}")
+    except Exception as e:
+        print(f"Failed to add tool to BigQuery: {e}")
+
+
 
 async def search_tools(query: str, k: int = 5) -> List[Dict]:
     """
