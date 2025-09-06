@@ -12,6 +12,7 @@ from backend.models.db import DBTransaction, DBRating, DBUser
 from backend.security import get_current_active_user
 import random 
 import time
+from ai_services.monitoring import get_tool_usage
 
 router = APIRouter()
 
@@ -100,5 +101,26 @@ async def get_reputation(tool_id: int, session: AsyncSession = Depends(get_async
     # Get all ratings for this tool
     ratings_result = await session.execute(select(DBRating.rating).where(DBRating.tool_id == tool_id))
     ratings = [row[0] for row in ratings_result.all()]
-    score = calculate_reputation(txs, ratings)
+
+    usage_logs = get_tool_usage(tool_id)
+
+
+    if usage_logs:
+        total_runs = len(usage_logs)
+        successful_runs = sum(1 for log in usage_logs if log.get("success"))
+        success_rate = successful_runs / total_runs if total_runs > 0 else 0.0
+        
+        total_time = sum(log.get("processing_time", 0) for log in usage_logs)
+        avg_processing_time = total_time / total_runs if total_runs > 0 else 0.0
+    else:
+        success_rate = 0.0
+        avg_processing_time = 0.0
+
+    score = calculate_reputation(
+        transactions=txs, 
+        ratings=ratings,
+        usage_logs=usage_logs,
+        success_rate=success_rate,
+        avg_processing_time=avg_processing_time
+    )
     return {"tool_id": tool_id, "reputation_score": score}
