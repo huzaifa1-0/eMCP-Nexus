@@ -90,37 +90,3 @@ async def rate_tool(
             raise HTTPException(status_code=400, detail="You have already rated this tool.")
         raise HTTPException(status_code=400, detail=f"Rating failed: {str(e)}")
 
-@router.get("/reputation/{tool_id}", response_model=ReputationResponse)
-async def get_reputation(tool_id: int, session: AsyncSession = Depends(get_async_session)) -> dict:
-    """
-    Computes reputation score from payments + ratings.
-    """
-    # Get all transactions for this tool
-    txs_result = await session.execute(select(DBTransaction.amount).where(DBTransaction.tool_id == tool_id))
-    txs = [row[0] for row in txs_result.all()]
-    # Get all ratings for this tool
-    ratings_result = await session.execute(select(DBRating.rating).where(DBRating.tool_id == tool_id))
-    ratings = [row[0] for row in ratings_result.all()]
-
-    usage_logs = get_tool_usage(tool_id)
-
-
-    if usage_logs:
-        total_runs = len(usage_logs)
-        successful_runs = sum(1 for log in usage_logs if log.get("success"))
-        success_rate = successful_runs / total_runs if total_runs > 0 else 0.0
-        
-        total_time = sum(log.get("processing_time", 0) for log in usage_logs)
-        avg_processing_time = total_time / total_runs if total_runs > 0 else 0.0
-    else:
-        success_rate = 0.0
-        avg_processing_time = 0.0
-
-    score = calculate_reputation(
-        transactions=txs, 
-        ratings=ratings,
-        usage_logs=usage_logs,
-        success_rate=success_rate,
-        avg_processing_time=avg_processing_time
-    )
-    return {"tool_id": tool_id, "reputation_score": score}
