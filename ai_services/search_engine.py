@@ -1,6 +1,10 @@
 from typing import List, Dict
 import os
-from google.cloud import bigquery
+import faiss
+import numpy as np
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from backend.models.db import DBTool
 from .embeddings import get_embedding
 
 

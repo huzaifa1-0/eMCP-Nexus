@@ -4,8 +4,7 @@ sqlalchemy
 pydantic
 pydantic-settings
 python-dotenv
-google-cloud-bigquery
-google-cloud-aiplatform
+faiss-cpu
 transformers
 pinecone-client
 stripe
