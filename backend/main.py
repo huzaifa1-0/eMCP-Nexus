@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from .routers import tools, payments, search, auth, monitoring, reputation, monetization
 from backend.db import init_db
+from ai_services.search_engine import load_faiss_index
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -12,6 +13,7 @@ async def lifespan(app: FastAPI):
     
     await init_db()
     print("Database tables initialized.")
+    load_faiss_index()
     yield
     print("Application shutdown...")
     
