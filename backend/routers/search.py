@@ -3,7 +3,7 @@ from ai_services.search_engine import search_tools
 
 router = APIRouter()
 
-@router.get("/search")
+@router.get("/")
 async def semantic_search(
     query: str = Query(..., description="Search query for AI tools"),
     k: int = Query(5, description="Number of results to return")
