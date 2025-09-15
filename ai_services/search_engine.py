@@ -39,4 +39,36 @@ def add_tool_to_faiss(tool_id: int, name: str, description: str):
     embedding_np = np.array([embedding]).astype('float32')
 
     index.add(embedding_np)
+
+    new_index_position = index.ntotal - 1
+    index_to_tool_id[new_index_position] = tool_id
+
+    save_faiss_index()
+    print(f"Tool {tool_id} added to Faiss index at position {new_index_position}")
+
+async def search_tools(session: AsyncSession, query: str, k: int = 5) -> List[Dict]:
+    if index.ntotal == 0:
+        return []
     
+    query_embedding = get_embedding(query)
+    query_embedding_np = np.array([query_embedding]).astype('float32')
+
+    distances, indices = index.search(query_embedding_np, k)
+
+    tool_ids = [index_to_tool_id[i] for i in indices[0]]
+
+    result = await session.execute(
+        select(DBTool).where(DBTool.id.in_(tool_ids))
+    )
+
+    tools = []
+    for tool in result.scalars().all():
+        tools.append({
+            "id": tool.id,
+            "name": tool.name,
+            "description": tool.description,
+            "cost": tool.cost,
+            "url": tool.url,
+            "owner_id": tool.owner_id
+        })
+    return tools
