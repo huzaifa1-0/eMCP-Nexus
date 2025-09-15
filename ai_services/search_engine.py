@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from backend.models.db import DBTool
 from .embeddings import get_embedding
+import asyncio
 
 
 DIMENSION = 384
@@ -32,19 +33,18 @@ def load_faiss_index():
     else:
         print("Faiss index file not found, starting with an empty index")
 
-    
-def add_tool_to_faiss(tool_id: int, name: str, description: str):
+faiss_lock = asyncio.Lock()
+
+async def add_tool_to_faiss(tool_id: int, name: str, description: str):
     embedding = get_embedding(f"{name}. {description}")
 
     embedding_np = np.array([embedding]).astype('float32')
-
-    index.add(embedding_np)
-
-    new_index_position = index.ntotal - 1
-    index_to_tool_id[new_index_position] = tool_id
-
-    save_faiss_index()
-    print(f"Tool {tool_id} added to Faiss index at position {new_index_position}")
+    async with faiss_lock:
+        index.add(embedding_np)
+        new_index_position = index.ntotal - 1
+        index_to_tool_id[new_index_position] = tool_id
+        save_faiss_index()
+        print(f"Tool {tool_id} added to Faiss index at position {new_index_position}")
 
 async def search_tools(session: AsyncSession, query: str, k: int = 5) -> List[Dict]:
     if index.ntotal == 0:
