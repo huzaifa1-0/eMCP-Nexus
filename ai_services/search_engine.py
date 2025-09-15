@@ -20,4 +20,17 @@ def save_faiss_index():
     with open("index_to_tool_id.json", "w") as f:
         import json
         json.dump(index_to_tool_id, f)
-        
+
+def load_faiss_index():
+    global index, index_to_tool_id
+    if os.path.exists(FAISS_INDEX_PATH):
+        index = faiss.read_index(FAISS_INDEX_PATH)
+        with open("index_to_tool_id.json", "r") as f:
+            import json
+            index_to_tool_id = {int(k): v for k, v in json.load(f).items()}
+        print("Faiss index json successfully")
+    else:
+        print("Faiss index file not found, starting with an empty index")
+
+    
+
