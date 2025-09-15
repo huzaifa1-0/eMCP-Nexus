@@ -6,7 +6,7 @@ from backend.db import get_async_session
 import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from ai_services.search_engine import add_tool_to_bigquery
+from ai_services.search_engine import add_tool_to_faiss
 from ai_services.monitoring import log_tool_usage
 import random 
 import time
@@ -34,7 +34,7 @@ async def create_tool(
     await session.refresh(db_tool)
 
     background_tasks.add_task(
-        add_tool_to_bigquery,
+        add_tool_to_faiss,
         tool_id=db_tool.id,
         name=db_tool.name,
         description=db_tool.description
