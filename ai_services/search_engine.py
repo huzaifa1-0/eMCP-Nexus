@@ -33,4 +33,10 @@ def load_faiss_index():
         print("Faiss index file not found, starting with an empty index")
 
     
+def add_tool_to_faiss(tool_id: int, name: str, description: str):
+    embedding = get_embedding(f"{name}. {description}")
 
+    embedding_np = np.array([embedding]).astype('float32')
+
+    index.add(embedding_np)
+    
