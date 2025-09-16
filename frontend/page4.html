@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New eMCP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #000, #001f3f);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Header styling to match eMCP */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(0, 0, 0, 0.8);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        
+        .nav-links a:hover {
+            color: #fff;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+        }
+        
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #bbb;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        
+        .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 30px 0;
+        }
+        
+        .card {
+            background: rgba(18, 18, 18, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .card-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #fff;
+            font-weight: 500;
+            font-size: 16px;
+        }
+        
+        .form-group .description {
+            color: #999;
+            font-size: 14px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(30, 30, 30, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #4cc9f0;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.3);
+        }
+        
+        .select-wrapper {
+            position: relative;
+        }
+        
+        .select-wrapper:after {
+            content: "▼";
+            font-size: 12px;
+            color: #4cc9f0;
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        
+        select.form-control {
+            appearance: none;
+            background: rgba(30, 30, 30, 0.7);
+        }
+        
+        .env-vars-container {
+            margin-top: 20px;
+        }
+        
+        .env-var-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .env-var-input {
+            flex: 1;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #fff;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #4cc9f0, #4361ee);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #4361ee, #4cc9f0);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-danger {
+            background: rgba(255, 77, 77, 0.2);
+            border: 1px solid rgba(255, 77, 77, 0.5);
+            padding: 8px 16px;
+        }
+        
+        .btn-danger:hover {
+            background: rgba(255, 77, 77, 0.3);
+        }
+        
+        .runtime-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            margin-top: 10px;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+        
+        .alert-error {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+        }
+        
+        @media (max-width: 600px) {
+            .env-var-item {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .main-header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header matching eMCP design -->
+    <header class="main-header">
+        <div class="logo">⚡ eMCP</div>
+        <nav class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#security">Security</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <header>
+            <div class="page-title">
+                <i class="fas fa-plus-circle"></i>
+                Create New eMCP
+            </div>
+            <div class="subtitle">
+                Deploy your Model Context Protocol service with GitHub Integration
+            </div>
+        </header>
+        
+        <div class="divider"></div>
+        
+        <div class="alert" id="alertBox"></div>
+        
+        <form id="emcpForm">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-cog"></i>
+                    Service Configuration
+                </h2>
+                
+                <div class="form-group">
+                    <label for="serviceName">Service Name</label>
+                    <input type="text" class="form-control" id="serviceName" value="Youtube G" required>
+                    <div class="description">A unique name for your eMCP service</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="repoUrl">GitHub Repository URL</label>
+                    <input type="url" class="form-control" id="repoUrl" placeholder="https://github.com/username/repo" required>
+                    <div class="description">The GitHub repository containing your eMCP service</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="branch">Branch</label>
+                    <div class="select-wrapper">
+                        <select class="form-control" id="branch">
+                            <option selected>main</option>
+                            <option>develop</option>
+                            <option>staging</option>
+                            <option>production</option>
+                        </select>
+                    </div>
+                    <div class="description">The Git branch to deploy from</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Environment Variables</label>
+                    <div class="env-vars-container" id="envVarsContainer">
+                        <div class="env-var-item">
+                            <input type="text" class="form-control env-var-input" placeholder="KEY">
+                            <input type="text" class="form-control env-var-input" placeholder="VALUE">
+                            <button type="button" class="btn btn-danger" onclick="removeEnvVar(this)">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addEnvVar()">
+                        <i class="fas fa-plus"></i> Add Variable
+                    </button>
+                </div>
+                
+                <div class="form-group">
+                    <label>Runtime</label>
+                    <div class="runtime-badge">
+                        <i class="fas fa-check-circle"></i>
+                        Node.js
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-database"></i>
+                    Data Source
+                </h2>
+                
+                <div class="form-group">
+                    <label for="dataSource">Data Source</label>
+                    <div class="select-wrapper">
+                        <select class="form-control" id="dataSource">
+                            <option selected>Select a data source</option>
+                            <option>YouTube API</option>
+                            <option>GitHub API</option>
+                            <option>Twitter API</option>
+                            <option>Custom API</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="actions">
+                <button type="button" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-rocket"></i> Deploy eMCP Service
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Function to add new environment variable field
+        function addEnvVar() {
+            const envVarsContainer = document.getElementById('envVarsContainer');
+            const newEnvVar = document.createElement('div');
+            newEnvVar.className = 'env-var-item';
+            newEnvVar.innerHTML = `
+                <input type="text" class="form-control env-var-input" placeholder="KEY">
+                <input type="text" class="form-control env-var-input" placeholder="VALUE">
+                <button type="button" class="btn btn-danger" onclick="removeEnvVar(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            envVarsContainer.appendChild(newEnvVar);
+        }
+        
+        // Function to remove environment variable field
+        function removeEnvVar(button) {
+            const envVarItem = button.parentElement;
+            // Only remove if there's more than one field
+            if (document.querySelectorAll('.env-var-item').length > 1) {
+                envVarItem.remove();
+            } else {
+                showAlert('You need at least one environment variable field.', 'error');
+            }
+        }
+        
+        // Function to show alert message
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = `alert ${type === 'error' ? 'alert-error' : ''}`;
+            alertBox.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i>
+                ${message}
+            `;
+            alertBox.style.display = 'flex';
+            
+            // Hide alert after 5 seconds
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Handle form submission
+        document.getElementById('emcpForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const serviceName = document.getElementById('serviceName').value;
+            const repoUrl = document.getElementById('repoUrl').value;
+            
+            if (!serviceName || !repoUrl) {
+                showAlert('Please fill in all required fields.', 'error');
+                return;
+            }
+            
+            // Validate GitHub URL format
+            const githubUrlPattern = /^https:\/\/github\.com\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+(\/)?$/;
+            if (!githubUrlPattern.test(repoUrl)) {
+                showAlert('Please enter a valid GitHub repository URL.', 'error');
+                return;
+            }
+            
+            // Simulate successful deployment
+            showAlert('eMCP service deployed successfully! Redirecting...', 'success');
+            
+            // Reset form after successful submission simulation
+            setTimeout(() => {
+                this.reset();
+                // Clear all but one environment variable field
+                const envVars = document.querySelectorAll('.env-var-item');
+                for (let i = 1; i < envVars.length; i++) {
+                    envVars[i].remove();
+                }
+            }, 3000);
+        });
+        
+        // Add event listener to cancel button
+        document.querySelector('.btn-secondary').addEventListener('click', function() {
+            if (confirm('Are you sure you want to cancel? All changes will be lost.')) {
+                document.getElementById('emcpForm').reset();
+                // Clear all but one environment variable field
+                const envVars = document.querySelectorAll('.env-var-item');
+                for (let i = 1; i < envVars.length; i++) {
+                    envVars[i].remove();
+                }
+                showAlert('Form has been reset.', 'success');
+            }
+        });
+    </script>
+</body>
+</html>
