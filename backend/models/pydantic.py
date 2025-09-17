@@ -1,16 +1,13 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
-
-
-
-
 from pydantic import field_validator, Field
 
 class ToolBase(BaseModel):
     name: str
     description: str
     cost: float = Field(..., gt=0, description="Tool cost must be positive")
-    url: str
+    repo_url: str
+    branch: str = "main"
 
 class ToolCreate(ToolBase):
     pass 
