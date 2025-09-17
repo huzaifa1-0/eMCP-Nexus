@@ -10,6 +10,7 @@ from ai_services.search_engine import add_tool_to_faiss
 from ai_services.monitoring import log_tool_usage
 import random 
 import time
+from ..services.deployment import deploy_tool
 
 router = APIRouter()
 
@@ -28,7 +29,17 @@ async def create_tool(
 ) -> DBTool:
     
     
-    db_tool = DBTool(**tool_data.dict(), owner_id=user.id)
+    deployment_info = await deploy_tool(repo_url=tool_data.repo_url)
+
+    db_tool = DBTool(
+        name = tool_data.name,
+        description = tool_data.description,
+        cost = tool_data.cost,
+        repo_url = tool_data.repo_url,
+        branch = tool_data.branch,
+        url = deployment_info["url"],
+        owner_id = user.id
+    )
     session.add(db_tool)
     await session.commit()
     await session.refresh(db_tool)
