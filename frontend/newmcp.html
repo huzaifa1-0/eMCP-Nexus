@@ -437,27 +437,48 @@
         }
         
         // Handle form submission
-        document.getElementById('emcpForm').addEventListener('submit', function(e) {
+        document.getElementById('emcpForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const serviceName = document.getElementById('serviceName').value;
             const repoUrl = document.getElementById('repoUrl').value;
+            const branch = document.getElementById('branch').value;
+
+            const authToken = "YOUR_AUTH_TOKEN"; 
             
             if (!serviceName || !repoUrl) {
                 showAlert('Please fill in all required fields.', 'error');
                 return;
             }
             
-            // Validate GitHub URL format
-            const githubUrlPattern = /^https:\/\/github\.com\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9_-]+(\/)?$/;
-            if (!githubUrlPattern.test(repoUrl)) {
-                showAlert('Please enter a valid GitHub repository URL.', 'error');
-                return;
+            try {
+            const response = await fetch('/tools/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    name: serviceName,
+                    description: "A new eMCP tool", // You can add a description field to your form
+                    cost: 0.0, // You can add a cost field
+                    repo_url: repoUrl,
+                    branch: branch
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to create eMCP service.');
             }
-            
-            // Simulate successful deployment
-            showAlert('eMCP service deployed successfully! Redirecting...', 'success');
-            
+
+            showAlert('eMCP service deployed successfully!', 'success');
+            // Optionally, redirect to the marketplace page
+            // window.location.href = '/marketplace.html';
+
+        } catch (error) {
+            showAlert(error.message, 'error');
+        }
             // Reset form after successful submission simulation
             setTimeout(() => {
                 this.reset();
