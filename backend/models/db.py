@@ -25,6 +25,9 @@ class DBTool(Base):
     name: Mapped[str] = mapped_column(String, index=True)
     description: Mapped[str] = mapped_column(String)
     cost: Mapped[float] = mapped_column(Float)
+
+    rep_url: Mapped[str] = mapped_column(String)
+    branch: Mapped[str] = mapped_column(String, default="main")
     
     
     owner_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
