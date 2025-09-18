@@ -38,6 +38,7 @@ class DBTool(Base):
     transactions: Mapped[list["DBTransaction"]] = relationship("DBTransaction", back_populates="tool")
 
     ratings: Mapped[list["DBRating"]] = relationship("DBRating", back_populates="tool")
+    status: Mapped[str] = mapped_column(String, default="deploying")
 
 class DBTransaction(Base):
     __tablename__ = "transactions"
