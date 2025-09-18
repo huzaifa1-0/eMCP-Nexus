@@ -7,7 +7,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy # <-- Add this condition
 
   frontend:
     build: ./frontend
@@ -25,3 +26,8 @@ services:
       POSTGRES_DB: marketplace
     ports:
       - "5432:5432"
+    healthcheck: # <-- Add this healthcheck
+      test: ["CMD-SHELL", "pg_isready -U admin -d marketplace"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
