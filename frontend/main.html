@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eMCP - Modular Compute Protocol</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #000, #001f3f);
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        nav ul li a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        nav ul li a:hover {
+            color: #fff;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin: 0;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #ccc;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 100px;
+            margin: 40px 0;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat h2 {
+            font-size: 36px;
+            margin: 0;
+        }
+
+        .stat p {
+            font-size: 16px;
+            color: #ccc;
+            margin: 5px 0 0;
+        }
+
+        .get-started {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            margin: 0 auto;
+            border-radius: 10px;
+        }
+
+        .get-started h2 {
+            font-size: 24px;
+        }
+
+        .get-started p {
+            color: #ccc;
+        }
+
+        .sign-in-btn {
+            background: #000;
+            color: #fff;
+            border: 1px solid #ccc;
+            padding: 10px 40px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+
+        .options {
+            text-align: left;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            color: #ccc;
+        }
+
+        .option::before {
+            content: '○';
+            margin-right: 10px;
+            color: #fff;
+        }
+
+        .features-section {
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+        .features-section h2 {
+            font-size: 36px;
+        }
+
+        .features-section p {
+            font-size: 18px;
+            color: #ccc;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+
+        .features {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: left;
+        }
+
+        .feature-card .icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+        }
+
+        .feature-card p {
+            color: #ccc;
+            font-size: 14px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #ccc;
+        }
+
+        .web3-badge {
+            background: #ffd700;
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            position: absolute;
+            top: 150px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        /* Login Modal Styles */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: rgba(18, 18, 18, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 450px;
+            max-height: 90vh;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.3);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .auth-form {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            opacity: 0;
+            transform: translateX(50px);
+            pointer-events: none;
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0;
+            padding: 2rem;
+            display: none;
+        }
+        
+        .auth-form.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: all;
+            display: block;
+            position: relative;
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-logo {
+            font-size: 2.2rem;
+            margin-bottom: 0.8rem;
+            color: #4cc9f0;
+            text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
+        }
+        
+        .auth-header h1 {
+            font-weight: 600;
+            font-size: 28px;
+            background: linear-gradient(45deg, #4cc9f0, #f72585);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        .auth-header p {
+            color: #b0b0b0;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            color: #ddd;
+            font-weight: 500;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .input-with-icon {
+            position: relative;
+        }
+        
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4cc9f0;
+            font-size: 18px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px 14px 14px 50px;
+            background: rgba(30, 30, 30, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #4cc9f0;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.3);
+            background: rgba(40, 40, 40, 0.7);
+        }
+        
+        .form-control::placeholder {
+            color: #888;
+        }
+        
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(45deg, #4cc9f0, #4361ee);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+        
+        .auth-btn:hover {
+            background: linear-gradient(45deg, #4361ee, #4cc9f0);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
+        }
+        
+        .auth-btn:active {
+            transform: translateY(0);
+        }
+        
+        .alternate-option {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .auth-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: transparent;
+            color: #4cc9f0;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid #4cc9f0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .auth-link:hover {
+            background: rgba(76, 201, 240, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 201, 240, 0.3);
+        }
+        
+        .modal-footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #777;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        
+        .modal-footer span {
+            color: #4cc9f0;
+            font-weight: bold;
+        }
+        
+        .message {
+            font-size: 14px;
+            margin-top: 0.8rem;
+            display: none;
+            text-align: center;
+            padding: 8px;
+            border-radius: 5px;
+            border-left: 3px solid;
+        }
+        
+        .error-message {
+            color: #ff4d4d;
+            background: rgba(255, 77, 77, 0.1);
+            border-left-color: #ff4d4d !important;
+        }
+        
+        .success-message {
+            color: #2ecc71;
+            background: rgba(46, 204, 113, 0.1);
+            border-left-color: #2ecc71 !important;
+        }
+        
+        .info-message {
+            color: #4cc9f0;
+            background: rgba(76, 201, 240, 0.1);
+            border-left-color: #4cc9f0 !important;
+        }
+        
+        .additional-options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.2rem;
+            font-size: 14px;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            color: #bbb;
+        }
+        
+        .remember-me input {
+            margin-right: 8px;
+            accent-color: #4cc9f0;
+        }
+        
+        .forgot-password {
+            color: #4cc9f0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .forgot-password:hover {
+            color: #f72585;
+            text-decoration: underline;
+        }
+        
+        .back-to-login {
+            color: #4cc9f0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            cursor: pointer;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+        
+        .back-to-login:hover {
+            color: #f72585;
+            text-decoration: underline;
+        }
+        
+        .verification-code {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1.5rem;
+            justify-content: center;
+        }
+        
+        .verification-code input {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 5px;
+            background: rgba(30, 30, 30, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+        }
+        
+        .resend-code {
+            color: #4cc9f0;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+            display: block;
+            margin-top: 1rem;
+        }
+        
+        .resend-code:hover {
+            color: #f72585;
+            text-decoration: underline;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 500px) {
+            .modal-content {
+                padding: 1.5rem;
+                max-height: 95vh;
+                width: 95%;
+            }
+            
+            .auth-form {
+                padding: 1.5rem;
+            }
+            
+            .auth-header h1 {
+                font-size: 24px;
+            }
+            
+            .additional-options {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            
+            .verification-code {
+                flex-wrap: wrap;
+            }
+            
+            .verification-code input {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+            
+            .auth-link {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            
+            .hero {
+                padding: 80px 20px;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .stats {
+                gap: 40px;
+                flex-wrap: wrap;
+            }
+            
+            .features {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .modal-content {
+                max-height: 95vh;
+                overflow: hidden;
+            }
+            
+            .auth-header {
+                margin-bottom: 1rem;
+            }
+            
+            .form-group {
+                margin-bottom: 1rem;
+            }
+            
+            .auth-header h1 {
+                font-size: 24px;
+            }
+            
+            .auth-header p {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">⚡ eMCP</div>
+        <nav>
+            <ul>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#security">Security</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="web3-badge">⭐ Web3-Enabled Platform</div>
+        <h1>Modular Compute Protocol</h1>
+        <p>Create, manage, and deploy MCP tools with blockchain-powered authentication. Experience the future of modular computing with Web3 wallet integration.</p>
+        <div class="stats">
+            <div class="stat">
+                <h2>10,000+</h2>
+                <p>Active Users</p>
+            </div>
+            <div class="stat">
+                <h2>500+</h2>
+                <p>MCP Tools</p>
+            </div>
+            <div class="stat">
+                <h2>99.9%</h2>
+                <p>Uptime</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="get-started">
+        <h2>Get Started</h2>
+        <p>Sign in with your Web3 wallet or traditional account to access the platform.</p>
+        <button class="sign-in-btn" id="signInBtn">Sign In</button>
+        <div class="options">
+            <div class="option">Connect with MetaMask, WalletConnect, or other Web3 wallets</div>
+            <div class="option">Blockchain-verified identity and secure authentication</div>
+        </div>
+    </section>
+
+    <section id="features" class="features-section">
+        <h2>Platform Features</h2>
+        <p>Everything you need to create, manage, and deploy MCP tools with enterprise-grade security.</p>
+        <div class="features">
+            <div class="feature-card">
+                <div class="icon">⚡</div>
+                <h3>Lightning Fast</h3>
+                <p>Deploy and manage MCP tools with instant configuration and real-time updates.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🛡️</div>
+                <h3>Secure by Design</h3>
+                <p>End-to-end encryption with blockchain authentication and row-level security.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">👥</div>
+                <h3>Collaborative</h3>
+                <p>Share configurations, collaborate on tools, and build together with your team.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        © 2024 eMCP. Powered by Civic Auth and Web3 technology.
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal-backdrop" id="loginModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm">
+                <div class="auth-header">
+                    <div class="modal-logo">
+                        <i class="fas fa-dna"></i>
+                    </div>
+                    <h1>Login</h1>
+                    <p>Access your eMCP Nexsus account to continue</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username">Username or Email</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" class="form-control" placeholder="Enter your username or email" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                    </div>
+                </div>
+                
+                <div class="additional-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe">
+                        Remember me
+                    </label>
+                    <span class="forgot-password" onclick="showForm('forgotPasswordForm')">Forgot password?</span>
+                </div>
+                
+                <button type="submit" class="auth-btn">Log in</button>
+                
+                <div class="message error-message" id="loginErrorMessage">
+                    <i class="fas fa-exclamation-circle"></i> Invalid username or password
+                </div>
+                
+                <div class="message success-message" id="loginSuccessMessage">
+                    <i class="fas fa-check-circle"></i> Login successful! Redirecting...
+                </div>
+                
+                <div class="alternate-option">
+                    <span class="auth-link" onclick="showForm('registerForm')">
+                        <i class="fas fa-user-plus"></i> Create account
+                    </span>
+                </div>
+                
+                <div class="modal-footer">
+                    Powered by <span>eMCP Nexsus</span>
+                </div>
+            </form>
+            
+            <!-- Registration Form -->
+            <form class="auth-form" id="registerForm">
+                <div class="auth-header">
+                    <div class="modal-logo">
+                        <i class="fas fa-dna"></i>
+                    </div>
+                    <h1>Create Account</h1>
+                    <p>Join the eMCP Nexsus Community Today</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regUsername">Username</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="regUsername" class="form-control" placeholder="Choose a username" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regEmail">Email Address</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="regEmail" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="regPassword" class="form-control" placeholder="Create a password" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regConfirmPassword">Confirm Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="regConfirmPassword" class="form-control" placeholder="Confirm your password" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="auth-btn">Create Account</button>
+                
+                <div class="message error-message" id="registerErrorMessage">
+                    <i class="fas fa-exclamation-circle"></i> Passwords do not match
+                </div>
+                
+                <div class="message success-message" id="registerSuccessMessage">
+                    <i class="fas fa-check-circle"></i> Account created successfully!
+                </div>
+                
+                <div class="alternate-option">
+                    <span class="back-to-login" onclick="showForm('loginForm')">
+                        <i class="fas fa-arrow-left"></i> Back to login
+                    </span>
+                </div>
+            </form>
+            
+            <!-- Forgot Password Form -->
+            <form class="auth-form" id="forgotPasswordForm">
+                <div class="auth-header">
+                    <div class="modal-logo">
+                        <i class="fas fa-dna"></i>
+                    </div>
+                    <h1>Reset Password</h1>
+                    <p>Enter your email to reset your password</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="recoveryEmail">Email Address</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="recoveryEmail" class="form-control" placeholder="Enter your email" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="auth-btn">Send Reset Link</button>
+                
+                <div class="message info-message" id="recoveryInfoMessage">
+                    <i class="fas fa-info-circle"></i> Reset instructions will be sent to your email
+                </div>
+                
+                <div class="message success-message" id="recoverySuccessMessage">
+                    <i class="fas fa-check-circle"></i> Reset instructions sent!
+                </div>
+                
+                <div class="alternate-option">
+                    <span class="back-to-login" onclick="showForm('loginForm')">
+                        <i class="fas fa-arrow-left"></i> Back to login
+                    </span>
+                </div>
+            </form>
+            
+            <!-- Verification Form -->
+            <form class="auth-form" id="verificationForm">
+                <div class="auth-header">
+                    <div class="modal-logo">
+                        <i class="fas fa-dna"></i>
+                    </div>
+                    <h1>Verify Account</h1>
+                    <p>Enter the verification code sent to your email</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="verificationCode">Verification Code</label>
+                    <div class="verification-code">
+                        <input type="text" class="form-control" maxlength="1" required>
+                        <input type="text" class="form-control" maxlength="1" required>
+                        <input type="text" class="form-control" maxlength="1" required>
+                        <input type="text" class="form-control" maxlength="1" required>
+                        <input type="text" class="form-control" maxlength="1" required>
+                        <input type="text" class="form-control" maxlength="1" required>
+                    </div>
+                </div>
+                
+                <button type="submit" class="auth-btn">Verify Account</button>
+                
+                <div class="message error-message" id="verificationErrorMessage">
+                    <i class="fas fa-exclamation-circle"></i> Invalid verification code
+                </div>
+                
+                <div class="message success-message" id="verificationSuccessMessage">
+                    <i class="fas fa-check-circle"></i> Account verified successfully!
+                </div>
+                
+                <div class="alternate-option">
+                    <span class="resend-code">Resend verification code</span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Modal functionality
+        const modal = document.getElementById('loginModal');
+        const signInBtn = document.getElementById('signInBtn');
+        const closeModalBtn = document.getElementById('closeModal');
+        
+        // Open modal when sign in button is clicked
+        signInBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        });
+        
+        // Close modal when X is clicked
+        closeModalBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Re-enable scrolling
+        });
+        
+        // Close modal when clicking outside the modal content
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Re-enable scrolling
+            }
+        });
+        
+        // Function to show the selected form and hide others
+        function showForm(formId) {
+            // Hide all forms
+            document.querySelectorAll('.auth-form').forEach(form => {
+                form.classList.remove('active');
+            });
+            
+            // Show the selected form
+            document.getElementById(formId).classList.add('active');
+            
+            // Reset messages
+            document.querySelectorAll('.message').forEach(message => {
+                message.style.display = 'none';
+            });
+        }
+        
+        // Form validation and submission
+        document.addEventListener('DOMContentLoaded', function() {
+            // Login form submission
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Simulate login process
+                setTimeout(function() {
+                    document.getElementById('loginSuccessMessage').style.display = 'block';
+                    
+                    // Redirect after successful login (simulated)
+                    setTimeout(function() {
+                        alert('Login successful! Welcome back.');
+                        modal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }, 1500);
+                }, 1000);
+            });
+            
+            // Registration form submission
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const password = document.getElementById('regPassword').value;
+                const confirmPassword = document.getElementById('regConfirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    document.getElementById('registerErrorMessage').style.display = 'block';
+                } else {
+                    document.getElementById('registerSuccessMessage').style.display = 'block';
+                    // Simulate registration process
+                    setTimeout(function() {
+                        showForm('verificationForm');
+                    }, 1500);
+                }
+            });
+            
+            // Forgot password form submission
+            document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                document.getElementById('recoverySuccessMessage').style.display = 'block';
+            });
+            
+            // Verification form submission
+            document.getElementById('verificationForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                document.getElementById('verificationSuccessMessage').style.display = 'block';
+                
+                // Simulate verification process
+                setTimeout(function() {
+                    showForm('loginForm');
+                }, 1500);
+            });
+            
+            // Auto-focus next input in verification code
+            const verificationInputs = document.querySelectorAll('.verification-code input');
+            verificationInputs.forEach((input, index) => {
+                input.addEventListener('input', function() {
+                    if (this.value.length === 1 && index < verificationInputs.length - 1) {
+                        verificationInputs[index + 1].focus();
+                    }
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                        verificationInputs[index - 1].focus();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
