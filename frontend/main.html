@@ -902,76 +902,102 @@
                 message.style.display = 'none';
             });
         }
+
+
         
-        // Form validation and submission
-        document.addEventListener('DOMContentLoaded', function() {
-            // Login form submission
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Simulate login process
-                setTimeout(function() {
-                    document.getElementById('loginSuccessMessage').style.display = 'block';
-                    
-                    // Redirect after successful login (simulated)
-                    setTimeout(function() {
-                        alert('Login successful! Welcome back.');
-                        modal.style.display = 'none';
-                        document.body.style.overflow = 'auto';
-                    }, 1500);
-                }, 1000);
+         // Login form submission
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const email = document.getElementById('username').value; // Assuming username field is for email
+        const password = document.getElementById('password').value;
+        const loginSuccessMessage = document.getElementById('loginSuccessMessage');
+        const loginErrorMessage = document.getElementById('loginErrorMessage');
+
+        try {
+            const response = await fetch('/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                }),
             });
-            
-            // Registration form submission
-            document.getElementById('registerForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const password = document.getElementById('regPassword').value;
-                const confirmPassword = document.getElementById('regConfirmPassword').value;
-                
-                if (password !== confirmPassword) {
-                    document.getElementById('registerErrorMessage').style.display = 'block';
-                } else {
-                    document.getElementById('registerSuccessMessage').style.display = 'block';
-                    // Simulate registration process
-                    setTimeout(function() {
-                        showForm('verificationForm');
-                    }, 1500);
-                }
+
+            if (response.ok) {
+                const data = await response.json();
+                loginSuccessMessage.style.display = 'block';
+                loginErrorMessage.style.display = 'none';
+
+                // Store the token and redirect
+                localStorage.setItem('accessToken', data.access_token);
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html'; // Or wherever you want to redirect
+                }, 1500);
+
+            } else {
+                const errorData = await response.json();
+                loginErrorMessage.textContent = errorData.detail || 'Invalid username or password';
+                loginErrorMessage.style.display = 'block';
+                loginSuccessMessage.style.display = 'none';
+            }
+        } catch (error) {
+            loginErrorMessage.textContent = 'An error occurred. Please try again.';
+            loginErrorMessage.style.display = 'block';
+            loginSuccessMessage.style.display = 'none';
+        }
+    });
+
+    // Registration form submission
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const username = document.getElementById('regUsername').value;
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
+        const confirmPassword = document.getElementById('regConfirmPassword').value;
+        const registerSuccessMessage = document.getElementById('registerSuccessMessage');
+        const registerErrorMessage = document.getElementById('registerErrorMessage');
+
+        if (password !== confirmPassword) {
+            registerErrorMessage.textContent = 'Passwords do not match';
+            registerErrorMessage.style.display = 'block';
+            return;
+        }
+
+        try {
+            const response = await fetch('/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    username: username,
+                    email: email,
+                    password: password
+                }),
             });
-            
-            // Forgot password form submission
-            document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                document.getElementById('recoverySuccessMessage').style.display = 'block';
-            });
-            
-            // Verification form submission
-            document.getElementById('verificationForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                document.getElementById('verificationSuccessMessage').style.display = 'block';
-                
-                // Simulate verification process
-                setTimeout(function() {
+
+            if (response.ok) {
+                registerSuccessMessage.style.display = 'block';
+                registerErrorMessage.style.display = 'none';
+
+                setTimeout(() => {
                     showForm('loginForm');
                 }, 1500);
-            });
-            
-            // Auto-focus next input in verification code
-            const verificationInputs = document.querySelectorAll('.verification-code input');
-            verificationInputs.forEach((input, index) => {
-                input.addEventListener('input', function() {
-                    if (this.value.length === 1 && index < verificationInputs.length - 1) {
-                        verificationInputs[index + 1].focus();
-                    }
-                });
-                
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Backspace' && this.value === '' && index > 0) {
-                        verificationInputs[index - 1].focus();
-                    }
-                });
-            });
+            } else {
+                const errorData = await response.json();
+                registerErrorMessage.textContent = errorData.detail || 'Registration failed';
+                registerErrorMessage.style.display = 'block';
+                registerSuccessMessage.style.display = 'none';
+            }
+        } catch (error) {
+            registerErrorMessage.textContent = 'An error occurred. Please try again.';
+            registerErrorMessage.style.display = 'block';
+            registerSuccessMessage.style.display = 'none';
+        }
         });
     </script>
 </body>
