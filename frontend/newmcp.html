@@ -444,7 +444,8 @@
             const repoUrl = document.getElementById('repoUrl').value;
             const branch = document.getElementById('branch').value;
 
-            const authToken = "YOUR_AUTH_TOKEN"; 
+            const authToken = localStorage.getItem('accessToken'); 
+            
             
             if (!serviceName || !repoUrl) {
                 showAlert('Please fill in all required fields.', 'error');
