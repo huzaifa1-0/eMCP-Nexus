@@ -33,4 +33,8 @@ async def deploy_tool(repo_url: str) -> dict:
     }
 
     async with httpx.AsyncClient() as client:
-        
+        response = await client.post("https://api.render.com/v1/services", headers=headers, json=payload)
+        response.raise_for_status()
+        data = response.json()
+
+        return {"url": data["service"]["url"]}
