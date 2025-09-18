@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from .routers import tools, payments, search, auth, monitoring, reputation, monetization
 from backend.db import init_db
 from ai_services.search_engine import load_faiss_index
+from fastapi.middleware.cors import CORSMiddleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -24,6 +25,14 @@ app = FastAPI(
     description="A modern backend for the eMCP Nexus marketplace.",
     version="1.0.0",
     lifespan=lifespan
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # This allows your frontend to make requests
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(tools.router, prefix="/tools", tags=["Tools"])
