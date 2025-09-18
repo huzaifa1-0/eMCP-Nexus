@@ -31,10 +31,15 @@ async def deploy_tool(repo_url: str) -> dict:
         },
         "type": "web_srv",
     }
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.post("https://api.render.com/v1/services", headers=headers, json=payload)
+            response.raise_for_status()
+            data = response.json()
 
-    async with httpx.AsyncClient() as client:
-        response = await client.post("https://api.render.com/v1/services", headers=headers, json=payload)
-        response.raise_for_status()
-        data = response.json()
-
-        return {"url": data["service"]["url"]}
+            return {"url": data["service"]["url"]}
+    except httpx.HTTPError as e:
+         raise ValueError(f"Render API error: {e.response.status_code} - {e.response.text}")
+    except httpx.RequestError as e:
+        # Handle network-level errors
+        raise ValueError(f"Failed to connect to Render API: {str(e)}")
