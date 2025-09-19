@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql://admin:password@db:5432/marketplace"
+    DATABASE_URL: str = "postgresql+asyncpg://admin:password@db:5432/marketplace"
     STRIPE_KEY: str
     COINBASE_KEY: str
     SECRET_KEY: str = "your-secret-key"  
