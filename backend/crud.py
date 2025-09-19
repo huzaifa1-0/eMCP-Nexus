@@ -16,6 +16,11 @@ async def get_user_by_username(db: AsyncSession, username: str):
     result = await db.execute(select(DBUser).filter(DBUser.username == username))
     return result.scalars().first()
 
+async def get_user_by_email(db: AsyncSession, email: str):
+    """Fetch a single user by their email."""
+    result = await db.execute(select(DBUser).filter(DBUser.email == email))
+    return result.scalars().first()
+
 async def create_user(db: AsyncSession, user: UserCreate):
     """Create a new user in the database."""
     from backend.security import get_password_hash

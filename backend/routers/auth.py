@@ -23,9 +23,15 @@ async def register_user(user: UserRegister, session: AsyncSession = Depends(get_
     Register a new user with hashed password.
     """
     # Check if user/email already exists
-    existing = await crud.get_user_by_username(session, user.username)
-    if existing:
+    existing_user = await crud.get_user_by_username(session, user.username)
+    if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
+
+    # Add this check for the email
+    existing_email = await crud.get_user_by_email(session, user.email)
+    if existing_email:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
     # Create user
     user_obj = UserCreate(username=user.username, email=user.email, password=user.password)
     db_user = await crud.create_user(session, user_obj)
