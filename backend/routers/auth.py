@@ -5,6 +5,9 @@ from backend.db import get_async_session
 from backend.models.pydantic import UserCreate, User
 from backend.security import get_password_hash, verify_password, create_access_token
 from backend import crud
+import logging
+
+logger = logging.getLogger("ai_marketplace")
 
 router = APIRouter()
 
@@ -18,24 +21,31 @@ class UserRegister(BaseModel):
     password: str
 
 @router.post("/register", response_model=User)
-async def register_user(user: UserRegister, session: AsyncSession = Depends(get_async_session)) -> dict:
+async def register_user(user: UserRegister, session: AsyncSession = Depends(get_async_session)) -> User:
     """
     Register a new user with hashed password.
     """
-    # Check if user/email already exists
-    existing_user = await crud.get_user_by_username(session, user.username)
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Username already exists")
+    try:
+        # Check if user/email already exists
+        existing_user = await crud.get_user_by_username(session, user.username)
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Username already exists")
 
-    # Add this check for the email
-    existing_email = await crud.get_user_by_email(session, user.email)
-    if existing_email:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        existing_email = await crud.get_user_by_email(session, user.email)
+        if existing_email:
+            raise HTTPException(status_code=400, detail="Email already registered")
 
-    # Create user
-    user_obj = UserCreate(username=user.username, email=user.email, password=user.password)
-    db_user = await crud.create_user(session, user_obj)
-    return db_user
+        # Create user
+        user_obj = UserCreate(username=user.username, email=user.email, password=user.password)
+        db_user = await crud.create_user(session, user_obj)
+        return db_user
+    except Exception as e:
+        # Log the full exception
+        logger.exception("An error occurred during user registration:")
+        raise HTTPException(status_code=500, detail="An internal server error occurred.")
+
+
+
 
 @router.post("/login")
 async def login_user(user: UserLogin, session: AsyncSession = Depends(get_async_session)) -> dict:
