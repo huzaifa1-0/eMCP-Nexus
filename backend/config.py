@@ -9,7 +9,10 @@ class Settings(BaseSettings):
     STRIPE_KEY: str
     COINBASE_KEY: str
     SECRET_KEY: str = "your-secret-key"  
-    ALGORITHM: str = "HS256"  
+    ALGORITHM: str = "HS256" 
+    RENDER_API_KEY: str
+    RENDER_OWNER_ID: str
+    CLERK_SECRET_KEY: str # Add this line 
     
 
 

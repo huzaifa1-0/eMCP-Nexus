@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from .routers import tools, payments, search, auth, monitoring, reputation, monetization
+from .routers import tools, payments, search, monitoring, reputation, monetization
 from backend.db import init_db
 from ai_services.search_engine import load_faiss_index
 from fastapi.middleware.cors import CORSMiddleware
@@ -38,7 +38,6 @@ app.add_middleware(
 app.include_router(tools.router, prefix="/tools", tags=["Tools"])
 app.include_router(payments.router, prefix="/payments", tags=["Payments"])
 app.include_router(search.router, prefix="/search", tags=["Search"])
-app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(monitoring.router, prefix="/monitoring", tags=["Monitoring"])
 app.include_router(reputation.router, prefix="/reputation", tags=["Reputation"])
 app.include_router(monetization.router, prefix="/monetization", tags=["Monetization"]) 

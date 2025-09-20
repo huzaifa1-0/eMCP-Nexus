@@ -1,74 +1,54 @@
-from datetime import datetime, timedelta, timezone
-from typing import Optional
-
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
-from passlib.context import CryptContext
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from . import crud
-from backend.models import db as models
+from clerk_sdk.client import ClerkClient
 from .config import settings
+from . import crud
+from sqlalchemy.ext.asyncio import AsyncSession
 from .db import get_async_session
+from .models.db import DBUser
 
-# --- Password Hashing Setup ---
-# This creates the context for hashing and verifying passwords using bcrypt.
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Initialize the Clerk client
+clerk_client = ClerkClient(secret_key=settings.CLERK_SECRET_KEY)
 
-# --- OAuth2 Scheme ---
-# This tells FastAPI where the client should go to get a token.
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token") # tokenUrl is just a placeholder
 
-# --- Password Utilities ---
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verifies a plain password against a hashed one."""
-    return pwd_context.verify(plain_password, hashed_password)
-
-def get_password_hash(password: str) -> str:
-    """Hashes a plain password."""
-    return pwd_context.hash(password)
-
-# --- JWT (JSON Web Token) Utilities ---
-
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    """Creates a new JWT access token."""
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        # Default expiration time if none is provided
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
-    return encoded_jwt
-
-# --- Current User Dependency ---
-
-async def get_current_active_user(
-    token: str = Depends(oauth2_scheme), 
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
     db: AsyncSession = Depends(get_async_session)
-) -> models.DBUser:
+) -> DBUser:
     """
-    The primary dependency for protecting endpoints.
-    It decodes the token, validates it, and fetches the user from the database.
+    Verifies the Clerk JWT and syncs the user with the local database.
     """
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        username: str = payload.get("sub")
-        if not username:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
+        # Verify the token with Clerk
+        decoded_token = clerk_client.sessions.verify_token(token=token)
+        user_id = decoded_token["sub"]
 
-    user = await crud.get_user_by_username(db, username=username)
-    if user is None:
-        raise credentials_exception
-    return user
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
+    # Check if the user exists in our database
+    user = await crud.get_user(db, user_id=user_id)
+    if user:
+        return user
+
+    # If not, fetch their details from Clerk and create a local record
+    clerk_user = clerk_client.users.get_user(user_id=user_id)
+
+    new_user = DBUser(
+        id=clerk_user.id,
+        email=clerk_user.email_addresses[0].email_address,
+        username=clerk_user.username or clerk_user.email_addresses[0].email_address.split('@')[0],
+        # We don't store passwords anymore
+        hashed_password="managed_by_clerk"
+    )
+    db.add(new_user)
+    await db.commit()
+    await db.refresh(new_user)
+    return new_user
+
+# It is important to also update the crud.py to take in the id as a string
