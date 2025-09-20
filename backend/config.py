@@ -1,7 +1,7 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql+asyncpg://admin:password@db:532/marketplace"
+    DATABASE_URL: str = "postgresql+asyncpg://admin:password@db:5432/marketplace"
     
     # --- JWT Settings ---
     SECRET_KEY: str = "your-super-secret-key-that-is-long-and-random"  # Replace with a real secret key

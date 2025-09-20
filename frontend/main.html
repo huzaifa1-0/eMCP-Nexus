@@ -668,12 +668,10 @@
         © 2024 eMCP. Powered by Civic Auth and Web3 technology.
     </footer>
 
-    <!-- Login Modal -->
     <div class="modal-backdrop" id="loginModal">
         <div class="modal-content">
             <span class="close-modal" id="closeModal">&times;</span>
             
-            <!-- Login Form -->
             <form class="auth-form active" id="loginForm">
                 <div class="auth-header">
                     <div class="modal-logo">
@@ -684,10 +682,10 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="username">Username or Email</label>
+                    <label for="email">Email</label>
                     <div class="input-with-icon">
-                        <i class="fas fa-user"></i>
-                        <input type="text" id="username" class="form-control" placeholder="Enter your username or email" required>
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
                     </div>
                 </div>
                 
@@ -728,7 +726,6 @@
                 </div>
             </form>
             
-            <!-- Registration Form -->
             <form class="auth-form" id="registerForm">
                 <div class="auth-header">
                     <div class="modal-logo">
@@ -787,7 +784,6 @@
                 </div>
             </form>
             
-            <!-- Forgot Password Form -->
             <form class="auth-form" id="forgotPasswordForm">
                 <div class="auth-header">
                     <div class="modal-logo">
@@ -822,7 +818,6 @@
                 </div>
             </form>
             
-            <!-- Verification Form -->
             <form class="auth-form" id="verificationForm">
                 <div class="auth-header">
                     <div class="modal-logo">
@@ -862,6 +857,9 @@
     </div>
 
     <script>
+        // Define the base URL for your backend API
+        const API_BASE_URL = 'http://localhost:8000';
+
         // Modal functionality
         const modal = document.getElementById('loginModal');
         const signInBtn = document.getElementById('signInBtn');
@@ -906,58 +904,121 @@
         // Form validation and submission
         document.addEventListener('DOMContentLoaded', function() {
             // Login form submission
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
+            document.getElementById('loginForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
                 
-                // Simulate login process
-                setTimeout(function() {
-                    document.getElementById('loginSuccessMessage').style.display = 'block';
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const loginButton = this.querySelector('.auth-btn');
+                loginButton.disabled = true;
+                loginButton.textContent = 'LOGGING IN...';
+
+
+                try {
+                    // Use the full API URL for the fetch request
+                    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email, password }),
+                    });
+
+                    // Check if response is ok, if not, try to parse error
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.detail || 'Login failed');
+                    }
+
+                    const data = await response.json();
+                    localStorage.setItem('accessToken', data.access_token);
                     
-                    // Redirect after successful login (simulated)
-                    setTimeout(function() {
-                        alert('Login successful! Welcome back.');
-                        modal.style.display = 'none';
-                        document.body.style.overflow = 'auto';
+                    document.getElementById('loginSuccessMessage').style.display = 'block';
+                    document.getElementById('loginErrorMessage').style.display = 'none';
+
+                    setTimeout(() => {
+                        window.location.href = '/newmcp.html';
                     }, 1500);
-                }, 1000);
-            });
-            
-            // Registration form submission
-            document.getElementById('registerForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const password = document.getElementById('regPassword').value;
-                const confirmPassword = document.getElementById('regConfirmPassword').value;
-                
-                if (password !== confirmPassword) {
-                    document.getElementById('registerErrorMessage').style.display = 'block';
-                } else {
-                    document.getElementById('registerSuccessMessage').style.display = 'block';
-                    // Simulate registration process
-                    setTimeout(function() {
-                        showForm('verificationForm');
-                    }, 1500);
+
+                } catch (error) {
+                    const loginErrorMessage = document.getElementById('loginErrorMessage');
+                    loginErrorMessage.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message}`;
+                    loginErrorMessage.style.display = 'block';
+                    document.getElementById('loginSuccessMessage').style.display = 'none';
+                } finally {
+                    loginButton.disabled = false;
+                    loginButton.textContent = 'Log In';
                 }
             });
             
-            // Forgot password form submission
+            // Registration form submission
+            document.getElementById('registerForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const username = document.getElementById('regUsername').value;
+                const email = document.getElementById('regEmail').value;
+                const password = document.getElementById('regPassword').value;
+                const confirmPassword = document.getElementById('regConfirmPassword').value;
+                const registerButton = this.querySelector('.auth-btn');
+                
+                if (password !== confirmPassword) {
+                    const registerErrorMessage = document.getElementById('registerErrorMessage');
+                    registerErrorMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Passwords do not match';
+                    registerErrorMessage.style.display = 'block';
+                    return;
+                }
+
+                registerButton.disabled = true;
+                registerButton.textContent = 'CREATING ACCOUNT...';
+                
+                try {
+                    // Use the full API URL for the fetch request
+                    const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username, email, password }),
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.detail || 'Registration failed');
+                    }
+
+                    document.getElementById('registerSuccessMessage').style.display = 'block';
+                    document.getElementById('registerErrorMessage').style.display = 'none';
+
+                    setTimeout(() => {
+                        showForm('loginForm');
+                    }, 1500);
+
+                } catch (error) {
+                    const registerErrorMessage = document.getElementById('registerErrorMessage');
+                    registerErrorMessage.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message}`;
+                    registerErrorMessage.style.display = 'block';
+                    document.getElementById('registerSuccessMessage').style.display = 'none';
+                } finally {
+                    registerButton.disabled = false;
+                    registerButton.textContent = 'Create Account';
+                }
+            });
+            
+            // (The rest of the placeholder forms remain unchanged)
             document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 document.getElementById('recoverySuccessMessage').style.display = 'block';
             });
             
-            // Verification form submission
             document.getElementById('verificationForm').addEventListener('submit', function(e) {
                 e.preventDefault();
                 document.getElementById('verificationSuccessMessage').style.display = 'block';
                 
-                // Simulate verification process
                 setTimeout(function() {
                     showForm('loginForm');
                 }, 1500);
             });
             
-            // Auto-focus next input in verification code
             const verificationInputs = document.querySelectorAll('.verification-code input');
             verificationInputs.forEach((input, index) => {
                 input.addEventListener('input', function() {
