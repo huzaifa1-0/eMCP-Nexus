@@ -10,7 +10,7 @@ from ai_services.search_engine import add_tool_to_faiss
 from ai_services.monitoring import log_tool_usage
 import random 
 import time
-from ..services.deployment import deploy_tool
+from backend.services.deployment import deploy_tool
 
 router = APIRouter()
 

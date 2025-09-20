@@ -5,7 +5,7 @@ from datetime import timedelta
 from backend import crud
 from backend.db import get_async_session
 from backend.models.pydantic import UserCreate, User
-from backend.security import create_access_token, verify_password, get_password_hash
+from backend.security import create_access_token, verify_password
 from backend.config import settings
 from pydantic import BaseModel
 

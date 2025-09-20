@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from .routers import tools, payments, search, monitoring, reputation, monetization, auth
+from backend.routers import tools, payments, search, monitoring, reputation, monetization, auth
 from backend.db import init_db
 from ai_services.search_engine import load_faiss_index
 from fastapi.middleware.cors import CORSMiddleware
