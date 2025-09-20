@@ -11,5 +11,6 @@ stripe
 requests
 python-jose[cryptography]
 passlib[bcrypt]
+psycopg2
 asyncpg
 authlib
