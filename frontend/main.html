@@ -6,6 +6,13 @@
     <title>eMCP - Modular Compute Protocol</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
         body {
             margin: 0;
             padding: 0;
@@ -13,6 +20,7 @@
             background: linear-gradient(to bottom, #000, #001f3f);
             color: #fff;
             overflow-x: hidden;
+            min-height: 100vh;
         }
 
         header {
@@ -48,7 +56,6 @@
         .hero {
             text-align: center;
             padding: 100px 20px;
-            position: relative;
         }
 
         .hero h1 {
@@ -111,12 +118,6 @@
             font-size: 16px;
             cursor: pointer;
             margin: 20px 0;
-            transition: all 0.3s ease;
-        }
-
-        .sign-in-btn:hover {
-            background: #222;
-            transform: translateY(-2px);
         }
 
         .options {
@@ -198,49 +199,55 @@
             border-radius: 5px;
             font-size: 12px;
             position: absolute;
-            top: 20px;
+            top: 150px;
             left: 50%;
             transform: translateX(-50%);
         }
         
         /* Login Modal Styles */
-        .login-modal {
+        .modal-backdrop {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
             z-index: 1000;
             justify-content: center;
             align-items: center;
         }
         
-        .login-modal.active {
-            display: flex;
-        }
-        
-        .modal-backdrop {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-        }
-        
-        .auth-container {
-            background: rgba(18, 18, 18, 0.98);
+        .modal-content {
+            background: rgba(18, 18, 18, 0.95);
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            width: 100%;
+            width: 90%;
             max-width: 450px;
             max-height: 90vh;
             padding: 2rem;
+            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow-y: auto;
+            overflow: hidden;
             position: relative;
-            z-index: 1001;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.3);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         .auth-form {
@@ -269,7 +276,7 @@
             margin-bottom: 1.5rem;
         }
         
-        .auth-logo {
+        .modal-logo {
             font-size: 2.2rem;
             margin-bottom: 0.8rem;
             color: #4cc9f0;
@@ -291,7 +298,7 @@
         }
         
         .form-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
             position: relative;
         }
         
@@ -395,7 +402,7 @@
             box-shadow: 0 5px 15px rgba(76, 201, 240, 0.3);
         }
         
-        .auth-footer {
+        .modal-footer {
             text-align: center;
             margin-top: 2rem;
             color: #777;
@@ -403,7 +410,7 @@
             letter-spacing: 1px;
         }
         
-        .auth-footer span {
+        .modal-footer span {
             color: #4cc9f0;
             font-weight: bold;
         }
@@ -421,19 +428,19 @@
         .error-message {
             color: #ff4d4d;
             background: rgba(255, 77, 77, 0.1);
-            border-left-color: #ff4d4d;
+            border-left-color: #ff4d4d !important;
         }
         
         .success-message {
             color: #2ecc71;
             background: rgba(46, 204, 113, 0.1);
-            border-left-color: #2ecc71;
+            border-left-color: #2ecc71 !important;
         }
         
         .info-message {
             color: #4cc9f0;
             background: rgba(76, 201, 240, 0.1);
-            border-left-color: #4cc9f0;
+            border-left-color: #4cc9f0 !important;
         }
         
         .additional-options {
@@ -488,22 +495,16 @@
         }
         
         .verification-code input {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             text-align: center;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
-            padding: 10px;
+            padding: 5px;
             background: rgba(30, 30, 30, 0.7);
             border: 1px solid #333;
             border-radius: 8px;
             color: #fff;
-        }
-        
-        .verification-code input:focus {
-            border-color: #4cc9f0;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.3);
         }
         
         .resend-code {
@@ -521,43 +522,12 @@
             text-decoration: underline;
         }
         
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: transparent;
-            border: none;
-            color: #ccc;
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 1002;
-        }
-        
-        .close-modal:hover {
-            color: #fff;
-        }
-        
         /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .stats {
-                flex-direction: column;
-                gap: 40px;
-            }
-            
-            .features {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .feature-card {
-                width: 100%;
-                max-width: 300px;
-            }
-            
-            .auth-container {
+        @media (max-width: 500px) {
+            .modal-content {
                 padding: 1.5rem;
                 max-height: 95vh;
-                margin: 0 15px;
+                width: 95%;
             }
             
             .auth-form {
@@ -578,21 +548,39 @@
             }
             
             .verification-code input {
-                width: 40px;
-                height: 40px;
-                font-size: 18px;
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
             }
             
             .auth-link {
                 padding: 8px 16px;
                 font-size: 13px;
             }
+            
+            .hero {
+                padding: 80px 20px;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .stats {
+                gap: 40px;
+                flex-wrap: wrap;
+            }
+            
+            .features {
+                flex-direction: column;
+                align-items: center;
+            }
         }
 
         @media (max-height: 700px) {
-            .auth-container {
+            .modal-content {
                 max-height: 95vh;
-                overflow-y: auto;
+                overflow: hidden;
             }
             
             .auth-header {
@@ -601,6 +589,14 @@
             
             .form-group {
                 margin-bottom: 1rem;
+            }
+            
+            .auth-header h1 {
+                font-size: 24px;
+            }
+            
+            .auth-header p {
+                font-size: 13px;
             }
         }
     </style>
@@ -612,7 +608,6 @@
             <ul>
                 <li><a href="#features">Features</a></li>
                 <li><a href="#security">Security</a></li>
-                <li><a href="#signout">Sign Out</a></li>
             </ul>
         </nav>
     </header>
@@ -672,16 +667,16 @@
     <footer>
         © 2024 eMCP. Powered by Civic Auth and Web3 technology.
     </footer>
-    
+
     <!-- Login Modal -->
-    <div class="login-modal" id="loginModal">
-        <div class="modal-backdrop" id="modalBackdrop"></div>
-        <button class="close-modal" id="closeModal">&times;</button>
-        <div class="auth-container">
+    <div class="modal-backdrop" id="loginModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            
             <!-- Login Form -->
             <form class="auth-form active" id="loginForm">
                 <div class="auth-header">
-                    <div class="auth-logo">
+                    <div class="modal-logo">
                         <i class="fas fa-dna"></i>
                     </div>
                     <h1>Login</h1>
@@ -709,7 +704,7 @@
                         <input type="checkbox" id="rememberMe">
                         Remember me
                     </label>
-                    <span class="forgot-password" onclick="showAuthForm('forgotPasswordForm')">Forgot password?</span>
+                    <span class="forgot-password" onclick="showForm('forgotPasswordForm')">Forgot password?</span>
                 </div>
                 
                 <button type="submit" class="auth-btn">Log in</button>
@@ -723,12 +718,12 @@
                 </div>
                 
                 <div class="alternate-option">
-                    <span class="auth-link" onclick="showAuthForm('registerForm')">
+                    <span class="auth-link" onclick="showForm('registerForm')">
                         <i class="fas fa-user-plus"></i> Create account
                     </span>
                 </div>
                 
-                <div class="auth-footer">
+                <div class="modal-footer">
                     Powered by <span>eMCP Nexsus</span>
                 </div>
             </form>
@@ -736,7 +731,7 @@
             <!-- Registration Form -->
             <form class="auth-form" id="registerForm">
                 <div class="auth-header">
-                    <div class="auth-logo">
+                    <div class="modal-logo">
                         <i class="fas fa-dna"></i>
                     </div>
                     <h1>Create Account</h1>
@@ -786,7 +781,7 @@
                 </div>
                 
                 <div class="alternate-option">
-                    <span class="back-to-login" onclick="showAuthForm('loginForm')">
+                    <span class="back-to-login" onclick="showForm('loginForm')">
                         <i class="fas fa-arrow-left"></i> Back to login
                     </span>
                 </div>
@@ -795,7 +790,7 @@
             <!-- Forgot Password Form -->
             <form class="auth-form" id="forgotPasswordForm">
                 <div class="auth-header">
-                    <div class="auth-logo">
+                    <div class="modal-logo">
                         <i class="fas fa-dna"></i>
                     </div>
                     <h1>Reset Password</h1>
@@ -821,7 +816,7 @@
                 </div>
                 
                 <div class="alternate-option">
-                    <span class="back-to-login" onclick="showAuthForm('loginForm')">
+                    <span class="back-to-login" onclick="showForm('loginForm')">
                         <i class="fas fa-arrow-left"></i> Back to login
                     </span>
                 </div>
@@ -830,7 +825,7 @@
             <!-- Verification Form -->
             <form class="auth-form" id="verificationForm">
                 <div class="auth-header">
-                    <div class="auth-logo">
+                    <div class="modal-logo">
                         <i class="fas fa-dna"></i>
                     </div>
                     <h1>Verify Account</h1>
@@ -867,153 +862,83 @@
     </div>
 
     <script>
+        // Modal functionality
+        const modal = document.getElementById('loginModal');
         const signInBtn = document.getElementById('signInBtn');
-        const signOutBtn = document.getElementById('signOutBtn'); // You'll need to add a sign-out button to your HTML nav
-        const API_URL = 'http://localhost:8000'; // Your backend URL
-
-    // --- AUTHENTICATION LOGIC ---
-
-    // Login form submission
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-                const email = document.getElementById('username').value; // Your form uses 'username' as id for email
-                const password = document.getElementById('password').value;
-                const loginErrorMessage = document.getElementById('loginErrorMessage');
-                const loginSuccessMessage = document.getElementById('loginSuccessMessage');
-
-            try {
-                const response = await fetch(`${API_URL}/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-             });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Login failed');
-                }
-
-                const data = await response.json();
-            // Store the token in localStorage
-                localStorage.setItem('accessToken', data.access_token);
+        const closeModalBtn = document.getElementById('closeModal');
+        
+        // Open modal when sign in button is clicked
+        signInBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        });
+        
+        // Close modal when X is clicked
+        closeModalBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Re-enable scrolling
+        });
+        
+        // Close modal when clicking outside the modal content
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto'; // Re-enable scrolling
+            }
+        });
+        
+        // Function to show the selected form and hide others
+        function showForm(formId) {
+            // Hide all forms
+            document.querySelectorAll('.auth-form').forEach(form => {
+                form.classList.remove('active');
+            });
             
-                loginSuccessMessage.style.display = 'block';
-                loginErrorMessage.style.display = 'none';
-
-                setTimeout(() => {
-                    hideLoginModal();
-                    alert('Login successful! Welcome back.');
-                    updateUIForLoggedInUser();
-                }, 1500);
-
-            } catch (error) {
-                loginErrorMessage.textContent = error.message;
-                loginErrorMessage.style.display = 'block';
-                loginSuccessMessage.style.display = 'none';
-            }
-        });
-
-    // Registration form submission
-        document.getElementById('registerForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-            const username = document.getElementById('regUsername').value;
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            const confirmPassword = document.getElementById('regConfirmPassword').value;
-            const registerErrorMessage = document.getElementById('registerErrorMessage');
-            const registerSuccessMessage = document.getElementById('registerSuccessMessage');
-
-            if (password !== confirmPassword) {
-                registerErrorMessage.textContent = 'Passwords do not match';
-                registerErrorMessage.style.display = 'block';
-                return;
-         }
-
-            try {
-                const response = await fetch(`${API_URL}/auth/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, email, password })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || 'Registration failed');
-                }
-
-                registerSuccessMessage.style.display = 'block';
-                registerErrorMessage.style.display = 'none';
-
-                setTimeout(() => {
-                    // Switch to login form after successful registration
-                    showAuthForm('loginForm');
-                }, 2000);
-
-            } catch (error) {
-                registerErrorMessage.textContent = error.message;
-                registerErrorMessage.style.display = 'block';
-                registerSuccessMessage.style.display = 'none';
-            }
-        });
-
-    // --- UI and Modal Logic ---
-        function updateUIForLoggedInUser() {
-            signInBtn.style.display = 'none';
-            if(signOutBtn) signOutBtn.style.display = 'block';
-        // You might want to add a welcome message or redirect to a dashboard
-     }
-
-        function updateUIForLoggedOutUser() {
-            signInBtn.style.display = 'block';
-            if(signOutBtn) signOutBtn.style.display = 'none';
-        }
-    
-    // Add a sign-out button to your header nav first.
-    // Example: <a href="#" id="signOutBtn" style="display: none;">Sign Out</a>
-        if (signOutBtn) {
-            signOutBtn.addEventListener('click', () => {
-                localStorage.removeItem('accessToken');
-                alert('You have been signed out.');
-                updateUIForLoggedOutUser();
+            // Show the selected form
+            document.getElementById(formId).classList.add('active');
+            
+            // Reset messages
+            document.querySelectorAll('.message').forEach(message => {
+                message.style.display = 'none';
             });
         }
-
-    // Check login status on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            const token = localStorage.getItem('accessToken');
-            if (token) {
-            updateUIForLoggedInUser();
-            } else {
-            updateUIForLoggedOutUser();
-            }
-        });
-
-    // --- Existing Modal and Form Logic (Keep this as is) ---
-        const loginModal = document.getElementById('loginModal');
-        const closeModal = document.getElementById('closeModal');
-        const modalBackdrop = document.getElementById('modalBackdrop');
-
-        function showLoginModal() {
-            loginModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function hideLoginModal() {
-            loginModal.classList.remove('active');
-            document.body.style.overflow = 'auto';
-            showAuthForm('loginForm');
-        }
-
-        signInBtn.addEventListener('click', showLoginModal);
-        closeModal.addEventListener('click', hideLoginModal);
-        modalBackdrop.addEventListener('click', hideLoginModal);
-
-        function showAuthForm(formId) {
-            document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
-            document.getElementById(formId).classList.add('active');
-            document.querySelectorAll('.message').forEach(message => message.style.display = 'none');
-     }
-
+        
+        // Form validation and submission
+        document.addEventListener('DOMContentLoaded', function() {
+            // Login form submission
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Simulate login process
+                setTimeout(function() {
+                    document.getElementById('loginSuccessMessage').style.display = 'block';
+                    
+                    // Redirect after successful login (simulated)
+                    setTimeout(function() {
+                        alert('Login successful! Welcome back.');
+                        modal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }, 1500);
+                }, 1000);
+            });
+            
+            // Registration form submission
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const password = document.getElementById('regPassword').value;
+                const confirmPassword = document.getElementById('regConfirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    document.getElementById('registerErrorMessage').style.display = 'block';
+                } else {
+                    document.getElementById('registerSuccessMessage').style.display = 'block';
+                    // Simulate registration process
+                    setTimeout(function() {
+                        showForm('verificationForm');
+                    }, 1500);
+                }
+            });
             
             // Forgot password form submission
             document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
@@ -1028,7 +953,7 @@
                 
                 // Simulate verification process
                 setTimeout(function() {
-                    showAuthForm('loginForm');
+                    showForm('loginForm');
                 }, 1500);
             });
             
@@ -1046,13 +971,6 @@
                         verificationInputs[index - 1].focus();
                     }
                 });
-            });
-            
-            // Close modal with Escape key
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && loginModal.classList.contains('active')) {
-                    hideLoginModal();
-                }
             });
         });
     </script>
