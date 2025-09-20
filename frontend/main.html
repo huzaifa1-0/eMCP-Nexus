@@ -6,13 +6,6 @@
     <title>eMCP - Modular Compute Protocol</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
         body {
             margin: 0;
             padding: 0;
@@ -20,7 +13,6 @@
             background: linear-gradient(to bottom, #000, #001f3f);
             color: #fff;
             overflow-x: hidden;
-            min-height: 100vh;
         }
 
         header {
@@ -56,6 +48,7 @@
         .hero {
             text-align: center;
             padding: 100px 20px;
+            position: relative;
         }
 
         .hero h1 {
@@ -118,6 +111,12 @@
             font-size: 16px;
             cursor: pointer;
             margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .sign-in-btn:hover {
+            background: #222;
+            transform: translateY(-2px);
         }
 
         .options {
@@ -199,55 +198,49 @@
             border-radius: 5px;
             font-size: 12px;
             position: absolute;
-            top: 150px;
+            top: 20px;
             left: 50%;
             transform: translateX(-50%);
         }
         
         /* Login Modal Styles */
-        .modal-backdrop {
+        .login-modal {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
             z-index: 1000;
             justify-content: center;
             align-items: center;
         }
         
-        .modal-content {
-            background: rgba(18, 18, 18, 0.95);
+        .login-modal.active {
+            display: flex;
+        }
+        
+        .modal-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        .auth-container {
+            background: rgba(18, 18, 18, 0.98);
             border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            width: 90%;
+            width: 100%;
             max-width: 450px;
             max-height: 90vh;
             padding: 2rem;
-            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            overflow: hidden;
+            overflow-y: auto;
             position: relative;
-        }
-        
-        .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            color: #fff;
-            font-size: 24px;
-            cursor: pointer;
-            z-index: 10;
-            background: rgba(0, 0, 0, 0.3);
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            z-index: 1001;
         }
         
         .auth-form {
@@ -276,7 +269,7 @@
             margin-bottom: 1.5rem;
         }
         
-        .modal-logo {
+        .auth-logo {
             font-size: 2.2rem;
             margin-bottom: 0.8rem;
             color: #4cc9f0;
@@ -298,7 +291,7 @@
         }
         
         .form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
             position: relative;
         }
         
@@ -402,7 +395,7 @@
             box-shadow: 0 5px 15px rgba(76, 201, 240, 0.3);
         }
         
-        .modal-footer {
+        .auth-footer {
             text-align: center;
             margin-top: 2rem;
             color: #777;
@@ -410,7 +403,7 @@
             letter-spacing: 1px;
         }
         
-        .modal-footer span {
+        .auth-footer span {
             color: #4cc9f0;
             font-weight: bold;
         }
@@ -428,19 +421,19 @@
         .error-message {
             color: #ff4d4d;
             background: rgba(255, 77, 77, 0.1);
-            border-left-color: #ff4d4d !important;
+            border-left-color: #ff4d4d;
         }
         
         .success-message {
             color: #2ecc71;
             background: rgba(46, 204, 113, 0.1);
-            border-left-color: #2ecc71 !important;
+            border-left-color: #2ecc71;
         }
         
         .info-message {
             color: #4cc9f0;
             background: rgba(76, 201, 240, 0.1);
-            border-left-color: #4cc9f0 !important;
+            border-left-color: #4cc9f0;
         }
         
         .additional-options {
@@ -495,16 +488,22 @@
         }
         
         .verification-code input {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             text-align: center;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            padding: 5px;
+            padding: 10px;
             background: rgba(30, 30, 30, 0.7);
             border: 1px solid #333;
             border-radius: 8px;
             color: #fff;
+        }
+        
+        .verification-code input:focus {
+            border-color: #4cc9f0;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.3);
         }
         
         .resend-code {
@@ -522,12 +521,43 @@
             text-decoration: underline;
         }
         
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: #ccc;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1002;
+        }
+        
+        .close-modal:hover {
+            color: #fff;
+        }
+        
         /* Responsive adjustments */
-        @media (max-width: 500px) {
-            .modal-content {
+        @media (max-width: 768px) {
+            .stats {
+                flex-direction: column;
+                gap: 40px;
+            }
+            
+            .features {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .feature-card {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .auth-container {
                 padding: 1.5rem;
                 max-height: 95vh;
-                width: 95%;
+                margin: 0 15px;
             }
             
             .auth-form {
@@ -548,39 +578,21 @@
             }
             
             .verification-code input {
-                width: 35px;
-                height: 35px;
-                font-size: 16px;
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
             }
             
             .auth-link {
                 padding: 8px 16px;
                 font-size: 13px;
             }
-            
-            .hero {
-                padding: 80px 20px;
-            }
-            
-            .hero h1 {
-                font-size: 36px;
-            }
-            
-            .stats {
-                gap: 40px;
-                flex-wrap: wrap;
-            }
-            
-            .features {
-                flex-direction: column;
-                align-items: center;
-            }
         }
 
         @media (max-height: 700px) {
-            .modal-content {
+            .auth-container {
                 max-height: 95vh;
-                overflow: hidden;
+                overflow-y: auto;
             }
             
             .auth-header {
@@ -589,14 +601,6 @@
             
             .form-group {
                 margin-bottom: 1rem;
-            }
-            
-            .auth-header h1 {
-                font-size: 24px;
-            }
-            
-            .auth-header p {
-                font-size: 13px;
             }
         }
     </style>
@@ -618,11 +622,11 @@
         <p>Create, manage, and deploy MCP tools with blockchain-powered authentication. Experience the future of modular computing with Web3 wallet integration.</p>
         <div class="stats">
             <div class="stat">
-                <h2>500+</h2>
+                <h2>10,000+</h2>
                 <p>Active Users</p>
             </div>
             <div class="stat">
-                <h2>50+</h2>
+                <h2>500+</h2>
                 <p>MCP Tools</p>
             </div>
             <div class="stat">
@@ -667,16 +671,16 @@
     <footer>
         © 2024 eMCP. Powered by Civic Auth and Web3 technology.
     </footer>
-
+    
     <!-- Login Modal -->
-    <div class="modal-backdrop" id="loginModal">
-        <div class="modal-content">
-            <span class="close-modal" id="closeModal">&times;</span>
-            
+    <div class="login-modal" id="loginModal">
+        <div class="modal-backdrop" id="modalBackdrop"></div>
+        <button class="close-modal" id="closeModal">&times;</button>
+        <div class="auth-container">
             <!-- Login Form -->
             <form class="auth-form active" id="loginForm">
                 <div class="auth-header">
-                    <div class="modal-logo">
+                    <div class="auth-logo">
                         <i class="fas fa-dna"></i>
                     </div>
                     <h1>Login</h1>
@@ -704,7 +708,7 @@
                         <input type="checkbox" id="rememberMe">
                         Remember me
                     </label>
-                    <span class="forgot-password" onclick="showForm('forgotPasswordForm')">Forgot password?</span>
+                    <span class="forgot-password" onclick="showAuthForm('forgotPasswordForm')">Forgot password?</span>
                 </div>
                 
                 <button type="submit" class="auth-btn">Log in</button>
@@ -718,12 +722,12 @@
                 </div>
                 
                 <div class="alternate-option">
-                    <span class="auth-link" onclick="showForm('registerForm')">
+                    <span class="auth-link" onclick="showAuthForm('registerForm')">
                         <i class="fas fa-user-plus"></i> Create account
                     </span>
                 </div>
                 
-                <div class="modal-footer">
+                <div class="auth-footer">
                     Powered by <span>eMCP Nexsus</span>
                 </div>
             </form>
@@ -731,7 +735,7 @@
             <!-- Registration Form -->
             <form class="auth-form" id="registerForm">
                 <div class="auth-header">
-                    <div class="modal-logo">
+                    <div class="auth-logo">
                         <i class="fas fa-dna"></i>
                     </div>
                     <h1>Create Account</h1>
@@ -781,7 +785,7 @@
                 </div>
                 
                 <div class="alternate-option">
-                    <span class="back-to-login" onclick="showForm('loginForm')">
+                    <span class="back-to-login" onclick="showAuthForm('loginForm')">
                         <i class="fas fa-arrow-left"></i> Back to login
                     </span>
                 </div>
@@ -790,7 +794,7 @@
             <!-- Forgot Password Form -->
             <form class="auth-form" id="forgotPasswordForm">
                 <div class="auth-header">
-                    <div class="modal-logo">
+                    <div class="auth-logo">
                         <i class="fas fa-dna"></i>
                     </div>
                     <h1>Reset Password</h1>
@@ -816,7 +820,7 @@
                 </div>
                 
                 <div class="alternate-option">
-                    <span class="back-to-login" onclick="showForm('loginForm')">
+                    <span class="back-to-login" onclick="showAuthForm('loginForm')">
                         <i class="fas fa-arrow-left"></i> Back to login
                     </span>
                 </div>
@@ -825,7 +829,7 @@
             <!-- Verification Form -->
             <form class="auth-form" id="verificationForm">
                 <div class="auth-header">
-                    <div class="modal-logo">
+                    <div class="auth-logo">
                         <i class="fas fa-dna"></i>
                     </div>
                     <h1>Verify Account</h1>
@@ -861,37 +865,124 @@
         </div>
     </div>
 
-  <script>
-        const clerkPublishableKey = "pk_test_bW9yYWwtY29sbGllLTIxLmNsZXJrLmFjY291bnRzLmRldiQ"; // Replace with your key from the Clerk Dashboard
-
-        const script = document.createElement("script");
-        script.setAttribute("data-clerk-publishable-key", clerkPublishableKey);
-        script.async = true;
-        script.src = `https://cdn.clerk.dev/clerk.browser.js`;
+    <script>
+        // Modal functionality
+        const loginModal = document.getElementById('loginModal');
+        const signInBtn = document.getElementById('signInBtn');
+        const closeModal = document.getElementById('closeModal');
+        const modalBackdrop = document.getElementById('modalBackdrop');
         
-        script.addEventListener("load", async function () {
-            await window.Clerk.load();
-
-            const userButton = document.getElementById("user-button");
-            const signInButtonContainer = document.getElementById("sign-in-button-container");
-            const signInBtn = document.getElementById("signInBtn");
-
-            window.Clerk.addListener(({ user }) => {
-                if (user) {
-                    // User is signed in
-                    signInButtonContainer.innerHTML = `<a href="/dashboard.html" class="sign-in-btn">Go to Dashboard</a>`;
+        // Show modal function
+        function showLoginModal() {
+            loginModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Hide modal function
+        function hideLoginModal() {
+            loginModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            // Reset to login form when closing modal
+            showAuthForm('loginForm');
+        }
+        
+        // Event listeners
+        signInBtn.addEventListener('click', showLoginModal);
+        closeModal.addEventListener('click', hideLoginModal);
+        modalBackdrop.addEventListener('click', hideLoginModal);
+        
+        // Function to show the selected form and hide others
+        function showAuthForm(formId) {
+            // Hide all forms
+            document.querySelectorAll('.auth-form').forEach(form => {
+                form.classList.remove('active');
+            });
+            
+            // Show the selected form
+            document.getElementById(formId).classList.add('active');
+            
+            // Reset messages
+            document.querySelectorAll('.message').forEach(message => {
+                message.style.display = 'none';
+            });
+        }
+        
+        // Form validation and submission
+        document.addEventListener('DOMContentLoaded', function() {
+            // Login form submission
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Simulate login process
+                setTimeout(function() {
+                    document.getElementById('loginSuccessMessage').style.display = 'block';
                     
-                    // Mount the UserButton component
-                    window.Clerk.mountUserButton(userButton);
+                    // Redirect after successful login (simulated)
+                    setTimeout(function() {
+                        hideLoginModal();
+                        alert('Login successful! Welcome back.');
+                    }, 1500);
+                }, 1000);
+            });
+            
+            // Registration form submission
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const password = document.getElementById('regPassword').value;
+                const confirmPassword = document.getElementById('regConfirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    document.getElementById('registerErrorMessage').style.display = 'block';
                 } else {
-                    // User is signed out
-                    signInBtn.style.display = 'block';
-                    signInBtn.onclick = () => window.Clerk.openSignIn();
-                    userButton.innerHTML = ''; // Clear the user button area
+                    document.getElementById('registerSuccessMessage').style.display = 'block';
+                    // Simulate registration process
+                    setTimeout(function() {
+                        showAuthForm('verificationForm');
+                    }, 1500);
+                }
+            });
+            
+            // Forgot password form submission
+            document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                document.getElementById('recoverySuccessMessage').style.display = 'block';
+            });
+            
+            // Verification form submission
+            document.getElementById('verificationForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                document.getElementById('verificationSuccessMessage').style.display = 'block';
+                
+                // Simulate verification process
+                setTimeout(function() {
+                    showAuthForm('loginForm');
+                }, 1500);
+            });
+            
+            // Auto-focus next input in verification code
+            const verificationInputs = document.querySelectorAll('.verification-code input');
+            verificationInputs.forEach((input, index) => {
+                input.addEventListener('input', function() {
+                    if (this.value.length === 1 && index < verificationInputs.length - 1) {
+                        verificationInputs[index + 1].focus();
+                    }
+                });
+                
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                        verificationInputs[index - 1].focus();
+                    }
+                });
+            });
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && loginModal.classList.contains('active')) {
+                    hideLoginModal();
                 }
             });
         });
-        document.body.appendChild(script);
     </script>
 </body>
 </html>

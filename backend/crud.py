@@ -6,7 +6,7 @@ from backend.models.pydantic import ToolCreate, UserCreate, TransactionCreate
 
 
 
-async def get_user(db: AsyncSession, user_id: int):
+async def get_user(db: AsyncSession, user_id: str):
     """Fetch a single user by their ID."""
     result = await db.execute(select(DBUser).filter(DBUser.id == user_id))
     return result.scalars().first()
