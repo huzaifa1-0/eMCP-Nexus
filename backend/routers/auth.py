@@ -21,7 +21,7 @@ class UserRegister(BaseModel):
     password: str
 
 @router.post("/register", response_model=User)
-async def register_user(user: UserRegister, session: AsyncSession = Depends(get_async_session)) -> User:
+async def register_user(user: UserCreate, session: AsyncSession = Depends(get_async_session)) -> User:
     """
     Register a new user with hashed password.
     """
@@ -36,15 +36,12 @@ async def register_user(user: UserRegister, session: AsyncSession = Depends(get_
             raise HTTPException(status_code=400, detail="Email already registered")
 
         # Create user
-        user_obj = UserCreate(username=user.username, email=user.email, password=user.password)
-        db_user = await crud.create_user(session, user_obj)
+        db_user = await crud.create_user(session, user)
         return db_user
     except Exception as e:
         # Log the full exception
         logger.exception("An error occurred during user registration:")
         raise HTTPException(status_code=500, detail="An internal server error occurred.")
-
-
 
 
 @router.post("/login")
