@@ -866,82 +866,153 @@
     </div>
 
     <script>
-        // Modal functionality
-        const loginModal = document.getElementById('loginModal');
         const signInBtn = document.getElementById('signInBtn');
+        const signOutBtn = document.getElementById('signOutBtn'); // You'll need to add a sign-out button to your HTML nav
+        const API_URL = 'http://localhost:8000'; // Your backend URL
+
+    // --- AUTHENTICATION LOGIC ---
+
+    // Login form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+                const email = document.getElementById('username').value; // Your form uses 'username' as id for email
+                const password = document.getElementById('password').value;
+                const loginErrorMessage = document.getElementById('loginErrorMessage');
+                const loginSuccessMessage = document.getElementById('loginSuccessMessage');
+
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+             });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Login failed');
+                }
+
+                const data = await response.json();
+            // Store the token in localStorage
+                localStorage.setItem('accessToken', data.access_token);
+            
+                loginSuccessMessage.style.display = 'block';
+                loginErrorMessage.style.display = 'none';
+
+                setTimeout(() => {
+                    hideLoginModal();
+                    alert('Login successful! Welcome back.');
+                    updateUIForLoggedInUser();
+                }, 1500);
+
+            } catch (error) {
+                loginErrorMessage.textContent = error.message;
+                loginErrorMessage.style.display = 'block';
+                loginSuccessMessage.style.display = 'none';
+            }
+        });
+
+    // Registration form submission
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const registerErrorMessage = document.getElementById('registerErrorMessage');
+            const registerSuccessMessage = document.getElementById('registerSuccessMessage');
+
+            if (password !== confirmPassword) {
+                registerErrorMessage.textContent = 'Passwords do not match';
+                registerErrorMessage.style.display = 'block';
+                return;
+         }
+
+            try {
+                const response = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || 'Registration failed');
+                }
+
+                registerSuccessMessage.style.display = 'block';
+                registerErrorMessage.style.display = 'none';
+
+                setTimeout(() => {
+                    // Switch to login form after successful registration
+                    showAuthForm('loginForm');
+                }, 2000);
+
+            } catch (error) {
+                registerErrorMessage.textContent = error.message;
+                registerErrorMessage.style.display = 'block';
+                registerSuccessMessage.style.display = 'none';
+            }
+        });
+
+    // --- UI and Modal Logic ---
+        function updateUIForLoggedInUser() {
+            signInBtn.style.display = 'none';
+            if(signOutBtn) signOutBtn.style.display = 'block';
+        // You might want to add a welcome message or redirect to a dashboard
+     }
+
+        function updateUIForLoggedOutUser() {
+            signInBtn.style.display = 'block';
+            if(signOutBtn) signOutBtn.style.display = 'none';
+        }
+    
+    // Add a sign-out button to your header nav first.
+    // Example: <a href="#" id="signOutBtn" style="display: none;">Sign Out</a>
+        if (signOutBtn) {
+            signOutBtn.addEventListener('click', () => {
+                localStorage.removeItem('accessToken');
+                alert('You have been signed out.');
+                updateUIForLoggedOutUser();
+            });
+        }
+
+    // Check login status on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('accessToken');
+            if (token) {
+            updateUIForLoggedInUser();
+            } else {
+            updateUIForLoggedOutUser();
+            }
+        });
+
+    // --- Existing Modal and Form Logic (Keep this as is) ---
+        const loginModal = document.getElementById('loginModal');
         const closeModal = document.getElementById('closeModal');
         const modalBackdrop = document.getElementById('modalBackdrop');
-        
-        // Show modal function
+
         function showLoginModal() {
             loginModal.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
-        
-        // Hide modal function
+
         function hideLoginModal() {
             loginModal.classList.remove('active');
             document.body.style.overflow = 'auto';
-            // Reset to login form when closing modal
             showAuthForm('loginForm');
         }
-        
-        // Event listeners
+
         signInBtn.addEventListener('click', showLoginModal);
         closeModal.addEventListener('click', hideLoginModal);
         modalBackdrop.addEventListener('click', hideLoginModal);
-        
-        // Function to show the selected form and hide others
+
         function showAuthForm(formId) {
-            // Hide all forms
-            document.querySelectorAll('.auth-form').forEach(form => {
-                form.classList.remove('active');
-            });
-            
-            // Show the selected form
+            document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
             document.getElementById(formId).classList.add('active');
-            
-            // Reset messages
-            document.querySelectorAll('.message').forEach(message => {
-                message.style.display = 'none';
-            });
-        }
-        
-        // Form validation and submission
-        document.addEventListener('DOMContentLoaded', function() {
-            // Login form submission
-            document.getElementById('loginForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Simulate login process
-                setTimeout(function() {
-                    document.getElementById('loginSuccessMessage').style.display = 'block';
-                    
-                    // Redirect after successful login (simulated)
-                    setTimeout(function() {
-                        hideLoginModal();
-                        alert('Login successful! Welcome back.');
-                    }, 1500);
-                }, 1000);
-            });
-            
-            // Registration form submission
-            document.getElementById('registerForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const password = document.getElementById('regPassword').value;
-                const confirmPassword = document.getElementById('regConfirmPassword').value;
-                
-                if (password !== confirmPassword) {
-                    document.getElementById('registerErrorMessage').style.display = 'block';
-                } else {
-                    document.getElementById('registerSuccessMessage').style.display = 'block';
-                    // Simulate registration process
-                    setTimeout(function() {
-                        showAuthForm('verificationForm');
-                    }, 1500);
-                }
-            });
+            document.querySelectorAll('.message').forEach(message => message.style.display = 'none');
+     }
+
             
             // Forgot password form submission
             document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
