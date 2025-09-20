@@ -1,24 +1,24 @@
 # Start with a Python 3.12 image
 FROM python:3.12-slim
 
-# Set the working directory
+# Set the working directory inside the container
 WORKDIR /code
 
-# Copy the requirements file to the root of the workdir
-COPY ./requirements.txt /code/requirements.txt
+# Copy the requirements file from the build context (the 'backend' folder)
+COPY requirements.txt .
 
 # Install the Python dependencies
-RUN pip install --no-cache-dir -r /code/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the backend application code
-COPY ./backend /code/backend
+# Copy the rest of the application code from the build context
+# (which includes the routers, services, ai_services, etc.)
+COPY . .
 
-
-# Set the PYTHONPATH to include both the root /code directory and the backend directory
-ENV PYTHONPATH="/code:/code/backend"
+# Set the PYTHONPATH to include the root directory
+ENV PYTHONPATH="/code"
 
 # Expose the port the app runs on
 EXPOSE 8000
 
 # Command to run the application
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
