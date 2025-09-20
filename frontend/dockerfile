@@ -1,6 +1,6 @@
 # Use the official Nginx image to serve static content
 FROM nginx:alpine
 
-# Copy the static HTML files from the build context's root
+# Copy the contents of the current directory (the frontend folder)
 # to the Nginx public directory
 COPY . /usr/share/nginx/html/

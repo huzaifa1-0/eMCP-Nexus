@@ -8,7 +8,7 @@ Base = declarative_base()
 
 class DBUser(Base):
     __tablename__ = "users"
-    id: Mapped[str] = mapped_column(String, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     username: Mapped[str] = mapped_column(String, unique=True, index=True)
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String)
@@ -30,7 +30,7 @@ class DBTool(Base):
     branch: Mapped[str] = mapped_column(String, default="main")
     
     
-    owner_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    owner_id: Mapped[str] = mapped_column(String, ForeignKey("users.id"))
     url: Mapped[str] = mapped_column(String)
     
     
