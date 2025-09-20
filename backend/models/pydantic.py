@@ -14,7 +14,7 @@ class ToolCreate(ToolBase):
 
 class Tool(ToolBase):
     id: int
-    owner_id: str
+    owner_id: int
     
     model_config = ConfigDict(from_attributes=True) 
 

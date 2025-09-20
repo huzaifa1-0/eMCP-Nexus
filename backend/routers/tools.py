@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from backend.models.db import DBTool, DBUser
 from backend.models.pydantic import ToolCreate, Tool
-from backend.security import get_current_active_user 
+from backend.security import get_current_user
 from backend.db import get_async_session
 import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,7 +24,7 @@ async def get_tool(tool_id: int, session: AsyncSession):
 async def create_tool(
     tool_data: ToolCreate,
     background_tasks: BackgroundTasks, 
-    user: DBUser = Depends(get_current_active_user),
+    user: DBUser = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_session)
 ) -> DBTool:
     
@@ -59,7 +59,7 @@ async def create_tool(
 async def use_tool(
     tool_id: int, 
     background_tasks: BackgroundTasks,
-    user: DBUser = Depends(get_current_active_user),
+    user: DBUser = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_session)
 ):
     """Simulates a user using a tool, and logs its performance."""
@@ -90,3 +90,5 @@ async def use_tool(
         "message": f"Tool {tool.name} executed.",
         "processing_time": processing_time
     }
+
+

@@ -10,16 +10,15 @@ COPY ./requirements.txt /code/requirements.txt
 # Install the Python dependencies
 RUN pip install --no-cache-dir -r /code/requirements.txt
 
-# Copy the entire backend application code (from the build context)
-# into a subdirectory named 'backend' inside the container.
-COPY . /code/backend
+# Copy the backend application code
+COPY ./backend /code/backend
 
-# Set the PYTHONPATH to include the root /code directory.
-# This allows Python to find the 'backend' package.
-ENV PYTHONPATH="/code"
+
+# Set the PYTHONPATH to include both the root /code directory and the backend directory
+ENV PYTHONPATH="/code:/code/backend"
 
 # Expose the port the app runs on
 EXPOSE 8000
 
-# Command to run the application, now correctly referring to the 'backend' package
+# Command to run the application
 CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
