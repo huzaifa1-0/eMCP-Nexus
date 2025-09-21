@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eMCP Nexus - Seller Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #000, #001f3f);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Header styling to match page5.html */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(0, 0, 0, 0.8);
+            margin-bottom: 30px;
+            border-radius: 8px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        
+        .nav-links a:hover {
+            color: #fff;
+        }
+        
+        .card {
+            background: rgba(18, 18, 18, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .welcome {
+            color: #ddd;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(30, 30, 30, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #4cc9f0;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.3);
+        }
+        
+        .date-filter {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #fff;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #4cc9f0, #4361ee);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #4361ee, #4cc9f0);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: rgba(30, 30, 30, 0.7);
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .metric-title {
+            font-size: 16px;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+        
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fff;
+        }
+        
+        .revenue-card {
+            background: linear-gradient(135deg, rgba(76, 201, 240, 0.2), rgba(67, 97, 238, 0.2));
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+        
+        .revenue-value {
+            color: #fff;
+            font-size: 36px;
+        }
+        
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .metrics-table th {
+            text-align: left;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .metrics-table th i {
+            margin-left: 8px;
+            font-size: 12px;
+        }
+        
+        .metrics-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        
+        .metrics-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .metrics-table tr:hover {
+            background: rgba(50, 50, 50, 0.5);
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .no-data i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .no-data-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .create-btn {
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #4cc9f0, #4361ee);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .create-btn:hover {
+            background: linear-gradient(45deg, #4361ee, #4cc9f0);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+        
+        .alert-success {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+        }
+        
+        .alert-error {
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #ccc;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 900px) {
+            .main-header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .date-filter {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .metrics-table {
+                display: block;
+                overflow-x: auto;
+            }
+            
+            .nav-links {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header matching page5.html design -->
+        <header class="main-header">
+            <div class="logo">⚡ eMCP Nexus</div>
+            <nav class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#security">Security</a>
+            </nav>
+        </header>
+        
+        <div class="alert">
+            <i class="fas fa-info-circle"></i>
+            Your dashboard metrics are updated in real-time.
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-chart-line"></i>
+                Seller Dashboard
+            </h2>
+            <div class="welcome">
+                Welcome back, Client!
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-filter"></i> Date Filter</label>
+                <div class="date-filter">
+                    <input type="date" class="form-control" id="startDate">
+                    <span>to</span>
+                    <input type="date" class="form-control" id="endDate">
+                    <button class="btn btn-primary" id="applyFilter">
+                        <i class="fas fa-check"></i> Apply Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-title">
+                    <i class="fas fa-download"></i> Total Installs
+                </div>
+                <div class="metric-value" id="totalInstalls">0</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-title">
+                    <i class="fas fa-play-circle"></i> Total Runs
+                </div>
+                <div class="metric-value" id="totalRuns">0</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-title">
+                    <i class="fas fa-coins"></i> Tokens Used
+                </div>
+                <div class="metric-value" id="tokensUsed">0</div>
+            </div>
+            
+            <div class="metric-card revenue-card">
+                <div class="metric-title">
+                    <i class="fas fa-dollar-sign"></i> Total Revenue
+                </div>
+                <div class="metric-value revenue-value" id="totalRevenue">$0.00</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2 class="card-title">
+                <i class="fas fa-chart-bar"></i> eMCP Nexus Performance Metrics
+            </h2>
+            
+            <table class="metrics-table">
+                <thead>
+                    <tr>
+                        <th>eMCP Name <i class="fas fa-sort"></i></th>
+                        <th>Installs <i class="fas fa-sort"></i></th>
+                        <th>Runs <i class="fas fa-sort"></i></th>
+                        <th>Tokens <i class="fas fa-sort"></i></th>
+                        <th>Revenue <i class="fas fa-sort"></i></th>
+                        <th>Date <i class="fas fa-sort-down"></i></th>
+                    </tr>
+                </thead>
+                <tbody id="metricsTableBody">
+                    <tr>
+                        <td colspan="6">
+                            <div class="no-data">
+                                <i class="fas fa-inbox"></i>
+                                <div class="no-data-title">No metrics data available</div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="no-data">
+            <i class="fas fa-chart-bar"></i>
+            <div class="no-data-title">No metrics available yet</div>
+            <p>Create your first eMCP to start tracking performance data</p>
+            <button class="create-btn">
+                <i class="fas fa-plus"></i> Create eMCP
+            </button>
+        </div>
+        
+        <footer>
+            © 2024 eMCP Nexus. Powered by Civic Auth and Web3 technology.
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date range (last 30 days)
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - 30);
+            
+            document.getElementById('startDate').valueAsDate = startDate;
+            document.getElementById('endDate').valueAsDate = endDate;
+            
+            // Apply filter button functionality
+            document.getElementById('applyFilter').addEventListener('click', function() {
+                const start = document.getElementById('startDate').value;
+                const end = document.getElementById('endDate').value;
+                
+                if (!start || !end) {
+                    showAlert('Please select both start and end dates', 'error');
+                    return;
+                }
+                
+                // Simulate loading data
+                simulateDataLoading();
+            });
+            
+            // Create MCP button functionality
+            document.querySelector('.create-btn').addEventListener('click', function() {
+                showAlert('Redirecting to eMCP creation page...', 'success');
+                // In a real application, this would redirect to the eMCP creation page
+            });
+            
+            // Table sorting functionality
+            const tableHeaders = document.querySelectorAll('.metrics-table th');
+            tableHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const column = this.cellIndex;
+                    // In a real application, this would sort the table by the selected column
+                    showAlert(`Sorting by column ${column + 1}`, 'success');
+                    
+                    // Update sort indicator
+                    tableHeaders.forEach(h => {
+                        const icon = h.querySelector('i');
+                        if (h === this) {
+                            icon.className = 'fas fa-sort-down';
+                        } else {
+                            icon.className = 'fas fa-sort';
+                        }
+                    });
+                });
+            });
+            
+            // Simulate data loading with random metrics
+            function simulateDataLoading() {
+                // Show loading state
+                const metrics = ['totalInstalls', 'totalRuns', 'tokensUsed', 'totalRevenue'];
+                metrics.forEach(metric => {
+                    const element = document.getElementById(metric);
+                    element.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                });
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    // Generate random data
+                    document.getElementById('totalInstalls').textContent = Math.floor(Math.random() * 100);
+                    document.getElementById('totalRuns').textContent = Math.floor(Math.random() * 1000);
+                    document.getElementById('tokensUsed').textContent = Math.floor(Math.random() * 5000);
+                    document.getElementById('totalRevenue').textContent = '$' + (Math.random() * 1000).toFixed(2);
+                    
+                    // Show still no data in table
+                    document.getElementById('metricsTableBody').innerHTML = `
+                        <tr>
+                            <td colspan="6">
+                                <div class="no-data">
+                                    <i class="fas fa-inbox"></i>
+                                    <div class="no-data-title">No metrics data available</div>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    
+                    showAlert('Data loaded for the selected date range', 'success');
+                }, 1500);
+            }
+            
+            // Function to show alert message
+            function showAlert(message, type) {
+                // Remove any existing alerts first
+                const existingAlert = document.querySelector('.alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+                
+                const alert = document.createElement('div');
+                alert.className = `alert ${type === 'error' ? 'alert-error' : ''}`;
+                alert.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i>
+                    ${message}
+                `;
+                
+                document.querySelector('.container').insertBefore(alert, document.querySelector('.card'));
+                
+                // Remove alert after 3 seconds
+                setTimeout(() => {
+                    if (alert.parentElement) {
+                        alert.remove();
+                    }
+                }, 3000);
+            }
+            
+            // Simulate initial page load with zero data
+            // In a real application, this would fetch data from an API
+        });
+    </script>
+</body>
+</html>

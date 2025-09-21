@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Marketplace</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #000, #001f3f);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Header styling to match page5.html */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(0, 0, 0, 0.8);
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        
+        .nav-links a:hover {
+            color: #fff;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        
+        .search-container {
+            background: rgba(18, 18, 18, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            background: rgba(30, 30, 30, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        
+        .search-input:focus {
+            border-color: #4cc9f0;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.3);
+        }
+        
+        .search-input::placeholder {
+            color: #888;
+        }
+        
+        .search-btn {
+            padding: 12px 25px;
+            background: linear-gradient(45deg, #4cc9f0, #4361ee);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .search-btn:hover {
+            background: linear-gradient(45deg, #4361ee, #4cc9f0);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
+        }
+        
+        .results-count {
+            margin-top: 15px;
+            color: #fff;
+            font-weight: 500;
+        }
+        
+        .divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 30px 0;
+        }
+        
+        .mcp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .mcp-card {
+            background: rgba(18, 18, 18, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .mcp-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        }
+        
+        .mcp-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        
+        .mcp-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .mcp-badge {
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        
+        .mcp-status {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 6px;
+            background: rgba(45, 45, 45, 0.7);
+            color: #ccc;
+            font-style: italic;
+            text-align: center;
+        }
+        
+        .mcp-config {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 6px;
+            background: rgba(51, 51, 34, 0.7);
+            color: #ccc;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .mcp-date {
+            color: #999;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+        
+        .tools-section {
+            margin-top: 20px;
+        }
+        
+        .tools-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tool-item {
+            background: rgba(45, 45, 45, 0.7);
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-left: 3px solid rgba(68, 68, 68, 0.7);
+        }
+        
+        .tool-name {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        
+        .tool-desc {
+            color: #ccc;
+            font-size: 14px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #fff;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #4cc9f0, #4361ee);
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #4361ee, #4cc9f0);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .alert {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #ccc;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 900px) {
+            .mcp-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .nav-links {
+                gap: 15px;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header matching page5.html design -->
+        <header class="main-header">
+            <div class="logo">⚡ eMCP Nexus</div>
+            <nav class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#security">Security</a>
+            </nav>
+        </header>
+        
+        <div class="alert">
+            <i class="fas fa-info-circle"></i>
+            Discover and integrate Modular Compute Protocol tools into your applications
+        </div>
+        
+        <div class="page-header">
+            <div class="page-title">
+                <i class="fas fa-store"></i>
+                MCP Marketplace
+            </div>
+            <div class="status-badge">
+                <i class="fas fa-check-circle"></i>
+                2 eMCPs available
+            </div>
+        </div>
+        
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Search eMCPs, tools, or descriptions...">
+                <button class="search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+            <div class="results-count">2 eMCPs available</div>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="mcp-grid">
+            <!-- YouTube Clipping Tool Card -->
+            <div class="mcp-card">
+                <div class="mcp-header">
+                    <div class="mcp-title">Youtube Clipping Tool</div>
+                    <div class="mcp-badge">eMCP service deployment</div>
+                </div>
+                
+                <div class="mcp-status">
+                    <i class="fas fa-spinner loading"></i> Loading tools...
+                </div>
+                
+                <div class="mcp-config">
+                    Config Unavailable
+                </div>
+                
+                <div class="mcp-date">
+                    <i class="far fa-calendar"></i> Created 8/23/2025
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plug"></i> Connect
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-info-circle"></i> Details
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Todo MCP Card -->
+            <div class="mcp-card">
+                <div class="mcp-header">
+                    <div class="mcp-title">todo</div>
+                    <div class="mcp-badge">Tools (3)</div>
+                </div>
+                
+                <div class="tools-section">
+                    <div class="tools-title">
+                        <i class="fas fa-tools"></i> Available Tools
+                    </div>
+                    
+                    <div class="tool-item">
+                        <div class="tool-name">Ekt-todos</div>
+                        <div class="tool-desc">List all the current topics</div>
+                    </div>
+                    
+                    <div class="tool-item">
+                        <div class="tool-name">aGd-todo</div>
+                        <div class="tool-desc">Add a topic</div>
+                    </div>
+                    
+                    <div class="tool-item">
+                        <div class="tool-name">delete-todo</div>
+                        <div class="tool-desc">Delete a note by index</div>
+                    </div>
+                </div>
+                
+                <div class="mcp-date">
+                    <i class="far fa-calendar"></i> Created 8/23/2025
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-copy"></i> Copy Config
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-plug"></i> Connect
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            © 2024 eMCP Nexus. Powered by Civic Auth and Web3 technology.
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('.search-input');
+            const searchBtn = document.querySelector('.search-btn');
+            const resultsCount = document.querySelector('.results-count');
+            const mcpCards = document.querySelectorAll('.mcp-card');
+            
+            // Search functionality
+            searchBtn.addEventListener('click', performSearch);
+            searchInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
+            });
+            
+            function performSearch() {
+                const searchTerm = searchInput.value.toLowerCase();
+                let visibleCount = 0;
+                
+                mcpCards.forEach(card => {
+                    const cardText = card.textContent.toLowerCase();
+                    if (cardText.includes(searchTerm)) {
+                        card.style.display = 'block';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                resultsCount.textContent = `${visibleCount} MCPs available`;
+                document.querySelector('.status-badge').innerHTML = `<i class="fas fa-check-circle"></i> ${visibleCount} eMCPs available`;
+            }
+            
+            // Simulate loading state for YouTube Clipping Tool
+            const youtubeCard = document.querySelector('.mcp-card:first-child');
+            const loadingElement = youtubeCard.querySelector('.mcp-status');
+            
+            setTimeout(() => {
+                loadingElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> No tools available';
+                loadingElement.style.background = 'rgba(51, 51, 34, 0.7)';
+                loadingElement.style.color = '#ccc';
+            }, 3000);
+            
+            // Connect button functionality
+            const connectButtons = document.querySelectorAll('.btn-primary');
+            connectButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const card = this.closest('.mcp-card');
+                    const title = card.querySelector('.mcp-title').textContent;
+                    
+                    if (this.innerHTML.includes('Connect')) {
+                        showAlert(`Connecting to ${title}...`, 'success');
+                    } else if (this.innerHTML.includes('Copy')) {
+                        navigator.clipboard.writeText(`Config for ${title}`).then(() => {
+                            showAlert(`Configuration for ${title} copied to clipboard!`, 'success');
+                        });
+                    }
+                });
+            });
+            
+            // Details button functionality
+            const detailsButtons = document.querySelectorAll('.btn-secondary');
+            detailsButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const card = this.closest('.mcp-card');
+                    const title = card.querySelector('.mcp-title').textContent;
+                    
+                    if (this.innerHTML.includes('Details')) {
+                        showAlert(`Showing details for ${title}`, 'success');
+                    } else if (this.innerHTML.includes('Connect')) {
+                        showAlert(`Connecting to ${title}...`, 'success');
+                    }
+                });
+            });
+            
+            // Function to show alert message
+            function showAlert(message, type) {
+                // Remove any existing alerts first
+                const existingAlert = document.querySelector('.alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+                
+                const alert = document.createElement('div');
+                alert.className = `alert`;
+                alert.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i>
+                    ${message}
+                `;
+                
+                document.querySelector('.container').insertBefore(alert, document.querySelector('.page-header'));
+                
+                // Remove alert after 3 seconds
+                setTimeout(() => {
+                    if (alert.parentElement) {
+                        alert.remove();
+                    }
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
