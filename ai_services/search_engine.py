@@ -5,7 +5,7 @@ import numpy as np
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from backend.models.db import DBTool
-from .embeddings import get_embedding
+from ai_services.embeddings import get_embedding
 import asyncio
 
 
