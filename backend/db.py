@@ -3,17 +3,12 @@ from typing import AsyncGenerator
 from backend.models.db import Base
 from backend.config import settings
 
-DATABASE_URL = "postgresql+asyncpg://admin:password@db:5432/marketplace"
-
 
 engine = create_async_engine(
-    DATABASE_URL, 
+    settings.DATABASE_URL, 
     echo=True,
-    pool_size=20,
-    max_overflow=10,
-    pool_timeout=30,
-    pool_recycle=1800,
-    )
+    connect_args={"check_same_thread": False}  # Only for SQLite
+)
 async_session_factory = async_sessionmaker(
     bind=engine, 
     expire_on_commit=False, 

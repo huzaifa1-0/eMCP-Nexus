@@ -1,11 +1,11 @@
 from fastapi import APIRouter
-from ai_services import reputation
+from backend.ai_services import reputation
 from pydantic import BaseModel
 from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from ai_services.monitoring import get_tool_usage
+from backend.ai_services.monitoring import get_tool_usage
 from backend.db import get_async_session
 from backend.models.db import DBTransaction, DBRating
 from backend.models.pydantic import BaseModel

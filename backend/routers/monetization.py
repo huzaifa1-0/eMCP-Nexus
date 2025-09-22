@@ -1,8 +1,8 @@
 # backend/routers/monetization.py
 from fastapi import APIRouter, Depends, HTTPException
-from ai_services.monetization import get_dynamic_price, get_subscription_plans
-from ai_services.monitoring import get_tool_usage
-from ai_services.reputation import calculate_reputation
+from backend.ai_services.monetization import get_dynamic_price, get_subscription_plans
+from backend.ai_services.monitoring import get_tool_usage
+from backend.ai_services.reputation import calculate_reputation
 from backend.db import get_async_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from backend.models.db import DBTransaction, DBRating

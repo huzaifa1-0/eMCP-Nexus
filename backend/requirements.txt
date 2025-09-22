@@ -13,3 +13,6 @@ python-jose[cryptography]
 passlib[bcrypt]
 asyncpg
 authlib
+aiosqlite
+httpx
+aiohttp

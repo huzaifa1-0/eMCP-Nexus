@@ -1,7 +1,7 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql+asyncpg://admin:password@db:5432/marketplace"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./marketplace.db"
     
     # --- JWT Settings ---
     SECRET_KEY: str = "your-super-secret-key-that-is-long-and-random"  # Replace with a real secret key
@@ -13,8 +13,6 @@ class Settings(BaseSettings):
     COINBASE_KEY: str
     RENDER_API_KEY: str
     RENDER_OWNER_ID: str
-    # You can now remove the CLERK_SECRET_KEY if you are not using it
-    # CLERK_SECRET_KEY: str
 
     class Config:
         env_file = ".env"

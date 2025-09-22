@@ -9,7 +9,7 @@ from backend.services.logging import log_event
 from ai_services.reputation import calculate_reputation
 from backend.db import get_async_session
 from backend.models.db import DBTransaction, DBRating, DBUser
-from backend.security import get_current_active_user
+from backend.security import get_current_user
 import random 
 import time
 from ai_services.monitoring import get_tool_usage
@@ -67,7 +67,7 @@ async def rate_tool(
     tool_id: int,
     rating_req: RatingBase,
     session: AsyncSession = Depends(get_async_session),
-    user: DBUser = Depends(get_current_active_user)
+    user: DBUser = Depends(get_current_user)
 ) -> dict:
     """
     Allows users to rate tools (0-5). Requires authentication.

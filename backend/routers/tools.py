@@ -1,13 +1,13 @@
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
-from backend.models.db import DBTool, DBUser
-from backend.models.pydantic import ToolCreate, Tool
-from backend.security import get_current_user
-from backend.db import get_async_session
+from ..models.db import DBTool, DBUser
+from ..models.pydantic import ToolCreate, Tool
+from ..security import get_current_user
+from ..db import get_async_session
 import sqlalchemy
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from ai_services.search_engine import add_tool_to_faiss
-from ai_services.monitoring import log_tool_usage
+from backend.ai_services.search_engine import add_tool_to_faiss
+from backend.ai_services.monitoring import log_tool_usage
 import random 
 import time
 from backend.services.deployment import deploy_tool

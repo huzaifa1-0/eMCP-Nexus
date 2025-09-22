@@ -2,8 +2,15 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from backend.routers import tools, payments, search, monitoring, reputation, monetization, auth
 from backend.db import init_db
-from ai_services.search_engine import load_faiss_index
+from backend.ai_services.search_engine import load_faiss_index
 from fastapi.middleware.cors import CORSMiddleware
+import os 
+import sys
+
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(current_dir)
+sys.path.append(project_root)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -45,6 +52,6 @@ app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 
 
 
-@app.get("/", tags=["Root"])
+@app.get("/")
 async def root():
     return {"message": "🚀 eMCP Nexus Backend is running"}
