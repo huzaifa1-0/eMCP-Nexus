@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from ai_services import monitoring
+from backend.ai_services import monitoring
 
 router = APIRouter()
 

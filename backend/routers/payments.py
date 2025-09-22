@@ -4,15 +4,15 @@ from backend.models.pydantic import RatingBase
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from ..services import payments
-from ai_services.monitoring import log_tool_usage
+from backend.ai_services.monitoring import log_tool_usage
 from backend.services.logging import log_event
-from ai_services.reputation import calculate_reputation
+from backend.ai_services.reputation import calculate_reputation
 from backend.db import get_async_session
 from backend.models.db import DBTransaction, DBRating, DBUser
 from backend.security import get_current_user
 import random 
 import time
-from ai_services.monitoring import get_tool_usage
+from backend.ai_services.monitoring import get_tool_usage
 
 router = APIRouter()
 

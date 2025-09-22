@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query
-from ai_services.search_engine import search_tools
+from backend.ai_services.search_engine import search_tools
 
 router = APIRouter()
 
