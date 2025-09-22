@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +13,7 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
             margin: 0;
             padding: 0;
@@ -203,7 +204,7 @@
             left: 50%;
             transform: translateX(-50%);
         }
-        
+
         /* Login Modal Styles */
         .modal-backdrop {
             display: none;
@@ -218,7 +219,7 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         .modal-content {
             background: rgba(18, 18, 18, 0.95);
             border-radius: 15px;
@@ -232,7 +233,7 @@
             overflow: hidden;
             position: relative;
         }
-        
+
         .close-modal {
             position: absolute;
             top: 15px;
@@ -249,7 +250,7 @@
             justify-content: center;
             align-items: center;
         }
-        
+
         .auth-form {
             transition: opacity 0.3s ease, transform 0.3s ease;
             opacity: 0;
@@ -262,7 +263,7 @@
             padding: 2rem;
             display: none;
         }
-        
+
         .auth-form.active {
             opacity: 1;
             transform: translateX(0);
@@ -270,19 +271,19 @@
             display: block;
             position: relative;
         }
-        
+
         .auth-header {
             text-align: center;
             margin-bottom: 1.5rem;
         }
-        
+
         .modal-logo {
             font-size: 2.2rem;
             margin-bottom: 0.8rem;
             color: #4cc9f0;
             text-shadow: 0 0 10px rgba(76, 201, 240, 0.5);
         }
-        
+
         .auth-header h1 {
             font-weight: 600;
             font-size: 28px;
@@ -291,17 +292,17 @@
             -webkit-text-fill-color: transparent;
             margin-bottom: 0.5rem;
         }
-        
+
         .auth-header p {
             color: #b0b0b0;
             font-size: 14px;
         }
-        
+
         .form-group {
             margin-bottom: 1.2rem;
             position: relative;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 0.6rem;
@@ -311,11 +312,11 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        
+
         .input-with-icon {
             position: relative;
         }
-        
+
         .input-with-icon i {
             position: absolute;
             left: 15px;
@@ -324,7 +325,7 @@
             color: #4cc9f0;
             font-size: 18px;
         }
-        
+
         .form-control {
             width: 100%;
             padding: 14px 14px 14px 50px;
@@ -335,18 +336,18 @@
             color: #fff;
             transition: all 0.3s ease;
         }
-        
+
         .form-control:focus {
             border-color: #4cc9f0;
             outline: none;
             box-shadow: 0 0 0 2px rgba(76, 201, 240, 0.3);
             background: rgba(40, 40, 40, 0.7);
         }
-        
+
         .form-control::placeholder {
             color: #888;
         }
-        
+
         .auth-btn {
             width: 100%;
             padding: 14px;
@@ -362,24 +363,24 @@
             text-transform: uppercase;
             margin-top: 0.5rem;
         }
-        
+
         .auth-btn:hover {
             background: linear-gradient(45deg, #4361ee, #4cc9f0);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
         }
-        
+
         .auth-btn:active {
             transform: translateY(0);
         }
-        
+
         .alternate-option {
             text-align: center;
             margin-top: 1.5rem;
             padding-top: 1.5rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .auth-link {
             display: inline-block;
             padding: 10px 20px;
@@ -395,13 +396,13 @@
             font-size: 14px;
             cursor: pointer;
         }
-        
+
         .auth-link:hover {
             background: rgba(76, 201, 240, 0.1);
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(76, 201, 240, 0.3);
         }
-        
+
         .modal-footer {
             text-align: center;
             margin-top: 2rem;
@@ -409,12 +410,12 @@
             font-size: 14px;
             letter-spacing: 1px;
         }
-        
+
         .modal-footer span {
             color: #4cc9f0;
             font-weight: bold;
         }
-        
+
         .message {
             font-size: 14px;
             margin-top: 0.8rem;
@@ -424,55 +425,55 @@
             border-radius: 5px;
             border-left: 3px solid;
         }
-        
+
         .error-message {
             color: #ff4d4d;
             background: rgba(255, 77, 77, 0.1);
             border-left-color: #ff4d4d !important;
         }
-        
+
         .success-message {
             color: #2ecc71;
             background: rgba(46, 204, 113, 0.1);
             border-left-color: #2ecc71 !important;
         }
-        
+
         .info-message {
             color: #4cc9f0;
             background: rgba(76, 201, 240, 0.1);
             border-left-color: #4cc9f0 !important;
         }
-        
+
         .additional-options {
             display: flex;
             justify-content: space-between;
             margin-top: 1.2rem;
             font-size: 14px;
         }
-        
+
         .remember-me {
             display: flex;
             align-items: center;
             color: #bbb;
         }
-        
+
         .remember-me input {
             margin-right: 8px;
             accent-color: #4cc9f0;
         }
-        
+
         .forgot-password {
             color: #4cc9f0;
             text-decoration: none;
             transition: color 0.3s ease;
             cursor: pointer;
         }
-        
+
         .forgot-password:hover {
             color: #f72585;
             text-decoration: underline;
         }
-        
+
         .back-to-login {
             color: #4cc9f0;
             text-decoration: none;
@@ -481,19 +482,19 @@
             display: inline-block;
             margin-top: 1rem;
         }
-        
+
         .back-to-login:hover {
             color: #f72585;
             text-decoration: underline;
         }
-        
+
         .verification-code {
             display: flex;
             gap: 8px;
             margin-bottom: 1.5rem;
             justify-content: center;
         }
-        
+
         .verification-code input {
             width: 40px;
             height: 40px;
@@ -506,7 +507,7 @@
             border-radius: 8px;
             color: #fff;
         }
-        
+
         .resend-code {
             color: #4cc9f0;
             text-decoration: none;
@@ -516,12 +517,12 @@
             display: block;
             margin-top: 1rem;
         }
-        
+
         .resend-code:hover {
             color: #f72585;
             text-decoration: underline;
         }
-        
+
         /* Responsive adjustments */
         @media (max-width: 500px) {
             .modal-content {
@@ -529,48 +530,48 @@
                 max-height: 95vh;
                 width: 95%;
             }
-            
+
             .auth-form {
                 padding: 1.5rem;
             }
-            
+
             .auth-header h1 {
                 font-size: 24px;
             }
-            
+
             .additional-options {
                 flex-direction: column;
                 gap: 0.8rem;
             }
-            
+
             .verification-code {
                 flex-wrap: wrap;
             }
-            
+
             .verification-code input {
                 width: 35px;
                 height: 35px;
                 font-size: 16px;
             }
-            
+
             .auth-link {
                 padding: 8px 16px;
                 font-size: 13px;
             }
-            
+
             .hero {
                 padding: 80px 20px;
             }
-            
+
             .hero h1 {
                 font-size: 36px;
             }
-            
+
             .stats {
                 gap: 40px;
                 flex-wrap: wrap;
             }
-            
+
             .features {
                 flex-direction: column;
                 align-items: center;
@@ -582,25 +583,107 @@
                 max-height: 95vh;
                 overflow: hidden;
             }
-            
+
             .auth-header {
                 margin-bottom: 1rem;
             }
-            
+
             .form-group {
                 margin-bottom: 1rem;
             }
-            
+
             .auth-header h1 {
                 font-size: 24px;
             }
-            
+
             .auth-header p {
                 font-size: 13px;
             }
         }
+
+        /* Connection status indicator */
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .connection-status.connected {
+            background: rgba(46, 204, 113, 0.9);
+            color: white;
+        }
+
+        .connection-status.disconnected {
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+        }
+
+        .connection-status.connecting {
+            background: rgba(241, 196, 15, 0.9);
+            color: white;
+        }
+
+        .connection-status .spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .connection-status.hidden {
+            display: none;
+        }
+
+        /* Debug panel */
+        .debug-panel {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            font-size: 12px;
+            z-index: 1000;
+            max-width: 300px;
+            display: none;
+        }
+
+        .debug-toggle {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            z-index: 1001;
+        }
     </style>
 </head>
+
 <body>
     <header>
         <div class="logo">⚡ eMCP</div>
@@ -615,7 +698,8 @@
     <section class="hero">
         <div class="web3-badge">⭐ Web3-Enabled Platform</div>
         <h1>Modular Compute Protocol</h1>
-        <p>Create, manage, and deploy MCP tools with blockchain-powered authentication. Experience the future of modular computing with Web3 wallet integration.</p>
+        <p>Create, manage, and deploy MCP tools with blockchain-powered authentication. Experience the future of modular
+            computing with Web3 wallet integration.</p>
         <div class="stats">
             <div class="stat">
                 <h2>10,000+</h2>
@@ -671,7 +755,7 @@
     <div class="modal-backdrop" id="loginModal">
         <div class="modal-content">
             <span class="close-modal" id="closeModal">&times;</span>
-            
+
             <form class="auth-form active" id="loginForm">
                 <div class="auth-header">
                     <div class="modal-logo">
@@ -680,7 +764,7 @@
                     <h1>Login</h1>
                     <p>Access your eMCP Nexsus account to continue</p>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="email">Email</label>
                     <div class="input-with-icon">
@@ -688,15 +772,16 @@
                         <input type="email" id="email" class="form-control" placeholder="Enter your email" required>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="input-with-icon">
                         <i class="fas fa-lock"></i>
-                        <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
+                        <input type="password" id="password" class="form-control" placeholder="Enter your password"
+                            required>
                     </div>
                 </div>
-                
+
                 <div class="additional-options">
                     <label class="remember-me">
                         <input type="checkbox" id="rememberMe">
@@ -704,28 +789,28 @@
                     </label>
                     <span class="forgot-password" onclick="showForm('forgotPasswordForm')">Forgot password?</span>
                 </div>
-                
+
                 <button type="submit" class="auth-btn">Log in</button>
-                
+
                 <div class="message error-message" id="loginErrorMessage">
                     <i class="fas fa-exclamation-circle"></i> Invalid username or password
                 </div>
-                
+
                 <div class="message success-message" id="loginSuccessMessage">
                     <i class="fas fa-check-circle"></i> Login successful! Redirecting...
                 </div>
-                
+
                 <div class="alternate-option">
                     <span class="auth-link" onclick="showForm('registerForm')">
                         <i class="fas fa-user-plus"></i> Create account
                     </span>
                 </div>
-                
+
                 <div class="modal-footer">
                     Powered by <span>eMCP Nexsus</span>
                 </div>
             </form>
-            
+
             <form class="auth-form" id="registerForm">
                 <div class="auth-header">
                     <div class="modal-logo">
@@ -734,15 +819,16 @@
                     <h1>Create Account</h1>
                     <p>Join the eMCP Nexsus Community Today</p>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="regUsername">Username</label>
                     <div class="input-with-icon">
                         <i class="fas fa-user"></i>
-                        <input type="text" id="regUsername" class="form-control" placeholder="Choose a username" required>
+                        <input type="text" id="regUsername" class="form-control" placeholder="Choose a username"
+                            required>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="regEmail">Email Address</label>
                     <div class="input-with-icon">
@@ -750,40 +836,42 @@
                         <input type="email" id="regEmail" class="form-control" placeholder="Enter your email" required>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="regPassword">Password</label>
                     <div class="input-with-icon">
                         <i class="fas fa-lock"></i>
-                        <input type="password" id="regPassword" class="form-control" placeholder="Create a password" required>
+                        <input type="password" id="regPassword" class="form-control" placeholder="Create a password"
+                            required>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="regConfirmPassword">Confirm Password</label>
                     <div class="input-with-icon">
                         <i class="fas fa-lock"></i>
-                        <input type="password" id="regConfirmPassword" class="form-control" placeholder="Confirm your password" required>
+                        <input type="password" id="regConfirmPassword" class="form-control"
+                            placeholder="Confirm your password" required>
                     </div>
                 </div>
-                
+
                 <button type="submit" class="auth-btn">Create Account</button>
-                
+
                 <div class="message error-message" id="registerErrorMessage">
                     <i class="fas fa-exclamation-circle"></i> Passwords do not match
                 </div>
-                
+
                 <div class="message success-message" id="registerSuccessMessage">
                     <i class="fas fa-check-circle"></i> Account created successfully!
                 </div>
-                
+
                 <div class="alternate-option">
                     <span class="back-to-login" onclick="showForm('loginForm')">
                         <i class="fas fa-arrow-left"></i> Back to login
                     </span>
                 </div>
             </form>
-            
+
             <form class="auth-form" id="forgotPasswordForm">
                 <div class="auth-header">
                     <div class="modal-logo">
@@ -792,32 +880,33 @@
                     <h1>Reset Password</h1>
                     <p>Enter your email to reset your password</p>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="recoveryEmail">Email Address</label>
                     <div class="input-with-icon">
                         <i class="fas fa-envelope"></i>
-                        <input type="email" id="recoveryEmail" class="form-control" placeholder="Enter your email" required>
+                        <input type="email" id="recoveryEmail" class="form-control" placeholder="Enter your email"
+                            required>
                     </div>
                 </div>
-                
+
                 <button type="submit" class="auth-btn">Send Reset Link</button>
-                
+
                 <div class="message info-message" id="recoveryInfoMessage">
                     <i class="fas fa-info-circle"></i> Reset instructions will be sent to your email
                 </div>
-                
+
                 <div class="message success-message" id="recoverySuccessMessage">
                     <i class="fas fa-check-circle"></i> Reset instructions sent!
                 </div>
-                
+
                 <div class="alternate-option">
                     <span class="back-to-login" onclick="showForm('loginForm')">
                         <i class="fas fa-arrow-left"></i> Back to login
                     </span>
                 </div>
             </form>
-            
+
             <form class="auth-form" id="verificationForm">
                 <div class="auth-header">
                     <div class="modal-logo">
@@ -826,7 +915,7 @@
                     <h1>Verify Account</h1>
                     <p>Enter the verification code sent to your email</p>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="verificationCode">Verification Code</label>
                     <div class="verification-code">
@@ -838,202 +927,464 @@
                         <input type="text" class="form-control" maxlength="1" required>
                     </div>
                 </div>
-                
+
                 <button type="submit" class="auth-btn">Verify Account</button>
-                
+
                 <div class="message error-message" id="verificationErrorMessage">
                     <i class="fas fa-exclamation-circle"></i> Invalid verification code
                 </div>
-                
+
                 <div class="message success-message" id="verificationSuccessMessage">
                     <i class="fas fa-check-circle"></i> Account verified successfully!
                 </div>
-                
+
                 <div class="alternate-option">
                     <span class="resend-code">Resend verification code</span>
                 </div>
             </form>
         </div>
     </div>
+    <!-- Connection status indicator -->
+    <div class="connection-status disconnected" id="connectionStatus">
+        <span class="status-icon"><i class="fas fa-exclamation-circle"></i></span>
+        <span class="status-text">Disconnected from server</span>
+    </div>
+
+    <!-- Debug panel -->
+    <button class="debug-toggle" id="debugToggle">Debug</button>
+    <div class="debug-panel" id="debugPanel">
+        <h3>Connection Debug</h3>
+        <div id="debugInfo">
+            <p>API Base URL: <span id="debugApiUrl">http://localhost:8000</span></p>
+            <p>Status: <span id="debugStatus">Not checked</span></p>
+            <p>Last Error: <span id="debugError">None</span></p>
+        </div>
+        <button id="testConnectionBtn">Test Connection</button>
+        <button id="changePortBtn">Change Port</button>
+    </div>
 
     <script>
-        // Define the base URL for your backend API
-        const API_BASE_URL = 'http://localhost:8000';
+    // Define the base URL for your backend API
+    let API_BASE_URL = 'http://localhost:8000/api';
 
-        // Modal functionality
-        const modal = document.getElementById('loginModal');
-        const signInBtn = document.getElementById('signInBtn');
-        const closeModalBtn = document.getElementById('closeModal');
-        
-        // Open modal when sign in button is clicked
-        signInBtn.addEventListener('click', () => {
+    // Modal functionality
+    const modal = document.getElementById('loginModal');
+    const signInBtn = document.getElementById('signInBtn');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    // Connection status elements
+    const connectionStatus = document.getElementById('connectionStatus');
+    const statusIcon = connectionStatus.querySelector('.status-icon');
+    const statusText = connectionStatus.querySelector('.status-text');
+
+    // Debug elements
+    const debugToggle = document.getElementById('debugToggle');
+    const debugPanel = document.getElementById('debugPanel');
+    const debugApiUrl = document.getElementById('debugApiUrl');
+    const debugStatus = document.getElementById('debugStatus');
+    const debugError = document.getElementById('debugError');
+    const testConnectionBtn = document.getElementById('testConnectionBtn');
+    const changePortBtn = document.getElementById('changePortBtn');
+
+    // Function to update connection status
+    function updateConnectionStatus(status, message) {
+        connectionStatus.classList.remove('hidden', 'connected', 'disconnected', 'connecting');
+
+        switch (status) {
+            case 'connected':
+                connectionStatus.classList.add('connected');
+                statusIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+                break;
+            case 'disconnected':
+                connectionStatus.classList.add('disconnected');
+                statusIcon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+                break;
+            case 'connecting':
+                connectionStatus.classList.add('connecting');
+                statusIcon.innerHTML = '<div class="spinner"></div>';
+                break;
+        }
+
+        statusText.textContent = message;
+        connectionStatus.classList.remove('hidden');
+
+        // Update debug panel
+        debugStatus.textContent = status;
+        if (status === 'disconnected') {
+            debugError.textContent = message;
+        }
+    }
+
+    // Function to check backend connection - SIMPLIFIED VERSION
+    async function checkBackendConnection() {
+        updateConnectionStatus('connecting', 'Checking backend connection...');
+        debugStatus.textContent = 'checking';
+
+        try {
+            console.log('Testing connection to:', `${API_BASE_URL}/health`);
+            
+            // Try multiple endpoints in case one fails
+            let response;
+            try {
+                response = await fetch(`${API_BASE_URL}/health`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+            } catch (error) {
+                // If /health fails, try the root API endpoint
+                console.log('Health endpoint failed, trying root API...');
+                response = await fetch(`${API_BASE_URL}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+            }
+
+            console.log('Response status:', response.status);
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Backend response:', data);
+                
+                updateConnectionStatus('connected', 'Connected to backend');
+                debugStatus.textContent = 'connected';
+                debugError.textContent = 'None';
+
+                // Hide status after 3 seconds if connected
+                setTimeout(() => {
+                    connectionStatus.classList.add('hidden');
+                }, 3000);
+
+                return true;
+            } else {
+                throw new Error(`Server returned ${response.status}`);
+            }
+        } catch (error) {
+            console.error('Backend connection failed:', error);
+            updateConnectionStatus('disconnected', `Connection error: ${error.message}`);
+            debugStatus.textContent = 'disconnected';
+            debugError.textContent = error.message;
+            return false;
+        }
+    }
+
+    // Enhanced fetch with timeout and better error handling
+    async function fetchWithTimeout(url, options = {}, timeout = 8000) {
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+
+        try {
+            const response = await fetch(url, {
+                ...options,
+                signal: controller.signal
+            });
+            clearTimeout(id);
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || errorData.message || `Server returned ${response.status}`);
+            }
+
+            return response;
+        } catch (error) {
+            clearTimeout(id);
+
+            if (error.name === 'AbortError') {
+                throw new Error('Request timeout: Server is not responding');
+            } else if (error.name === 'TypeError') {
+                throw new Error('Network error: Cannot connect to the server');
+            } else {
+                throw error;
+            }
+        }
+    }
+
+    // Open modal when sign in button is clicked
+    signInBtn.addEventListener('click', async () => {
+        // Check backend connection before showing modal
+        const isConnected = await checkBackendConnection();
+
+        if (isConnected) {
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden'; // Prevent scrolling
-        });
-        
-        // Close modal when X is clicked
-        closeModalBtn.addEventListener('click', () => {
+        } else {
+            // Show error message if backend is not connected
+            alert('Cannot connect to the server. Please make sure the backend is running on localhost:8000\n\nCheck the debug panel (click the Debug button) for more information.');
+        }
+    });
+
+    // Close modal when X is clicked
+    closeModalBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Re-enable scrolling
+    });
+
+    // Close modal when clicking outside the modal content
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
             modal.style.display = 'none';
             document.body.style.overflow = 'auto'; // Re-enable scrolling
+        }
+    });
+
+    // Debug panel toggle
+    debugToggle.addEventListener('click', () => {
+        debugPanel.style.display = debugPanel.style.display === 'block' ? 'none' : 'block';
+    });
+
+    // Test connection button
+    testConnectionBtn.addEventListener('click', async () => {
+        await checkBackendConnection();
+    });
+
+    // Change port button
+    changePortBtn.addEventListener('click', () => {
+        const newPort = prompt('Enter new port number (default is 8000):', '8000');
+        if (newPort) {
+            API_BASE_URL = `http://localhost:${newPort}/api`;
+            debugApiUrl.textContent = API_BASE_URL;
+            localStorage.setItem('apiBaseUrl', API_BASE_URL);
+            checkBackendConnection();
+        }
+    });
+
+    // Function to show the selected form and hide others
+    function showForm(formId) {
+        // Hide all forms
+        document.querySelectorAll('.auth-form').forEach(form => {
+            form.classList.remove('active');
         });
-        
-        // Close modal when clicking outside the modal content
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto'; // Re-enable scrolling
+
+        // Show the selected form
+        document.getElementById(formId).classList.add('active');
+
+        // Reset messages
+        document.querySelectorAll('.message').forEach(message => {
+            message.style.display = 'none';
+        });
+    }
+
+    // Form validation and submission
+    document.addEventListener('DOMContentLoaded', function () {
+        // Load saved API URL if exists
+        const savedApiUrl = localStorage.getItem('apiBaseUrl');
+        if (savedApiUrl) {
+            API_BASE_URL = savedApiUrl;
+            debugApiUrl.textContent = API_BASE_URL;
+        }
+
+        // Check backend connection on page load
+        checkBackendConnection();
+
+        // Login form submission - UPDATED AND CORRECTED
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const loginButton = this.querySelector('.auth-btn');
+            const errorMessage = document.getElementById('loginErrorMessage');
+            const successMessage = document.getElementById('loginSuccessMessage');
+
+            // Basic validation
+            if (!email || !password) {
+                errorMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please fill in all fields';
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+                return;
+            }
+
+            loginButton.disabled = true;
+            loginButton.textContent = 'LOGGING IN...';
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+
+            try {
+                console.log('Attempting login with:', email);
+                
+                const response = await fetchWithTimeout(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await response.json();
+                console.log('Login successful:', data);
+                
+                // Store the access token
+                localStorage.setItem('accessToken', data.access_token);
+                localStorage.setItem('userEmail', email);
+
+                successMessage.style.display = 'block';
+                errorMessage.style.display = 'none';
+
+                // Redirect to marketplace after successful login
+                setTimeout(() => {
+                    window.location.href = '/marketplace';
+                }, 1500);
+
+            } catch (error) {
+                console.error('Login error:', error);
+                
+                let errorMsg = error.message;
+                if (error.message.includes('401') || error.message.includes('Incorrect email or password')) {
+                    errorMsg = 'Invalid email or password';
+                } else if (error.message.includes('Failed to fetch') || error.message.includes('Network error')) {
+                    errorMsg = 'Cannot connect to authentication server. Please check if the backend is running.';
+                } else if (error.message.includes('404')) {
+                    errorMsg = 'Authentication endpoint not found. Check backend routes.';
+                }
+                
+                errorMessage.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${errorMsg}`;
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+
+                updateConnectionStatus('disconnected', `Login failed: ${error.message}`);
+            } finally {
+                loginButton.disabled = false;
+                loginButton.textContent = 'Log In';
             }
         });
-        
-        // Function to show the selected form and hide others
-        function showForm(formId) {
-            // Hide all forms
-            document.querySelectorAll('.auth-form').forEach(form => {
-                form.classList.remove('active');
-            });
-            
-            // Show the selected form
-            document.getElementById(formId).classList.add('active');
-            
-            // Reset messages
-            document.querySelectorAll('.message').forEach(message => {
-                message.style.display = 'none';
-            });
-        }
-        
-        // Form validation and submission
-        document.addEventListener('DOMContentLoaded', function() {
-            // Login form submission
-            document.getElementById('loginForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
+
+        // Registration form submission - UPDATED AND CORRECTED
+        document.getElementById('registerForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            const registerButton = this.querySelector('.auth-btn');
+            const errorMessage = document.getElementById('registerErrorMessage');
+            const successMessage = document.getElementById('registerSuccessMessage');
+
+            // Client-side validation
+            if (password !== confirmPassword) {
+                errorMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Passwords do not match';
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+                return;
+            }
+
+            if (password.length < 6) {
+                errorMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Password must be at least 6 characters';
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+                return;
+            }
+
+            if (!username || !email || !password) {
+                errorMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please fill in all fields';
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+                return;
+            }
+
+            registerButton.disabled = true;
+            registerButton.textContent = 'CREATING ACCOUNT...';
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+
+            try {
+                console.log('Attempting registration for:', email);
                 
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                const loginButton = this.querySelector('.auth-btn');
-                loginButton.disabled = true;
-                loginButton.textContent = 'LOGGING IN...';
+                const response = await fetchWithTimeout(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, email, password }),
+                });
 
-
-                try {
-                    // Use the full API URL for the fetch request
-                    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ email, password }),
-                    });
-
-                    // Check if response is ok, if not, try to parse error
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.detail || 'Login failed');
-                    }
-
-                    const data = await response.json();
-                    localStorage.setItem('accessToken', data.access_token);
-                    
-                    document.getElementById('loginSuccessMessage').style.display = 'block';
-                    document.getElementById('loginErrorMessage').style.display = 'none';
-
-                    setTimeout(() => {
-                        window.location.href = '/marketplace.html'; // Redirect to marketplace or dashboard
-                    }, 1500);
-
-                } catch (error) {
-                    const loginErrorMessage = document.getElementById('loginErrorMessage');
-                    loginErrorMessage.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message}`;
-                    loginErrorMessage.style.display = 'block';
-                    document.getElementById('loginSuccessMessage').style.display = 'none';
-                } finally {
-                    loginButton.disabled = false;
-                    loginButton.textContent = 'Log In';
-                }
-            });
-            
-            // Registration form submission
-            document.getElementById('registerForm').addEventListener('submit', async function(e) {
-                e.preventDefault();
+                const data = await response.json();
+                console.log('Registration successful:', data);
                 
-                const username = document.getElementById('regUsername').value;
-                const email = document.getElementById('regEmail').value;
-                const password = document.getElementById('regPassword').value;
-                const confirmPassword = document.getElementById('regConfirmPassword').value;
-                const registerButton = this.querySelector('.auth-btn');
-                
-                if (password !== confirmPassword) {
-                    const registerErrorMessage = document.getElementById('registerErrorMessage');
-                    registerErrorMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> Passwords do not match';
-                    registerErrorMessage.style.display = 'block';
-                    return;
-                }
+                successMessage.style.display = 'block';
+                errorMessage.style.display = 'none';
 
-                registerButton.disabled = true;
-                registerButton.textContent = 'CREATING ACCOUNT...';
-                
-                try {
-                    // Use the full API URL for the fetch request
-                    const response = await fetch(`${API_BASE_URL}/auth/register`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ username, email, password }),
-                    });
+                // Clear form and switch to login after successful registration
+                document.getElementById('regUsername').value = '';
+                document.getElementById('regEmail').value = '';
+                document.getElementById('regPassword').value = '';
+                document.getElementById('regConfirmPassword').value = '';
 
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.detail || 'Registration failed');
-                    }
-
-                    document.getElementById('registerSuccessMessage').style.display = 'block';
-                    document.getElementById('registerErrorMessage').style.display = 'none';
-
-                    setTimeout(() => {
-                        showForm('loginForm');
-                    }, 1500);
-
-                } catch (error) {
-                    const registerErrorMessage = document.getElementById('registerErrorMessage');
-                    registerErrorMessage.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${error.message}`;
-                    registerErrorMessage.style.display = 'block';
-                    document.getElementById('registerSuccessMessage').style.display = 'none';
-                } finally {
-                    registerButton.disabled = false;
-                    registerButton.textContent = 'Create Account';
-                }
-            });
-            
-            // (The rest of the placeholder forms remain unchanged)
-            document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                document.getElementById('recoverySuccessMessage').style.display = 'block';
-            });
-            
-            document.getElementById('verificationForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                document.getElementById('verificationSuccessMessage').style.display = 'block';
-                
-                setTimeout(function() {
+                setTimeout(() => {
                     showForm('loginForm');
+                    // Pre-fill the login email
+                    document.getElementById('email').value = email;
                 }, 1500);
-            });
-            
-            const verificationInputs = document.querySelectorAll('.verification-code input');
-            verificationInputs.forEach((input, index) => {
-                input.addEventListener('input', function() {
-                    if (this.value.length === 1 && index < verificationInputs.length - 1) {
-                        verificationInputs[index + 1].focus();
-                    }
-                });
+
+            } catch (error) {
+                console.error('Registration error:', error);
                 
-                input.addEventListener('keydown', function(e) {
-                    if (e.key === 'Backspace' && this.value === '' && index > 0) {
-                        verificationInputs[index - 1].focus();
-                    }
-                });
+                let errorMsg = error.message;
+                if (error.message.includes('400') && error.message.includes('already registered')) {
+                    errorMsg = 'Email already registered';
+                } else if (error.message.includes('Failed to fetch') || error.message.includes('Network error')) {
+                    errorMsg = 'Cannot connect to authentication server. Please check if the backend is running.';
+                } else if (error.message.includes('404')) {
+                    errorMsg = 'Registration endpoint not found. Check backend routes.';
+                }
+                
+                errorMessage.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${errorMsg}`;
+                errorMessage.style.display = 'block';
+                successMessage.style.display = 'none';
+
+                updateConnectionStatus('disconnected', `Registration failed: ${error.message}`);
+            } finally {
+                registerButton.disabled = false;
+                registerButton.textContent = 'Create Account';
+            }
+        });
+
+        // Placeholder forms for forgot password and verification
+        document.getElementById('forgotPasswordForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            document.getElementById('recoveryInfoMessage').style.display = 'block';
+            document.getElementById('recoverySuccessMessage').style.display = 'none';
+            
+            setTimeout(() => {
+                document.getElementById('recoveryInfoMessage').style.display = 'none';
+                document.getElementById('recoverySuccessMessage').style.display = 'block';
+            }, 1000);
+        });
+
+        document.getElementById('verificationForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            document.getElementById('verificationSuccessMessage').style.display = 'block';
+
+            setTimeout(function () {
+                showForm('loginForm');
+            }, 1500);
+        });
+
+        // Verification code input handling
+        const verificationInputs = document.querySelectorAll('.verification-code input');
+        verificationInputs.forEach((input, index) => {
+            input.addEventListener('input', function () {
+                if (this.value.length === 1 && index < verificationInputs.length - 1) {
+                    verificationInputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('keydown', function (e) {
+                if (e.key === 'Backspace' && this.value === '' && index > 0) {
+                    verificationInputs[index - 1].focus();
+                }
             });
         });
-    </script>
+
+        // Resend code functionality
+        document.querySelector('.resend-code').addEventListener('click', function() {
+            alert('Verification code has been resent to your email.');
+        });
+    });
+</script>
 </body>
+
 </html>
