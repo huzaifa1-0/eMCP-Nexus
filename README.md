@@ -103,6 +103,6 @@ A: We support crypto micro-payments and Stripe for flexible, global access.
 **Q: Can I use eMCP Nexus for free?**
 A: Many tools are free or offer free tiers. Paid tools use a pay-per-use model.
 
----
+-----------------------------------------------------------------------------------------------------------------------------
 
 eMCP Nexus — Accelerating software innovation for everyone.
