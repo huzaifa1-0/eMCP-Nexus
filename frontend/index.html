@@ -966,14 +966,6 @@
     const statusIcon = connectionStatus.querySelector('.status-icon');
     const statusText = connectionStatus.querySelector('.status-text');
 
-    // Debug elements
-    const debugToggle = document.getElementById('debugToggle');
-    const debugPanel = document.getElementById('debugPanel');
-    const debugApiUrl = document.getElementById('debugApiUrl');
-    const debugStatus = document.getElementById('debugStatus');
-    const debugError = document.getElementById('debugError');
-    const testConnectionBtn = document.getElementById('testConnectionBtn');
-    const changePortBtn = document.getElementById('changePortBtn');
 
     // Function to update connection status
     function updateConnectionStatus(status, message) {
@@ -997,17 +989,11 @@
         statusText.textContent = message;
         connectionStatus.classList.remove('hidden');
 
-        // Update debug panel
-        debugStatus.textContent = status;
-        if (status === 'disconnected') {
-            debugError.textContent = message;
-        }
     }
 
     // Function to check backend connection - SIMPLIFIED VERSION
     async function checkBackendConnection() {
         updateConnectionStatus('connecting', 'Checking backend connection...');
-        debugStatus.textContent = 'checking';
 
         try {
             console.log('Testing connection to:', `${API_BASE_URL}/health`);
@@ -1039,8 +1025,6 @@
                 console.log('Backend response:', data);
                 
                 updateConnectionStatus('connected', 'Connected to backend');
-                debugStatus.textContent = 'connected';
-                debugError.textContent = 'None';
 
                 // Hide status after 3 seconds if connected
                 setTimeout(() => {
@@ -1054,8 +1038,6 @@
         } catch (error) {
             console.error('Backend connection failed:', error);
             updateConnectionStatus('disconnected', `Connection error: ${error.message}`);
-            debugStatus.textContent = 'disconnected';
-            debugError.textContent = error.message;
             return false;
         }
     }
@@ -1119,27 +1101,6 @@
         }
     });
 
-    // Debug panel toggle
-    debugToggle.addEventListener('click', () => {
-        debugPanel.style.display = debugPanel.style.display === 'block' ? 'none' : 'block';
-    });
-
-    // Test connection button
-    testConnectionBtn.addEventListener('click', async () => {
-        await checkBackendConnection();
-    });
-
-    // Change port button
-    changePortBtn.addEventListener('click', () => {
-        const newPort = prompt('Enter new port number (default is 8000):', '8000');
-        if (newPort) {
-            API_BASE_URL = `http://localhost:${newPort}/api`;
-            debugApiUrl.textContent = API_BASE_URL;
-            localStorage.setItem('apiBaseUrl', API_BASE_URL);
-            checkBackendConnection();
-        }
-    });
-
     // Function to show the selected form and hide others
     function showForm(formId) {
         // Hide all forms
@@ -1162,7 +1123,6 @@
         const savedApiUrl = localStorage.getItem('apiBaseUrl');
         if (savedApiUrl) {
             API_BASE_URL = savedApiUrl;
-            debugApiUrl.textContent = API_BASE_URL;
         }
 
         // Check backend connection on page load
