@@ -130,6 +130,21 @@ async def serve_marketplace():
         return FileResponse(marketplace_path)
     else:
         return {"error": "marketplace.html not found", "path": marketplace_path}
+    
+
+@app.get("/seller_dashboard.html")
+async def serve_seller_dashboard():
+    path = os.path.join(frontend_dir, "seller_dashboard.html")
+    if os.path.exists(path):
+        return FileResponse(path)
+    return {"error": "file not found"}
+
+@app.get("/newmcp.html")
+async def serve_new_mcp():
+    path = os.path.join(frontend_dir, "newmcp.html")
+    if os.path.exists(path):
+        return FileResponse(path)
+    return {"error": "file not found"}
 
 # ✅ ADD: Catch-all route for SPA routing (should be last)
 @app.get("/{full_path:path}")
