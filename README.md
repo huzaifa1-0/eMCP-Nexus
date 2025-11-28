@@ -1,4 +1,3 @@
-
 # eMCP Nexus: The Smart Marketplace for On-Demand Compute
 
 eMCP Nexus is a next-generation marketplace and platform for discovering, deploying, and monetizing developer tools, APIs, and Modular Compute Protocols (MCPs). Unlike traditional marketplaces that rely on keyword search, eMCP Nexus uses advanced vector search (FAISS) to understand the true functionality of tools—making discovery smarter, faster, and more relevant.
@@ -104,6 +103,6 @@ A: We support crypto micro-payments and Stripe for flexible, global access.
 **Q: Can I use eMCP Nexus for free?**
 A: Many tools are free or offer free tiers. Paid tools use a pay-per-use model.
 
----
+-----------------------------------------------------------------------------------------------------------------------------
 
 eMCP Nexus — Accelerating software innovation for everyone.
