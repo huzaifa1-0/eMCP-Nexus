@@ -1,6 +1,6 @@
-# eMCP Nexus: The Smart Marketplace for On-Demand Compute
+# eMCP Nexus: The Smart Marketplace for On-Demand MCP Tools
 
-eMCP Nexus is a next-generation marketplace and platform for discovering, deploying, and monetizing developer tools, APIs, and Modular Compute Protocols (MCPs). Unlike traditional marketplaces that rely on keyword search, eMCP Nexus uses advanced vector search (FAISS) to understand the true functionality of tools—making discovery smarter, faster, and more relevant.
+eMCP Nexus is a next-generation marketplace and platform for discovering, deploying, and monetizing developer tools, APIs, and Model Context Protocols (MCPs). Unlike traditional marketplaces that rely on keyword search, eMCP Nexus uses advanced vector search (FAISS) to understand the true functionality of tools—making discovery smarter, faster, and more relevant.
 
 ## 🚀 Key Features
 
@@ -9,7 +9,7 @@ eMCP Nexus is a next-generation marketplace and platform for discovering, deploy
 	- FAISS-powered search matches tools by meaning, not just keywords.
 
 - **Instant MCP Deployment:**
-	- Deploy any GitHub repository as a live, reusable Modular Compute Protocol (MCP) with one click.
+	- Deploy any GitHub repository as a live, reusable Model Context Protocol (MCP) with one click.
 	- No extra setup required—share your code as a service instantly.
 
 - **Crypto Micro-Payments:**
