@@ -476,106 +476,192 @@
         </footer>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.querySelector('.search-input');
-            const searchBtn = document.querySelector('.search-btn');
-            const resultsCount = document.querySelector('.results-count');
-            const mcpCards = document.querySelectorAll('.mcp-card');
-            
-            // Search functionality
-            searchBtn.addEventListener('click', performSearch);
-            searchInput.addEventListener('keyup', function(e) {
-                if (e.key === 'Enter') {
-                    performSearch();
-                }
-            });
-            
-            function performSearch() {
-                const searchTerm = searchInput.value.toLowerCase();
-                let visibleCount = 0;
-                
-                mcpCards.forEach(card => {
-                    const cardText = card.textContent.toLowerCase();
-                    if (cardText.includes(searchTerm)) {
-                        card.style.display = 'block';
-                        visibleCount++;
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
-                
-                resultsCount.textContent = `${visibleCount} MCPs available`;
-                document.querySelector('.status-badge').innerHTML = `<i class="fas fa-check-circle"></i> ${visibleCount} eMCPs available`;
-            }
-            
-            // Simulate loading state for YouTube Clipping Tool
-            const youtubeCard = document.querySelector('.mcp-card:first-child');
-            const loadingElement = youtubeCard.querySelector('.mcp-status');
-            
-            setTimeout(() => {
+   <script>
+    const API_BASE_URL = '/api';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchTools();
+        
+        // Search functionality
+        const searchBtn = document.getElementById('searchBtn');
+        const searchInput = document.getElementById('searchInput');
+        
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') performSearch();
+        });
+        
+        // Update static card loading state after a few seconds
+        setTimeout(() => {
+            const loadingElement = document.querySelector('.static-card .mcp-status');
+            if(loadingElement) {
                 loadingElement.innerHTML = '<i class="fas fa-exclamation-triangle"></i> No tools available';
                 loadingElement.style.background = 'rgba(51, 51, 34, 0.7)';
                 loadingElement.style.color = '#ccc';
-            }, 3000);
+            }
+        }, 3000);
+    });
+
+    let allTools = [];
+
+    // 1. Fetch Tools from Backend
+    async function fetchTools() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/tools/`);
+            if (!response.ok) throw new Error("Failed to fetch tools");
             
-            // Connect button functionality
-            const connectButtons = document.querySelectorAll('.btn-primary');
-            connectButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const card = this.closest('.mcp-card');
-                    const title = card.querySelector('.mcp-title').textContent;
-                    
-                    if (this.innerHTML.includes('Connect')) {
-                        showAlert(`Connecting to ${title}...`, 'success');
-                    } else if (this.innerHTML.includes('Copy')) {
-                        navigator.clipboard.writeText(`Config for ${title}`).then(() => {
-                            showAlert(`Configuration for ${title} copied to clipboard!`, 'success');
-                        });
-                    }
-                });
-            });
+            allTools = await response.json();
+            appendToolsToGrid(allTools);
             
-            // Details button functionality
-            const detailsButtons = document.querySelectorAll('.btn-secondary');
-            detailsButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const card = this.closest('.mcp-card');
-                    const title = card.querySelector('.mcp-title').textContent;
-                    
-                    if (this.innerHTML.includes('Details')) {
-                        showAlert(`Showing details for ${title}`, 'success');
-                    } else if (this.innerHTML.includes('Connect')) {
-                        showAlert(`Connecting to ${title}...`, 'success');
-                    }
-                });
-            });
+            // Update counts (Static 2 + Dynamic N)
+            const totalTools = 2 + allTools.length;
+            const resultsCount = document.getElementById('resultsCount');
+            const statusBadge = document.getElementById('statusBadge');
             
-            // Function to show alert message
-            function showAlert(message, type) {
-                // Remove any existing alerts first
-                const existingAlert = document.querySelector('.alert');
-                if (existingAlert) {
-                    existingAlert.remove();
-                }
+            if (resultsCount) resultsCount.innerText = `${totalTools} eMCPs available`;
+            if (statusBadge) statusBadge.innerHTML = `<i class="fas fa-check-circle"></i> ${totalTools} eMCPs available`;
+            
+        } catch (error) {
+            console.error(error);
+            showAlert("Could not load dynamic tools: " + error.message, "error");
+        }
+    }
+
+    // 2. Append new cards to the existing grid (Matching Static Design Exactly)
+    function appendToolsToGrid(tools) {
+        const grid = document.getElementById('mcpGrid');
+
+        tools.forEach(tool => {
+            const card = document.createElement('div');
+            card.className = 'mcp-card dynamic-card'; // Same class as static cards
+            
+            // I constructed this HTML to match your "YouTube Clipping Tool" card exactly
+            card.innerHTML = `
+                <div class="mcp-header">
+                    <div class="mcp-title">${tool.name}</div>
+                    <div class="mcp-badge">eMCP service deployment</div>
+                </div>
                 
-                const alert = document.createElement('div');
-                alert.className = `alert`;
-                alert.innerHTML = `
-                    <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i>
-                    ${message}
-                `;
+                <div class="mcp-status" style="color: #4cc9f0; background: rgba(76, 201, 240, 0.1);">
+                    <i class="fas fa-check-circle"></i> Active & Ready
+                </div>
                 
-                document.querySelector('.container').insertBefore(alert, document.querySelector('.page-header'));
+                <div class="mcp-config" style="text-align: left; font-size: 13px; padding: 15px;">
+                    <div style="margin-bottom: 5px;"><strong>Description:</strong></div>
+                    <div style="color: #ccc; margin-bottom: 10px;">${tool.description}</div>
+                    <div><strong>Cost:</strong> $${tool.cost} / run</div>
+                    <div><strong>Branch:</strong> ${tool.branch}</div>
+                </div>
                 
-                // Remove alert after 3 seconds
-                setTimeout(() => {
-                    if (alert.parentElement) {
-                        alert.remove();
-                    }
-                }, 3000);
+                <div class="mcp-date">
+                    <i class="far fa-calendar"></i> GitHub: <a href="${tool.repo_url}" target="_blank" style="color: #999; text-decoration: underline;">View Repo</a>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="useTool(${tool.id}, '${tool.name}')">
+                        <i class="fas fa-play"></i> Run Tool
+                    </button>
+                    <button class="btn btn-secondary" onclick="showDetails('${tool.name}', '${tool.description}', ${tool.cost})">
+                        <i class="fas fa-info-circle"></i> Details
+                    </button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // 3. Search/Filter Logic
+    function performSearch() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const cards = document.querySelectorAll('.mcp-card');
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+            const text = card.textContent.toLowerCase();
+            if (text.includes(query)) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
             }
         });
-    </script>
+        
+        const resultsCount = document.getElementById('resultsCount');
+        if (resultsCount) resultsCount.innerText = `${visibleCount} eMCPs found`;
+    }
+
+    // 4. Functionality: Use/Run the Tool
+    async function useTool(toolId, toolName) {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+            showAlert("Please log in first!", "error");
+            return;
+        }
+
+        showAlert(`Running ${toolName}...`, "success");
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/tools/use/${toolId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+            
+            if (response.ok) {
+                const statusMsg = data.status === 'success' ? 'Success' : 'Failed';
+                alert(`✅ Execution Result:\n\nStatus: ${statusMsg}\nMessage: ${data.message}\nTime: ${data.processing_time}s`);
+            } else {
+                throw new Error(data.detail || "Execution failed");
+            }
+        } catch (error) {
+            showAlert(error.message, "error");
+        }
+    }
+
+    function showDetails(name, desc, cost) {
+        alert(`Details for ${name}:\n\n${desc}\n\nCost per run: $${cost}\n\nThis tool is hosted on eMCP Nexus.`);
+    }
+
+    // Helper to show floating alerts
+    function showAlert(message, type) {
+        // Remove existing alert
+        const existing = document.querySelector('.alert-popup');
+        if (existing) existing.remove();
+
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-popup';
+        alert.style.background = 'rgba(18, 18, 18, 0.95)';
+        alert.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+        alert.style.borderLeft = `4px solid ${type === 'error' ? '#ff4d4d' : '#4cc9f0'}`;
+        alert.style.padding = '15px 20px';
+        alert.style.borderRadius = '8px';
+        alert.style.color = '#fff';
+        alert.style.position = 'fixed';
+        alert.style.top = '20px';
+        alert.style.right = '20px';
+        alert.style.zIndex = '9999';
+        alert.style.display = 'flex';
+        alert.style.alignItems = 'center';
+        alert.style.gap = '10px';
+        alert.style.boxShadow = '0 5px 15px rgba(0,0,0,0.5)';
+        alert.style.minWidth = '300px';
+        
+        alert.innerHTML = `
+            <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'info-circle'}" style="color: ${type === 'error' ? '#ff4d4d' : '#4cc9f0'}"></i>
+            <span>${message}</span>
+        `;
+        document.body.appendChild(alert);
+
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            alert.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => alert.remove(), 500);
+        }, 4000);
+    }
+</script>
 </body>
 </html>

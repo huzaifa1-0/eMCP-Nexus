@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from ..models.db import DBTool, DBUser
 from ..models.pydantic import ToolCreate, Tool
@@ -10,9 +11,22 @@ from backend.ai_services.search_engine import add_tool_to_faiss
 from backend.ai_services.monitoring import log_tool_usage
 import random 
 import time
+from backend import crud
 from backend.services.deployment import deploy_tool
 
 router = APIRouter()
+
+
+
+@router.get("/", response_class=List[Tool])
+async def read_tools(
+    skip: int = 0,
+    limit: int = 100,
+    session: AsyncSession = Depends(get_async_session)
+):
+    """Get a list of all available tools from the database."""
+    tools = await crud.get_tools(session, skip=skip, limit=limit)
+    return tools
 
 async def get_tool(tool_id: int, session: AsyncSession):
     result = await session.execute(select(DBTool).where(DBTool.id == tool_id))
@@ -88,7 +102,8 @@ async def use_tool(
     return {
         "status": "success" if success else "failure",
         "message": f"Tool {tool.name} executed.",
-        "processing_time": processing_time
+        "processing_time": round(processing_time, 3),
+        "result": "Sample output data from tool..."
     }
 
 
