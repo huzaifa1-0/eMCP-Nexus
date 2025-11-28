@@ -1,4 +1,5 @@
 from typing import List
+from backend import crud
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from ..models.db import DBTool, DBUser
 from ..models.pydantic import ToolCreate, Tool
@@ -11,14 +12,14 @@ from backend.ai_services.search_engine import add_tool_to_faiss
 from backend.ai_services.monitoring import log_tool_usage
 import random 
 import time
-from backend import crud
+
 from backend.services.deployment import deploy_tool
 
 router = APIRouter()
 
 
 
-@router.get("/", response_class=List[Tool])
+@router.get("/", response_model=List[Tool])
 async def read_tools(
     skip: int = 0,
     limit: int = 100,
