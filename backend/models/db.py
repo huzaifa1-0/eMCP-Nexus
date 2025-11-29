@@ -1,6 +1,8 @@
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column, declarative_base
+from sqlalchemy import JSON
+
 
 Base = declarative_base()
 
@@ -25,6 +27,8 @@ class DBTool(Base):
     branch: Mapped[str] = mapped_column(String, default="main")
     owner_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id")) # Corrected to Integer
     url: Mapped[str] = mapped_column(String)
+    tool_definition: Mapped[dict] = mapped_column(JSON, nullable=True)
+    deploy_id: Mapped[str] = mapped_column(String, nullable=True)
     
     owner: Mapped["DBUser"] = relationship("DBUser", back_populates="tools")
     transactions: Mapped[list["DBTransaction"]] = relationship("DBTransaction", back_populates="tool")
