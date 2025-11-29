@@ -7,45 +7,52 @@ load_dotenv()
 RENDER_API_KEY = os.getenv("RENDER_API_KEY")
 RENDER_OWNER_ID = os.getenv("RENDER_OWNER_ID")
 
-async def deploy_tool(repo_url: str) -> dict:
+async def deploy_tool(repo_url: str):
+    api_key = os.getenv("RENDER_API_KEY")
+    owner_id = os.getenv("RENDER_OWNER_ID")  # <--- Load Owner ID
     
-    if not RENDER_API_KEY or not RENDER_OWNER_ID:
-        raise ValueError("Render API key or owner ID is not set in environment variables.")
-    
+    if not api_key or not owner_id:
+        raise ValueError("Missing RENDER_API_KEY or RENDER_OWNER_ID")
+
+    url = "https://api.render.com/v1/services"
     headers = {
-        "Authentication": f"Bearer {RENDER_API_KEY}",
-        "Content-Type": "application/json",
-        "Accept": "application/json"
+        "Authorization": f"Bearer {api_key}",
+        "Accept": "application/json",
+        "Content-Type": "application/json"
     }
-
-    service_name = repo_url.split("/")[-1].replace(".git", "")
-
+    
+    # Simple payload to deploy a Node/Python service from a public repo
     payload = {
         "serviceDetails": {
-            "env":"Python",
-            "repo": repo_url,
-            "name": service_name,
-            "ownerId": RENDER_OWNER_ID,
-            "autoDeploy": "yes",
-            "branch": "main"
+            "env": "node", # or 'python' depending on your tool
+            "envSpecificDetails": {
+                "buildCommand": "npm install",
+                "startCommand": "node index.js"
+            }
         },
-        "type": "web_srv",
+        "type": "web_service",
+        "name": repo_url.split("/")[-1], # Use repo name as service name
+        "ownerId": owner_id, # <--- Use the ID you found
+        "repo": repo_url,
+        "autoDeploy": "yes",
+        "branch": "main"
     }
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.post("https://api.render.com/v1/services", headers=headers, json=payload)
+
+    async with httpx.AsyncClient() as client:
+        try:
+            response = await client.post(url, json=payload, headers=headers)
             response.raise_for_status()
             data = response.json()
-
+            
+            # RETURN BOTH URL AND ID
             return {
-                        "url": data["service"]["url"],
-                        "serviceId": data["service"]["id"]
+                "url": data["service"]["serviceDetails"]["url"],
+                "serviceId": data["service"]["id"]  # <--- Critical for monitoring!
             }
-    except httpx.HTTPError as e:
-         raise ValueError(f"Render API error: {e.response.status_code} - {e.response.text}")
-    except httpx.RequestError as e:
-        # Handle network-level errors
-        raise ValueError(f"Failed to connect to Render API: {str(e)}")
+            
+        except httpx.HTTPError as e:
+            print(f"Render Error: {e.response.text if e.response else e}")
+            raise ValueError(f"Render API error: {e.response.status_code if e.response else 'Unknown'}")
     
 
 async def get_service_status(service_id: str) -> str:

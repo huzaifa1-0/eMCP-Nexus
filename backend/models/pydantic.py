@@ -5,7 +5,7 @@ from pydantic import field_validator, Field
 class ToolBase(BaseModel):
     name: str
     description: str
-    cost: float = Field(..., gt=0, description="Tool cost must be positive")
+    cost: float = Field(..., ge=0, description="Tool cost must be positive")
     repo_url: str
     branch: str = "main"
 
