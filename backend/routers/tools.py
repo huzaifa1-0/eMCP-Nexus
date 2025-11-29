@@ -1,3 +1,4 @@
+import asyncio
 from typing import List
 from backend import crud
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
@@ -13,11 +14,51 @@ from backend.ai_services.monitoring import log_tool_usage
 import random 
 import time
 
-from backend.services.deployment import deploy_tool
+from backend.services.deployment import deploy_tool, get_service_status
+from backend.services.discovery import discover_tools
 
 router = APIRouter()
 
 
+
+async def monitor_deployment_and_discover(service_id: str, db_tool_id: int, db_session_factory):
+    """
+    Polls Render API until service is live, then runs discovery.
+    """
+    print(f"⏳ Starting monitoring for Service ID: {service_id}")
+
+    async with db_session_factory() as session:
+        max_retries = 60
+
+        for i in range(max_retries):
+            status = await get_service_status(service_id)
+            print(f"   Status check {i+1}: {status}")
+
+            result = await session.execute(select(DBTool).where(DBTool.id == db_tool_id))
+            tool = result.scalar_one_or_none()
+
+            if tool:
+                tool.status = status
+                await session.commit()
+            
+            if status == "live":
+                print(f"🚀 Service is LIVE! Starting discovery on {tool.url}...")
+
+                await asyncio.sleep(10)
+
+                discovered_tools = await discover_tools(tool.url)
+
+                if discovered_tools:
+                    tool.tool_definitions = discovered_tools
+                    # Optionally update description with discovered info
+                    tool.description = f"{tool.description} | Includes: {', '.join([t['name'] for t in discovered_tools])}"
+                    await session.commit()
+                    await add_tool_to_faiss(tool.id, tool.name, tool.description)
+                
+                break
+            
+            # Wait before next check
+            await asyncio.sleep(5)
 
 @router.get("/", response_model=List[Tool])
 async def read_tools(
@@ -46,6 +87,8 @@ async def create_tool(
     
     deployment_info = await deploy_tool(repo_url=tool_data.repo_url)
 
+    service_id = deployment_info.get("serviceId", "unknown")
+
     db_tool = DBTool(
         name = tool_data.name,
         description = tool_data.description,
@@ -53,17 +96,21 @@ async def create_tool(
         repo_url = tool_data.repo_url,
         branch = tool_data.branch,
         url = deployment_info["url"],
-        owner_id = user.id
+        deploy_id = service_id,
+        owner_id = user.id,
+        status = "deploying"
     )
     session.add(db_tool)
     await session.commit()
     await session.refresh(db_tool)
 
+
+    from backend.db import async_session_factory
     background_tasks.add_task(
-        add_tool_to_faiss,
-        tool_id=db_tool.id,
-        name=db_tool.name,
-        description=db_tool.description
+        monitor_deployment_and_discover,
+        service_id,
+        db_tool.id,
+        async_session_factory
     )
     
     
