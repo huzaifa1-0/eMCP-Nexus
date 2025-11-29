@@ -14,5 +14,6 @@ passlib[bcrypt]
 asyncpg
 authlib
 aiosqlite
+mcp
 httpx
 aiohttp
