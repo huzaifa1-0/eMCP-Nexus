@@ -469,6 +469,7 @@
                 
             } catch (error) {
                 console.error(error);
+                if (statusBadge) statusBadge.innerHTML = `<i class="fas fa-times-circle"></i> System Offline`;
                 grid.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ff6b6b;">
                         <i class="fas fa-exclamation-circle" style="font-size: 48px; margin-bottom: 15px;"></i>
