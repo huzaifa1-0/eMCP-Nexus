@@ -51,3 +51,12 @@ async def get_dashboard_stats(
             select(func.sum(DBTransaction.amount)).where(DBTransaction.tool_id == tool.id)
         )
         tool_revenue = tool_rev_res.scalar() or 0.0
+
+        performance_data.append({
+            "name": tool.name,
+            "installs": 1, # Placeholder: In MCP, "install" usually means "created/deployed"
+            "runs": tool_runs,
+            "tokens": tool_runs * 150, # Placeholder estimate if you don't track exact tokens yet
+            "revenue": tool_revenue,
+            "date": "2025-01-01" # You can add created_at to DBTool later
+        })
