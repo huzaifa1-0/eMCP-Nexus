@@ -30,3 +30,9 @@ async def get_dashboard_stats(
             "totalRevenue": 0.0,
             "performanceData": []
         }
+    
+    runs_query = select(func.count(DBUsageLog.id)).where(DBUsageLog.tool_id.in_(tool_ids))
+    runs_result = await session.execute(runs_query)
+    total_runs = runs_result.scalar() or 0
+
+    
