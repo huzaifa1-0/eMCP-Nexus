@@ -542,12 +542,12 @@
             const query = document.getElementById('searchInput').value.trim();
             const grid = document.getElementById('mcpGrid');
             const resultsCount = document.getElementById('resultsCount');
-            const filtered = allTools.filter(t => 
-                t.name.toLowerCase().includes(query) || 
-                t.description.toLowerCase().includes(query)
-            );
-            renderTools(filtered);
-            document.getElementById('resultsCount').innerText = `${filtered.length} eMCPs found`;
+            
+            if (!query) {
+                fetchTools(); // Reloads the full list
+                return;
+            }
+            
         }
 
         // 4. Functionality: Use/Run the Tool
