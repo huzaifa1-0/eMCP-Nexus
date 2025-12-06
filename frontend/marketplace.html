@@ -553,7 +553,14 @@
                     <p>AI is analyzing your request...</p>
                 </div>`;
             
-            
+            try {
+                // Call the AI Search Endpoint
+                const response = await fetch(`${API_BASE_URL}/search/?query=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) throw new Error("Search failed");
+                
+                const data = await response.json();
+                const results = data.results;
         }
 
         // 4. Functionality: Use/Run the Tool
