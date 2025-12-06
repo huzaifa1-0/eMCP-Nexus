@@ -5,3 +5,6 @@ from typing import List, Dict, Any
 
 from backend.db import get_async_session
 from backend.security import get_current_user
+from backend.models.db import DBUser, DBTool, DBTransaction, DBUsageLog
+
+router = APIRouter()
