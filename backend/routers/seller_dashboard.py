@@ -60,3 +60,11 @@ async def get_dashboard_stats(
             "revenue": tool_revenue,
             "date": "2025-01-01" # You can add created_at to DBTool later
         })
+
+    return {
+        "totalInstalls": len(user_tools), # Total tools created
+        "totalRuns": total_runs,
+        "tokensUsed": total_runs * 150, # Estimated
+        "totalRevenue": total_revenue,
+        "performanceData": performance_data
+    }
