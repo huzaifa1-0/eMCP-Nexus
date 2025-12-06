@@ -538,8 +538,10 @@
         }
 
         // 3. Search/Filter Logic
-        function performSearch() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
+        async function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            const grid = document.getElementById('mcpGrid');
+            const resultsCount = document.getElementById('resultsCount');
             const filtered = allTools.filter(t => 
                 t.name.toLowerCase().includes(query) || 
                 t.description.toLowerCase().includes(query)
