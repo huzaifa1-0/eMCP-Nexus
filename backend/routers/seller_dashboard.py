@@ -38,3 +38,11 @@ async def get_dashboard_stats(
     revenue_query = select(func.sum(DBTransaction.amount)).where(DBTransaction.tool_id.in_(tool_ids))
     revenue_result = await session.execute(revenue_query)
     total_revenue = revenue_result.scalar() or 0.0
+
+    performance_data = []
+    for tool in user_tools:
+        # Get runs for this specific tool
+        tool_runs_res = await session.execute(
+            select(func.count(DBUsageLog.id)).where(DBUsageLog.tool_id == tool.id)
+        )
+        tool_runs = tool_runs_res.scalar() or 0
