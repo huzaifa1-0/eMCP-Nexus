@@ -105,7 +105,7 @@ async def debug_files():
     except Exception as e:
         return {"error": str(e)}
 
-# ✅ FIXED: Now include routers AFTER defining our custom routes
+
 app.include_router(tools.router, prefix="/api/tools", tags=["Tools"])
 app.include_router(payments.router, prefix="/api/payments", tags=["Payments"])
 app.include_router(search.router, prefix="/api/search", tags=["Search"])
@@ -113,8 +113,9 @@ app.include_router(monitoring.router, prefix="/api/monitoring", tags=["Monitorin
 app.include_router(reputation.router, prefix="/api/reputation", tags=["Reputation"])
 app.include_router(monetization.router, prefix="/api/monetization", tags=["Monetization"]) 
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"]) 
+app.include_router(seller_dashboard.router, prefix="/api/seller_dashboard", tags=["Seller Dashboard"])
 
-# ✅ FIXED: Serve frontend routes AFTER API routes
+
 @app.get("/")
 async def serve_index():
     index_path = os.path.join(frontend_dir, "index.html")
