@@ -17,4 +17,7 @@ async def get_dashboard_stats(
     """
     Returns aggregated metrics for the Seller Dashboard.
     """
+    result = await session.execute(select(DBTool).where(DBTool.owner_id == current_user.id))
+    user_tools = result.scalars().all()
+
     
