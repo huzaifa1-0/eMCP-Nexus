@@ -10,3 +10,6 @@ from backend.models.db import DBUser, DBTool, DBTransaction, DBUsageLog
 router = APIRouter()
 
 @router.get("/stats")
+async def get_dashboard_stats(
+    
+)
