@@ -20,4 +20,6 @@ async def get_dashboard_stats(
     result = await session.execute(select(DBTool).where(DBTool.owner_id == current_user.id))
     user_tools = result.scalars().all()
 
+    tool_ids = [t.id for t in user_tools]
+
     
