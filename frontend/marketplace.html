@@ -451,6 +451,7 @@
                 if (!response.ok) throw new Error("Failed to fetch tools");
                 
                 allTools = await response.json();
+                const count = allTools.length;
                 
                 // Update counts
                 if (statusBadge) statusBadge.innerHTML = `<i class="fas fa-check-circle"></i> ${allTools.length} eMCPs available`;
