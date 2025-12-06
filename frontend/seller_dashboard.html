@@ -432,116 +432,138 @@
         </footer>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set default date range (last 30 days)
-            const endDate = new Date();
-            const startDate = new Date();
-            startDate.setDate(startDate.getDate() - 30);
-            
-            document.getElementById('startDate').valueAsDate = startDate;
-            document.getElementById('endDate').valueAsDate = endDate;
-            
-            // Apply filter button functionality
-            document.getElementById('applyFilter').addEventListener('click', function() {
-                const start = document.getElementById('startDate').value;
-                const end = document.getElementById('endDate').value;
-                
-                if (!start || !end) {
-                    showAlert('Please select both start and end dates', 'error');
-                    return;
-                }
-                
-                // Simulate loading data
-                simulateDataLoading();
-            });
-            
-            // Create MCP button functionality
-            document.querySelector('.create-btn').addEventListener('click', function() {
-                window.location.href = 'newmcp.html';
-            });
-            
-            // Table sorting functionality
-            const tableHeaders = document.querySelectorAll('.metrics-table th');
-            tableHeaders.forEach(header => {
-                header.addEventListener('click', function() {
-                    const column = this.cellIndex;
-                    // In a real application, this would sort the table by the selected column
-                    showAlert(`Sorting by column ${column + 1}`, 'success');
-                    
-                    // Update sort indicator
-                    tableHeaders.forEach(h => {
-                        const icon = h.querySelector('i');
-                        if (h === this) {
-                            icon.className = 'fas fa-sort-down';
-                        } else {
-                            icon.className = 'fas fa-sort';
-                        }
-                    });
-                });
-            });
-            
-            // Simulate data loading with random metrics
-            function simulateDataLoading() {
-                // Show loading state
-                const metrics = ['totalInstalls', 'totalRuns', 'tokensUsed', 'totalRevenue'];
-                metrics.forEach(metric => {
-                    const element = document.getElementById(metric);
-                    element.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                });
-                
-                // Simulate API call delay
-                setTimeout(() => {
-                    // Generate random data
-                    document.getElementById('totalInstalls').textContent = Math.floor(Math.random() * 100);
-                    document.getElementById('totalRuns').textContent = Math.floor(Math.random() * 1000);
-                    document.getElementById('tokensUsed').textContent = Math.floor(Math.random() * 5000);
-                    document.getElementById('totalRevenue').textContent = '$' + (Math.random() * 1000).toFixed(2);
-                    
-                    // Show still no data in table
-                    document.getElementById('metricsTableBody').innerHTML = `
-                        <tr>
-                            <td colspan="6">
-                                <div class="no-data">
-                                    <i class="fas fa-inbox"></i>
-                                    <div class="no-data-title">No metrics data available</div>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                    
-                    showAlert('Data loaded for the selected date range', 'success');
-                }, 1500);
-            }
-            
-            // Function to show alert message
-            function showAlert(message, type) {
-                // Remove any existing alerts first
-                const existingAlert = document.querySelector('.alert');
-                if (existingAlert) {
-                    existingAlert.remove();
-                }
-                
-                const alert = document.createElement('div');
-                alert.className = `alert ${type === 'error' ? 'alert-error' : ''}`;
-                alert.innerHTML = `
-                    <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i>
-                    ${message}
-                `;
-                
-                document.querySelector('.container').insertBefore(alert, document.querySelector('.card'));
-                
-                // Remove alert after 3 seconds
-                setTimeout(() => {
-                    if (alert.parentElement) {
-                        alert.remove();
-                    }
-                }, 3000);
-            }
-            
-            // Simulate initial page load with zero data
-            // In a real application, this would fetch data from an API
+   <script>
+    const API_BASE_URL = '/api';
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Set default date range (Visual only for now)
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - 30);
+        
+        document.getElementById('startDate').valueAsDate = startDate;
+        document.getElementById('endDate').valueAsDate = endDate;
+        
+        // 2. Load REAL data immediately when page opens
+        fetchDashboardData();
+
+        // 3. Setup Buttons
+        document.getElementById('applyFilter').addEventListener('click', function() {
+            // For now, just reload current data (Filtering logic comes later)
+            fetchDashboardData(); 
+            showAlert('Refreshed data from database', 'success');
         });
-    </script>
+        
+        document.querySelector('.create-btn').addEventListener('click', function() {
+            window.location.href = 'newmcp.html';
+        });
+    });
+
+    // --- NEW FUNCTION: Fetches Real Data from Your Backend ---
+    async function fetchDashboardData() {
+        const token = localStorage.getItem('accessToken');
+        
+        // Security Check: Are we logged in?
+        if (!token) {
+            showAlert("Please log in to view your dashboard", "error");
+            setTimeout(() => window.location.href = 'index.html', 2000);
+            return;
+        }
+
+        // Show "Loading spinners" while we wait for the server
+        const metrics = ['totalInstalls', 'totalRuns', 'tokensUsed', 'totalRevenue'];
+        metrics.forEach(id => {
+            document.getElementById(id).innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        });
+
+        try {
+            // The actual API Call to the file you created (routers/dashboard.py)
+            const response = await fetch(`${API_BASE_URL}/dashboard/stats`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`, // Send the token so server knows who we are
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) throw new Error("Failed to load stats");
+
+            const data = await response.json();
+
+            // Update HTML with REAL numbers from database
+            document.getElementById('totalInstalls').textContent = data.totalInstalls;
+            document.getElementById('totalRuns').textContent = data.totalRuns;
+            document.getElementById('tokensUsed').textContent = (data.tokensUsed || 0).toLocaleString();
+            document.getElementById('totalRevenue').textContent = '$' + (data.totalRevenue || 0).toFixed(2);
+
+            // Update the Table with REAL tool list
+            renderTable(data.performanceData);
+            
+            // If user has tools, hide the "No Data" message
+            if (data.totalInstalls > 0) {
+                const noDataMsg = document.querySelector('.no-data');
+                if(noDataMsg) noDataMsg.style.display = 'none';
+            }
+
+        } catch (error) {
+            console.error(error);
+            showAlert("Could not load dashboard data. Is the server running?", "error");
+            // Reset spinners to 0 on error
+            metrics.forEach(id => document.getElementById(id).textContent = "0");
+        }
+    }
+
+    // Helper to build the table rows
+    function renderTable(items) {
+        const tbody = document.getElementById('metricsTableBody');
+        tbody.innerHTML = ''; // Clear existing rows
+
+        if (!items || items.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="no-data">
+                            <i class="fas fa-inbox"></i>
+                            <div class="no-data-title">No metrics data available</div>
+                        </div>
+                    </td>
+                </tr>`;
+            return;
+        }
+
+        items.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${item.name}</strong></td>
+                <td>${item.installs}</td>
+                <td>${item.runs}</td>
+                <td>${item.tokens.toLocaleString()}</td>
+                <td style="color: #4cc9f0;">$${item.revenue.toFixed(2)}</td>
+                <td>${item.date}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Function to show alert message (Kept same as before)
+    function showAlert(message, type) {
+        const existingAlert = document.querySelector('.alert-popup');
+        if (existingAlert) existingAlert.remove();
+
+        const alert = document.createElement('div');
+        alert.className = `alert alert-popup ${type === 'error' ? 'alert-error' : 'alert-success'}`;
+        alert.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i> ${message}`;
+        
+        // Add styling for fixed popup if not already in CSS
+        alert.style.position = 'fixed';
+        alert.style.top = '20px';
+        alert.style.right = '20px';
+        alert.style.zIndex = '9999';
+        
+        document.body.appendChild(alert);
+        
+        setTimeout(() => alert.remove(), 3000);
+    }
+</script>
 </body>
 </html>
