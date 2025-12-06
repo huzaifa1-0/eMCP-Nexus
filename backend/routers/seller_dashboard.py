@@ -11,5 +11,6 @@ router = APIRouter()
 
 @router.get("/stats")
 async def get_dashboard_stats(
-    
-)
+    current_user: DBUser = Depends(get_current_user),
+    session: AsyncSession = Depends(get_async_session)
+):
