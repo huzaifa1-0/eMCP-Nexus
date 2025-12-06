@@ -547,6 +547,12 @@
                 fetchTools(); // Reloads the full list
                 return;
             }
+            grid.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ccc;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 32px; margin-bottom: 15px; color: #4cc9f0;"></i>
+                    <p>AI is analyzing your request...</p>
+                </div>`;
+            
             
         }
 
