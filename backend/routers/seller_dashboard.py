@@ -8,3 +8,5 @@ from backend.security import get_current_user
 from backend.models.db import DBUser, DBTool, DBTransaction, DBUsageLog
 
 router = APIRouter()
+
+@router.get("/stats")
