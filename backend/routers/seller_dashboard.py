@@ -22,4 +22,11 @@ async def get_dashboard_stats(
 
     tool_ids = [t.id for t in user_tools]
 
-    
+    if not tool_ids:
+        return {
+            "totalInstalls": 0,
+            "totalRuns": 0,
+            "tokensUsed": 0,
+            "totalRevenue": 0.0,
+            "performanceData": []
+        }
