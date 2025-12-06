@@ -456,8 +456,13 @@
                 const label = count === 1 ? 'eMCP tool available' : 'eMCP tools available';
                 
                 // Update counts
-                if (statusBadge) statusBadge.innerHTML = `<i class="fas fa-check-circle"></i> ${allTools.length} eMCPs available`;
-                if (resultsCount) resultsCount.innerText = `${allTools.length} eMCPs available`;
+                if (statusBadge) {
+                    statusBadge.innerHTML = `<i class="fas fa-check-circle"></i> ${count} ${label}`;
+                }
+        
+                if (resultsCount) {
+                    resultsCount.innerText = `${count} ${label}`;
+                }
 
                 // Render
                 renderTools(allTools);
