@@ -356,6 +356,17 @@
                 flex-direction: column;
             }
         }
+        /* Voice Search Animation */
+        @keyframes pulse-red {
+            0% { transform: scale(1); text-shadow: 0 0 0 rgba(255, 77, 77, 0.7); }
+            50% { transform: scale(1.1); text-shadow: 0 0 10px rgba(255, 77, 77, 0.8); }
+            100% { transform: scale(1); text-shadow: 0 0 0 rgba(255, 77, 77, 0.7); }
+        }
+
+        .listening {
+            color: #ff4d4d !important; /* Red color when active */
+            animation: pulse-red 1.5s infinite;
+        }
     </style>
 </head>
 <body>
@@ -388,8 +399,15 @@
         
         <div class="search-container">
             <div class="search-box">
-                <input type="text" class="search-input" placeholder="Search eMCPs, tools, or descriptions...">
-                <button class="search-btn">
+                <div style="position: relative; flex: 1; display: flex; align-items: center;">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search eMCPs, tools, or descriptions..." style="padding-right: 45px; width: 100%;">
+        
+                    <button id="voiceBtn" type="button" style="position: absolute; right: 10px; background: none; border: none; color: #888; cursor: pointer; font-size: 18px; transition: all 0.3s ease;" title="Search by voice">
+                    <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+
+                <button id="searchBtn" class="search-btn">
                     <i class="fas fa-search"></i> Search
                 </button>
             </div>
@@ -592,6 +610,59 @@
                 setTimeout(() => alert.remove(), 500);
             }, 4000);
         }
+        // --- Voice Search Feature ---
+    const voiceBtn = document.getElementById('voiceBtn');
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+
+    // Check browser support
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+
+        recognition.continuous = false; // Stop listening after one sentence
+        recognition.lang = 'en-US';     // Default language
+        recognition.interimResults = false;
+
+        voiceBtn.addEventListener('click', () => {
+            if (voiceBtn.classList.contains('listening')) {
+                recognition.stop();
+            } else {
+                try {
+                    recognition.start();
+                    // Visual feedback: Add 'listening' class
+                    voiceBtn.classList.add('listening');
+                    searchInput.placeholder = "Listening...";
+                } catch (error) {
+                    console.error("Speech recognition start error:", error);
+                }
+            }
+        });
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            searchInput.value = transcript;
+            
+            // Automatically trigger the search
+            performSearch();
+        };
+
+        recognition.onend = () => {
+            // Reset UI when finished
+            voiceBtn.classList.remove('listening');
+            searchInput.placeholder = "Search eMCPs, tools, or descriptions...";
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Speech recognition error", event.error);
+            voiceBtn.classList.remove('listening');
+            searchInput.placeholder = "Error. Try again.";
+        };
+    } else {
+        // Hide microphone if browser doesn't support API
+        voiceBtn.style.display = 'none';
+        console.log("Web Speech API not supported in this browser.");
+    }
     </script>
 </body>
 </html>
