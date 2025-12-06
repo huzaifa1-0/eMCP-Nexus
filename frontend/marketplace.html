@@ -561,6 +561,21 @@
                 
                 const data = await response.json();
                 const results = data.results;
+
+                if (resultsCount) {
+                    const label = results.length === 1 ? 'match found' : 'matches found';
+                    resultsCount.innerText = `${results.length} AI ${label}`;
+                }
+
+                renderTools(results);
+            } catch (error) {
+                console.error("Search Error:", error);
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ff6b6b;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 32px; margin-bottom: 15px;"></i>
+                        <p>Search failed. Please try again.</p>
+                    </div>`;
+            }
         }
 
         // 4. Functionality: Use/Run the Tool
