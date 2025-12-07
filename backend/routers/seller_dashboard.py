@@ -54,17 +54,17 @@ async def get_dashboard_stats(
 
         performance_data.append({
             "name": tool.name,
-            "installs": 1, # Placeholder: In MCP, "install" usually means "created/deployed"
+            "installs": 1, 
             "runs": tool_runs,
-            "tokens": tool_runs * 150, # Placeholder estimate if you don't track exact tokens yet
+            "tokens": tool_runs * 150, 
             "revenue": tool_revenue,
-            "date": "2025-01-01" # You can add created_at to DBTool later
+            "date": "2025-01-01" 
         })
 
     return {
-        "totalInstalls": len(user_tools), # Total tools created
+        "totalInstalls": len(user_tools), 
         "totalRuns": total_runs,
-        "tokensUsed": total_runs * 150, # Estimated
+        "tokensUsed": total_runs * 150, 
         "totalRevenue": total_revenue,
         "performanceData": performance_data
     }
