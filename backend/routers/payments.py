@@ -33,9 +33,9 @@ async def process_payment(
     session: AsyncSession = Depends(get_async_session)
 ) -> dict:
     try:
-        # Simulate the tool running and getting performance data
+        
         start_time = time.time()
-        # In a real app, you'd get this from the tool's execution result
+        
         success = random.choice([True, False]) 
         processing_time = time.time() - start_time
         tx = await payments.handle_payment(request)
