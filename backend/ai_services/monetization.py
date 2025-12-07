@@ -5,12 +5,12 @@ def get_dynamic_price(base_price: float,tool_id: int, reputation_score: float, u
     Calculates a dynamic price for a tool based on its reputation and usage.
     """
 
-    # Adjust price based on reputation (higher reputation can command a higher price)
-    reputation_multiplier = 1 + (reputation_score * 0.5) # Up to 50% increase for top reputation
+    
+    reputation_multiplier = 1 + (reputation_score * 0.5) 
 
-    # Adjust price based on demand (higher recent usage could increase the price)
-    recent_usage = len(usage_stats.get(tool_id, [])) # Simplified: count all logs
-    demand_multiplier = 1 + min(recent_usage / 1000.0, 0.5) # Up to 50% increase for high demand
+    
+    recent_usage = len(usage_stats.get(tool_id, [])) 
+    demand_multiplier = 1 + min(recent_usage / 1000.0, 0.5) 
 
     dynamic_price = base_price * reputation_multiplier * demand_multiplier
 
