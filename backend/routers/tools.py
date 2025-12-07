@@ -50,14 +50,14 @@ async def monitor_deployment_and_discover(service_id: str, db_tool_id: int, db_s
 
                 if discovered_tools:
                     tool.tool_definitions = discovered_tools
-                    # Optionally update description with discovered info
+                    
                     tool.description = f"{tool.description} | Includes: {', '.join([t['name'] for t in discovered_tools])}"
                     await session.commit()
                     await add_tool_to_faiss(tool.id, tool.name, tool.description)
                 
                 break
             
-            # Wait before next check
+            
             await asyncio.sleep(5)
 
 @router.get("/", response_model=List[Tool])
@@ -126,7 +126,7 @@ async def use_tool(
 ):
     """Simulates a user using a tool, and logs its performance."""
     
-    # Check if tool exists
+    
     tool = await get_tool(tool_id, session)
     if not tool:
         raise HTTPException(status_code=404, detail="Tool not found")
