@@ -1,4 +1,3 @@
-# backend/routers/monetization.py
 from fastapi import APIRouter, Depends, HTTPException
 from backend.ai_services.monetization import get_dynamic_price, get_subscription_plans
 from backend.ai_services.monitoring import get_tool_usage
@@ -20,7 +19,7 @@ async def dynamic_price(tool_id: int, session: AsyncSession = Depends(get_async_
     tool = tool_result.scalar_one_or_none()
     if not tool:
         raise HTTPException(status_code=404, detail="Tool not found")
-    # You'll need to fetch the necessary data to calculate the price
+
     txs_result = await session.execute(select(DBTransaction.amount).where(DBTransaction.tool_id == tool_id))
     txs = [row[0] for row in txs_result.all()]
     ratings_result = await session.execute(select(DBRating.rating).where(DBRating.tool_id == tool_id))
