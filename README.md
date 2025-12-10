@@ -110,9 +110,9 @@ eMCP Nexus is an AI-powered marketplace that connects AI engineers with users th
 
 ## 🧩 Core Components
 
-- **Semantic Search Engine:** FAISS-powered vector search that understands tool functionality and intent, enabling natural language queries.
+- **Semantic Search Engine:** FAISS-powered vector search that understands the tool functionality and intent, enabling natural language queries.
 - **AI Recommendation System:** Intelligent ranking algorithm that surfaces the most relevant, high-quality tools based on multiple factors.
-- **RAG Chatbot:** Retrieval-Augmented Generation powered assistant for 24/7 customer support, tool discovery, and troubleshooting.
+- **RAG Chatbot:** (RAG)Retrieval-Augmented Generation powered assistant for 24/7 customer support, tool discovery, and troubleshooting.
 - **GitHub Integration:** Seamless MCP tool deployment from GitHub repositories.
 - **Pay-Per-Task Billing:** Flexible micro-payment system supporting crypto and traditional payments.
 - **Creator Dashboard:** Real-time analytics, earnings tracking, and tool management for AI engineers.
