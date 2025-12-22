@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from groq import Groq
 from backend.db import get_async_session
-from backend.services.vector_search import search_tools
+from backend.ai_services.search_engine import search_tools
 
 router = APIRouter()
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
@@ -43,7 +43,7 @@ async def chat_with_nexus(
     try:
         completion = client.chat.completions.create(
             messages=[{"role": "system", "content": system_prompt}],
-            model="llama3-8b-8192",
+            model="llama-3.3-70b-versatile",
         )
         return {"response": completion.choices[0].message.content}
     except Exception as e:
