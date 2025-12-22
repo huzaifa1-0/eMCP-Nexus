@@ -430,9 +430,9 @@
     </button>
 
     <div id="chat-window" style="display: none; position: absolute; bottom: 80px; right: 0; width: 350px; height: 500px; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
-        <div style="background: #4cc9f0; padding: 15px; color: white; font-weight: bold; display: flex; justify-content: space-between;">
+        <div style="background: #4cc9f0; padding: 15px; color: white; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
             <span>⚡ NexusAI Assistant</span>
-            <span id="close-chat" style="cursor: pointer;">&times;</span>
+            <span id="close-chat" style="cursor: pointer; font-size: 20px;">&times;</span>
         </div>
         
         <div id="chat-messages" style="flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #121212;">
@@ -442,8 +442,8 @@
         </div>
 
         <div style="padding: 15px; background: #1a1a1a; border-top: 1px solid #333; display: flex; gap: 10px;">
-            <input type="text" id="chat-input" placeholder="Ask me anything..." style="flex: 1; padding: 10px; border-radius: 20px; border: 1px solid #444; background: #2a2a2a; color: white; outline: none;">
-            <button id="send-btn" style="background: #4cc9f0; border: none; width: 40px; height: 40px; border-radius: 50%; color: white; cursor: pointer;">
+            <input type="text" id="chat-input" placeholder="Ask me anything..." style="flex: 1; padding: 10px; border-radius: 20px; border: 1px solid #444; background: #2a2a2a; color: white; outline: none; color: #fff;">
+            <button id="send-btn" style="background: #4cc9f0; border: none; width: 40px; height: 40px; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
@@ -728,6 +728,105 @@
         voiceBtn.style.display = 'none';
         console.log("Web Speech API not supported in this browser.");
     }
+
+    // --- NEXUS CHAT LOGIC ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Ensure API_BASE_URL is defined
+        const API_BASE_URL = '/api'; 
+
+        const widget = document.getElementById('nexus-chat-widget');
+        const toggleBtn = document.getElementById('chat-toggle');
+        const windowEl = document.getElementById('chat-window');
+        const closeBtn = document.getElementById('close-chat');
+        const input = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const messages = document.getElementById('chat-messages');
+
+        // Check if elements exist to prevent errors
+        if (!toggleBtn || !windowEl || !input || !sendBtn) return;
+
+        // 1. Toggle Chat Window
+        const toggleChat = () => {
+            const isVisible = windowEl.style.display === 'flex';
+            windowEl.style.display = isVisible ? 'none' : 'flex';
+            if (!isVisible) setTimeout(() => input.focus(), 100);
+        };
+
+        toggleBtn.addEventListener('click', toggleChat);
+        closeBtn.addEventListener('click', toggleChat);
+
+        // 2. Send Message Logic
+        const sendMessage = async () => {
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Add User Message
+            appendMessage(text, 'user');
+            input.value = '';
+
+            // Add "Thinking..." bubble
+            const loadingId = 'loading-' + Date.now();
+            appendMessage('Thinking...', 'bot', loadingId);
+
+            try {
+                // Call Backend API
+                const res = await fetch(`${API_BASE_URL}/chat/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                
+                const data = await res.json();
+                
+                // Remove loading and show response
+                const loader = document.getElementById(loadingId);
+                if (loader) loader.remove();
+                
+                // Handle different response formats
+                const replyText = data.response || data.reply || "I didn't get a response.";
+                appendMessage(replyText, 'bot');
+
+            } catch (error) {
+                console.error(error);
+                const loader = document.getElementById(loadingId);
+                if(loader) loader.innerText = "Error connecting to NexusAI.";
+            }
+        };
+
+        // 3. Helper to append messages
+        function appendMessage(text, sender, id = null) {
+            const div = document.createElement('div');
+            if (id) div.id = id;
+            div.style.padding = '10px 15px';
+            div.style.borderRadius = '15px';
+            div.style.maxWidth = '80%';
+            div.style.lineHeight = '1.4';
+            div.style.fontSize = '14px';
+            div.style.marginBottom = '10px';
+            
+            if (sender === 'user') {
+                div.style.alignSelf = 'flex-end';
+                div.style.background = '#4cc9f0';
+                div.style.color = '#fff';
+                div.style.borderRadius = '15px 15px 0 15px';
+            } else {
+                div.style.alignSelf = 'flex-start';
+                div.style.background = '#2a2a2a';
+                div.style.color = '#ddd';
+                div.style.borderRadius = '15px 15px 15px 0';
+            }
+            
+            div.innerHTML = text.replace(/\n/g, '<br>');
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        // Listeners
+        sendBtn.addEventListener('click', sendMessage);
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    });
     </script>
 </body>
 </html>
