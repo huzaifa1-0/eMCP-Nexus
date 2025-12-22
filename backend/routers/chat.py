@@ -39,3 +39,13 @@ async def chat_with_nexus(
     If no tools match, politely say we don't have that yet.
     Keep answers short and helpful.
     """
+
+    try:
+        completion = client.chat.completions.create(
+            messages=[{"role": "system", "content": system_prompt}],
+            model="llama3-8b-8192",
+        )
+        return {"response": completion.choices[0].message.content}
+    except Exception as e:
+        print(f"AI Error: {e}")
+        return {"response": "I'm having trouble connecting to my brain. Please search manually."}
