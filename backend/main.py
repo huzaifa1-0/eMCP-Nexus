@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from backend.routers import tools, payments, search, monitoring, reputation, monetization, auth, seller_dashboard
+from backend.routers import tools, payments, search, monitoring, reputation, monetization, auth, seller_dashboard, chat
 from backend.db import init_db
 from backend.ai_services.search_engine import load_faiss_index
 from fastapi.middleware.cors import CORSMiddleware
@@ -114,6 +114,7 @@ app.include_router(reputation.router, prefix="/api/reputation", tags=["Reputatio
 app.include_router(monetization.router, prefix="/api/monetization", tags=["Monetization"]) 
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"]) 
 app.include_router(seller_dashboard.router, prefix="/api/seller_dashboard", tags=["Seller Dashboard"])
+app.include_router(chat.router, prefix="/api/chat", tags=["AI Chat"])
 
 
 @app.get("/")
