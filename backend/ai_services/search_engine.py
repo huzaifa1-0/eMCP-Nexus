@@ -34,7 +34,6 @@ def load_faiss_index():
         try:
             index = faiss.read_index(FAISS_INDEX_PATH)
             with open(MAP_PATH, "r") as f:
-                # Convert keys back to integers because JSON makes them strings
                 data = json.load(f)
                 index_to_tool_id = {int(k): v for k, v in data.items()}
             print(f"✅ FAISS index loaded with {index.ntotal} vectors.")
@@ -45,14 +44,14 @@ def load_faiss_index():
     else:
         print("ℹ️ No existing FAISS index found. Starting fresh.")
 
-# Load immediately on import
+# Load immediately
 load_faiss_index()
 
 # --- Core Functions ---
 
 async def add_tool_to_faiss(tool_id: int, name: str, description: str):
     """
-    Generates embedding for a tool and adds it to the FAISS index.
+    Adds a tool to the FAISS index.
     """
     try:
         text = f"{name}. {description}"
@@ -68,24 +67,21 @@ async def add_tool_to_faiss(tool_id: int, name: str, description: str):
     except Exception as e:
         print(f"❌ Error adding tool to FAISS: {e}")
 
-async def search_tools(session: AsyncSession, query: str, k: int = 3) -> List[Dict[str, Any]]:
+# --- THE CRITICAL FUNCTION FIX ---
+async def search_tools(session: AsyncSession, query: str, k: int = 5) -> List[Dict[str, Any]]:
     """
-    Hybrid Search:
-    1. Tries Semantic Search (FAISS) first.
-    2. If that fails or finds nothing, falls back to SQL Database Search.
+    Hybrid Search: FAISS -> SQL Fallback
+    CRITICAL: This function MUST accept 'k' as an argument.
     """
     tools = []
     
-    # --- STRATEGY 1: Semantic Search (FAISS) ---
+    # 1. Try Semantic Search (FAISS)
     if index.ntotal > 0:
         try:
             query_embedding = get_embedding(query)
             query_np = np.array([query_embedding]).astype('float32')
-            
-            # Search FAISS
             distances, indices = index.search(query_np, k)
             
-            # Get Tool IDs (Filter out -1 which means 'not found')
             found_ids = [index_to_tool_id.get(i) for i in indices[0] if i != -1 and i in index_to_tool_id]
             
             if found_ids:
@@ -93,11 +89,11 @@ async def search_tools(session: AsyncSession, query: str, k: int = 3) -> List[Di
                 result = await session.execute(stmt)
                 tools = result.scalars().all()
         except Exception as e:
-            print(f"⚠️ Semantic search error: {e}")
+            print(f"⚠️ FAISS Error: {e}")
 
-    # --- STRATEGY 2: Fallback SQL Search (If FAISS returned nothing) ---
+    # 2. Fallback SQL Search (If FAISS failed or empty)
     if not tools:
-        print("ℹ️ Semantic search yielded 0 results. Using SQL fallback.")
+        print("ℹ️ Using SQL Fallback Search")
         stmt = select(DBTool).where(
             (DBTool.name.ilike(f"%{query}%")) | 
             (DBTool.description.ilike(f"%{query}%"))
@@ -105,21 +101,20 @@ async def search_tools(session: AsyncSession, query: str, k: int = 3) -> List[Di
         result = await session.execute(stmt)
         tools = result.scalars().all()
 
-    # --- STRATEGY 3: Last Resort (Just show ANY tools) ---
-    # Only if the query found absolute nothing, show latest tools so Chatbot isn't empty
+    # 3. Last Resort (Show anything)
     if not tools:
         stmt = select(DBTool).order_by(DBTool.id.desc()).limit(k)
         result = await session.execute(stmt)
         tools = result.scalars().all()
 
-    # Format Output
+    # Format for JSON response
     return [
         {
             "id": t.id,
             "name": t.name,
             "description": t.description,
             "cost": t.cost,
-            "url": t.url if hasattr(t, 'url') else "",
+            "url": getattr(t, 'url', ''), # Safe access
             "owner_id": t.owner_id
         } 
         for t in tools
