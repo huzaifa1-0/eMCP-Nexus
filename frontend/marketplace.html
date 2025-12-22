@@ -424,6 +424,32 @@
             © 2025 eMCP Nexus. Powered by Civic Auth and Web3 technology.
         </footer>
     </div>
+<div id="nexus-chat-widget" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: sans-serif;">
+    <button id="chat-toggle" style="width: 60px; height: 60px; border-radius: 50%; background: #4cc9f0; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: transform 0.2s;">
+        <i class="fas fa-robot" style="font-size: 28px; color: white;"></i>
+    </button>
+
+    <div id="chat-window" style="display: none; position: absolute; bottom: 80px; right: 0; width: 350px; height: 500px; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+        <div style="background: #4cc9f0; padding: 15px; color: white; font-weight: bold; display: flex; justify-content: space-between;">
+            <span>⚡ NexusAI Assistant</span>
+            <span id="close-chat" style="cursor: pointer;">&times;</span>
+        </div>
+        
+        <div id="chat-messages" style="flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; background: #121212;">
+            <div style="align-self: flex-start; background: #2a2a2a; color: #ddd; padding: 10px 15px; border-radius: 15px 15px 15px 0; max-width: 80%;">
+                Hello! I can help you find the perfect tool. What do you need?
+            </div>
+        </div>
+
+        <div style="padding: 15px; background: #1a1a1a; border-top: 1px solid #333; display: flex; gap: 10px;">
+            <input type="text" id="chat-input" placeholder="Ask me anything..." style="flex: 1; padding: 10px; border-radius: 20px; border: 1px solid #444; background: #2a2a2a; color: white; outline: none;">
+            <button id="send-btn" style="background: #4cc9f0; border: none; width: 40px; height: 40px; border-radius: 50%; color: white; cursor: pointer;">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+    
 
    <script>
         const API_BASE_URL = '/api';
