@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30 # Token will be valid for 30 minutes
 
+    GROQ_API_KEY: str | None = None
+
     # --- Other Keys ---
     STRIPE_KEY: str
     COINBASE_KEY: str
