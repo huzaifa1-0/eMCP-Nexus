@@ -336,6 +336,23 @@
                     </div>
                     <div class="description">The Git branch to deploy from</div>
                 </div>
+                <div class="form-group">
+                    <label for="rootDir">Root Directory (Optional)</label>
+                    <input type="text" class="form-control" id="rootDir" placeholder="./">
+                    <div class="description">Directory where your app is located (leave empty for root)</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="buildCommand">Build Command</label>
+                    <input type="text" class="form-control" id="buildCommand" placeholder="npm install && npm run build" value="npm install && npm run build">
+                    <div class="description">Command to build your application</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="startCommand">Start Command</label>
+                    <input type="text" class="form-control" id="startCommand" placeholder="npm start" value="npm start">
+                    <div class="description">Command to start your application</div>
+                </div>
                 
                 <div class="form-group">
                     <label>Environment Variables</label>
@@ -443,6 +460,9 @@
             const serviceName = document.getElementById('serviceName').value;
             const repoUrl = document.getElementById('repoUrl').value;
             const branch = document.getElementById('branch').value;
+            const buildCommand = document.getElementById('buildCommand').value;
+            const startCommand = document.getElementById('startCommand').value;
+            const rootDir = document.getElementById('rootDir').value;
 
             const authToken = localStorage.getItem('accessToken'); 
             
