@@ -25,6 +25,9 @@ class DBTool(Base):
     cost: Mapped[float] = mapped_column(Float)
     repo_url: Mapped[str] = mapped_column(String)  # Corrected typo from rep_url
     branch: Mapped[str] = mapped_column(String, default="main")
+    build_command: Mapped[str] = mapped_column(String, default="npm install && npm run build")
+    start_command: Mapped[str] = mapped_column(String, default="npm start")
+    root_dir: Mapped[str] = mapped_column(String, default="", nullable=True)
     owner_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id")) # Corrected to Integer
     url: Mapped[str] = mapped_column(String)
     tool_definitions: Mapped[dict] = mapped_column(JSON, nullable=True)
