@@ -8,6 +8,9 @@ class ToolBase(BaseModel):
     cost: float = Field(..., ge=0, description="Tool cost must be positive")
     repo_url: str
     branch: str = "main"
+    build_command: str = "npm install && npm run build"
+    start_command: str = "npm start"
+    root_dir: str = ""
 
 class ToolCreate(ToolBase):
     pass 
