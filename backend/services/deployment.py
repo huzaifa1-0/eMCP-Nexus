@@ -22,6 +22,7 @@ async def deploy_tool(repo_url: str, branch: str, build_command: str, start_comm
     # Simple payload to deploy a Node/Python service from a public repo
     payload = {
         "serviceDetails": {
+            "model": "free",
             "env": "node", # Defaulting to node for MCP quickstarts
             "envSpecificDetails": {
                 "buildCommand": build_command, # Standard build command
