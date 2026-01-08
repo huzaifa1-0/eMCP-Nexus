@@ -5,13 +5,11 @@ from dotenv import load_dotenv  # Import dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-async def deploy_tool(repo_url: str):
+async def deploy_tool(repo_url: str, branch: str, build_command: str, start_command: str, root_dir: str):
     api_key = os.getenv("RENDER_API_KEY")
     owner_id = os.getenv("RENDER_OWNER_ID")
     
     if not api_key or not owner_id:
-        # Debug print to help you see if it failed
-        print(f"DEBUG: API Key present? {bool(api_key)}, Owner ID present? {bool(owner_id)}")
         raise ValueError("Missing RENDER_API_KEY or RENDER_OWNER_ID in .env file")
 
     url = "https://api.render.com/v1/services"
@@ -26,8 +24,8 @@ async def deploy_tool(repo_url: str):
         "serviceDetails": {
             "env": "node", # Defaulting to node for MCP quickstarts
             "envSpecificDetails": {
-                "buildCommand": "npm install && npm run build", # Standard build command
-                "startCommand": "node build/index.js" # Standard start command
+                "buildCommand": build_command, # Standard build command
+                "startCommand": start_command # Standard start command
             }
         },
         "type": "web_service",
@@ -35,7 +33,8 @@ async def deploy_tool(repo_url: str):
         "ownerId": owner_id,
         "repo": repo_url,
         "autoDeploy": "yes",
-        "branch": "main"
+        "branch": branch,
+        "rootDir": root_dir
     }
 
     async with httpx.AsyncClient() as client:
