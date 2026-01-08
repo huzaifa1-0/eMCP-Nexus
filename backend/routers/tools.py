@@ -85,7 +85,13 @@ async def create_tool(
 ) -> DBTool:
     
     
-    deployment_info = await deploy_tool(repo_url=tool_data.repo_url)
+    deployment_info = await deploy_tool(
+        repo_url=tool_data.repo_url,
+        branch=tool_data.branch,
+        build_command=tool_data.build_command,
+        start_command=tool_data.start_command,
+        root_dir=tool_data.root_dir
+        )
 
     service_id = deployment_info.get("serviceId", "unknown")
 
@@ -95,6 +101,9 @@ async def create_tool(
         cost = tool_data.cost,
         repo_url = tool_data.repo_url,
         branch = tool_data.branch,
+        build_command = tool_data.build_command,
+        start_command = tool_data.start_command,
+        root_dir = tool_data.root_dir,
         url = deployment_info["url"],
         deploy_id = service_id,
         owner_id = user.id,
