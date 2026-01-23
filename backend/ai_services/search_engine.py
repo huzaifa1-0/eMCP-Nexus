@@ -44,7 +44,7 @@ def load_faiss_index():
     else:
         print("ℹ️ No existing FAISS index found. Starting fresh.")
 
-# Load immediately
+
 load_faiss_index()
 
 # --- Core Functions ---
