@@ -1,5 +1,6 @@
 import os
 import httpx
+import uuid
 from dotenv import load_dotenv  # Import dotenv
 
 # Load environment variables from .env file
@@ -18,6 +19,10 @@ async def deploy_tool(repo_url: str, branch: str, build_command: str, start_comm
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
+
+    base_name = repo_url.split("/")[-1]
+    unique_suffix = str(uuid.uuid4())[:8]
+    service_name = f"{base_name}-{unique_suffix}"
     
     # Simple payload to deploy a Python service from a public repo
     payload = {
@@ -30,7 +35,7 @@ async def deploy_tool(repo_url: str, branch: str, build_command: str, start_comm
             }
         },
         "type": "web_service",
-        "name": repo_url.split("/")[-1], 
+        "name": service_name, 
         "ownerId": owner_id,
         "repo": repo_url,
         "autoDeploy": "yes",
