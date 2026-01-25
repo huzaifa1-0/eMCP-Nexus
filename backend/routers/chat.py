@@ -28,7 +28,7 @@ async def chat_with_nexus(
 
     relevant_tools = await search_tools(session, user_query, k=3)
     tools_context = "\n".join(
-        [f"- {t.name}: {t.description} (Cost: ${t.cost})" for t in relevant_tools]
+        [f"- {t['name']}: {t['description']} (Cost: ${t['cost']})" for t in relevant_tools]
     )
     system_prompt = f"""You are NexusAI, a helpful assistant for the eMCP Marketplace.
     User Question: "{user_query}"
