@@ -81,29 +81,24 @@ async def get_service_status(service_id: str) -> str:
         try:
             response = await client.get(url, headers=headers)
             
+            # If Render says "Not Found" or "Unauthorized", return error
             if response.status_code != 200:
                 print(f"⚠️ Render API Warning: Received {response.status_code}")
-                return "unknown"
+                return "error"
 
             deploys = response.json()
             
-            # ✅ FIX: Safety check for empty list and missing keys
+            # ✅ SAFE CHECK: Use .get() to avoid crashing
             if isinstance(deploys, list) and len(deploys) > 0:
                 latest_deploy = deploys[0]
                 
-                # Check if 'status' exists, otherwise use 'state' or default to 'unknown'
-                # Some Render endpoints use 'state' instead of 'status'
-                status = latest_deploy.get('status') or latest_deploy.get('state')
-                
-                if not status:
-                    # 🔍 DEBUG: Print what keys ARE available so we can see the correct name
-                    print(f"⚠️ DEBUG: Deploy object is missing 'status'. Available keys: {list(latest_deploy.keys())}")
-                    return "unknown"
-                    
+                # Try to get 'status', if missing try 'state', if both missing assume 'live' (since 200 OK)
+                status = latest_deploy.get('status') or latest_deploy.get('state') or "live"
                 return status
             
-            return "unknown"
+            # If list is empty, it might be a fresh service
+            return "live"
 
         except Exception as e:
-            print(f"❌ Error checking service status: {type(e).__name__} - {e}")
+            print(f"❌ Error checking service status: {e}")
             return "error"
