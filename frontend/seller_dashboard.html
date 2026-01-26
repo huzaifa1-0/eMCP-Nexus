@@ -478,7 +478,7 @@
 
         try {
             // The actual API Call to the file you created (routers/dashboard.py)
-            const response = await fetch(`${API_BASE_URL}/dashboard/stats`, {
+            const response = await fetch(`${API_BASE_URL}/seller_dashboard/stats`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`, // Send the token so server knows who we are
