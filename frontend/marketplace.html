@@ -529,6 +529,28 @@
         </div>
     </div>
 </div>
+
+<div id="configModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header-row">
+            <div class="modal-title">Use with Claude Desktop</div>
+            <button class="close-modal-btn" onclick="closeConfigModal()">&times;</button>
+        </div>
+        
+        <p style="color: #bbb; font-size: 14px; margin-bottom: 15px;">
+            Add this configuration to your <code>claude_desktop_config.json</code> file to use this tool.
+        </p>
+
+        <div id="configCodeBlock" class="config-block"></div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeConfigModal()">Close</button>
+            <button class="btn btn-primary" onclick="copyFromModal()">
+                <i class="fas fa-copy"></i> Copy to Clipboard
+            </button>
+        </div>
+    </div>
+</div>
     
 
    <script>
