@@ -77,29 +77,33 @@ async def get_service_status(service_id: str) -> str:
 
     url = f"https://api.render.com/v1/services/{service_id}/deploys?limit=1"
 
-    # Use a longer timeout (30s) to prevent premature timeouts
     async with httpx.AsyncClient(timeout=30.0) as client:
         try:
             response = await client.get(url, headers=headers)
             
-            # 1. Log non-200 responses to see if Render is rejecting us
             if response.status_code != 200:
                 print(f"⚠️ Render API Warning: Received {response.status_code}")
-                print(f"   Response: {response.text}")
                 return "unknown"
 
             deploys = response.json()
-            if len(deploys) > 0:
-                status = deploys[0]['status']
-                # Map Render statuses to our internal statuses if needed
-                return status 
+            
+            # ✅ FIX: Safety check for empty list and missing keys
+            if isinstance(deploys, list) and len(deploys) > 0:
+                latest_deploy = deploys[0]
+                
+                # Check if 'status' exists, otherwise use 'state' or default to 'unknown'
+                # Some Render endpoints use 'state' instead of 'status'
+                status = latest_deploy.get('status') or latest_deploy.get('state')
+                
+                if not status:
+                    # 🔍 DEBUG: Print what keys ARE available so we can see the correct name
+                    print(f"⚠️ DEBUG: Deploy object is missing 'status'. Available keys: {list(latest_deploy.keys())}")
+                    return "unknown"
+                    
+                return status
             
             return "unknown"
 
-        except httpx.TimeoutException:
-            print(f"❌ Error: Connection timed out checking status for {service_id}")
-            return "error"
         except Exception as e:
-            # 2. Print the FULL error so we can fix it
-            print(f"❌ CRITICAL Error checking service status: {type(e).__name__} - {e}")
+            print(f"❌ Error checking service status: {type(e).__name__} - {e}")
             return "error"
