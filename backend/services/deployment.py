@@ -64,7 +64,6 @@ async def get_service_status(service_id: str) -> str:
     """
     Polls Render API to get the current status of a service.
     """
-    # FIX: Get the key inside this function too
     api_key = os.getenv("RENDER_API_KEY")
     
     if not api_key:
@@ -78,15 +77,29 @@ async def get_service_status(service_id: str) -> str:
 
     url = f"https://api.render.com/v1/services/{service_id}/deploys?limit=1"
 
-    async with httpx.AsyncClient() as client:
+    # Use a longer timeout (30s) to prevent premature timeouts
+    async with httpx.AsyncClient(timeout=30.0) as client:
         try:
             response = await client.get(url, headers=headers)
-            if response.status_code == 200:
-                deploys = response.json()
-                if len(deploys) > 0:
-                    return deploys[0]['status'] # e.g., 'live', 'build_in_progress'
+            
+            # 1. Log non-200 responses to see if Render is rejecting us
+            if response.status_code != 200:
+                print(f"⚠️ Render API Warning: Received {response.status_code}")
+                print(f"   Response: {response.text}")
+                return "unknown"
+
+            deploys = response.json()
+            if len(deploys) > 0:
+                status = deploys[0]['status']
+                # Map Render statuses to our internal statuses if needed
+                return status 
+            
             return "unknown"
 
+        except httpx.TimeoutException:
+            print(f"❌ Error: Connection timed out checking status for {service_id}")
+            return "error"
         except Exception as e:
-            print(f"Error checking service status: {e}")
+            # 2. Print the FULL error so we can fix it
+            print(f"❌ CRITICAL Error checking service status: {type(e).__name__} - {e}")
             return "error"
