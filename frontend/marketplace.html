@@ -506,60 +506,113 @@
             }
         }
 
+        async function copyConfig(name, url) {
+            if (!url) {
+                showAlert("No deployment URL available for this tool.", "error");
+                return;
+            }
+
+            const config = {
+                "mcpServers": {
+                    [name.toLowerCase().replace(/\s+/g, '-')]: {
+                        "url": url,
+                        "type": "sse"
+                    }
+                }
+            };
+
+            try {
+                await navigator.clipboard.writeText(JSON.stringify(config, null, 2));
+                showAlert("Config copied to clipboard!", "success");
+            } catch (err) {
+                console.error('Failed to copy:', err);
+                showAlert("Failed to copy config.", "error");
+            }
+        }
+
         // 2. Render Tools (Handles Empty State)
         function renderTools(tools) {
             const grid = document.getElementById('mcpGrid');
-            grid.innerHTML = ''; // Clear existing content
+            grid.innerHTML = ''; 
 
             // ✅ SHOW THIS IF NO TOOLS EXIST
             if (tools.length === 0) {
-                grid.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: #ccc;">
-                        <i class="fas fa-box-open" style="font-size: 48px; margin-bottom: 20px; color: #4cc9f0;"></i>
-                        <h3 style="font-size: 24px; margin-bottom: 10px;">No tools yet</h3>
-                        <p style="margin-bottom: 20px;">The marketplace is empty. Be the first to publish a tool!</p>
-                        <a href="seller_dashboard.html" class="btn btn-primary" style="text-decoration: none; display: inline-block;">
-                            <i class="fas fa-plus"></i> Go to Dashboard
-                        </a>
-                    </div>`;
-                return;
+            grid.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: #ccc;">
+                <i class="fas fa-box-open" style="font-size: 48px; margin-bottom: 20px; color: #4cc9f0;"></i>
+                <h3 style="font-size: 24px; margin-bottom: 10px;">No tools yet</h3>
+                <p style="margin-bottom: 20px;">The marketplace is empty. Be the first to publish a tool!</p>
+                <a href="seller_dashboard.html" class="btn btn-primary" style="text-decoration: none; display: inline-block;">
+                    <i class="fas fa-plus"></i> Go to Dashboard
+                </a>
+                </div>`;
+            return;
             }
 
             // ✅ RENDER CARDS IF TOOLS EXIST
             tools.forEach(tool => {
-                const card = document.createElement('div');
-                card.className = 'mcp-card';
-                card.innerHTML = `
-                    <div class="mcp-header">
-                        <div class="mcp-title">${tool.name}</div>
-                        <div class="mcp-badge">eMCP service deployment</div>
-                    </div>
-                    
-                    <div class="mcp-status" style="color: #4cc9f0; background: rgba(76, 201, 240, 0.1);">
-                        <i class="fas fa-check-circle"></i> Active & Ready
-                    </div>
-                    
-                    <div class="mcp-config" style="text-align: left; font-size: 13px; padding: 15px;">
-                        <div style="margin-bottom: 5px;"><strong>Description:</strong></div>
-                        <div style="color: #ccc; margin-bottom: 10px;">${tool.description}</div>
-                        <div><strong>Cost:</strong> $${tool.cost} / run</div>
-                        <div><strong>Branch:</strong> ${tool.branch}</div>
-                    </div>
-                    
-                    <div class="mcp-date">
-                        <i class="far fa-calendar"></i> GitHub: <a href="${tool.repo_url}" target="_blank" style="color: #999; text-decoration: underline;">View Repo</a>
-                    </div>
-                    
-                    <div class="action-buttons">
-                        <button class="btn btn-primary" onclick="useTool(${tool.id}, '${tool.name}')">
-                            <i class="fas fa-play"></i> Run Tool
-                        </button>
-                        <button class="btn btn-secondary" onclick="showDetails('${tool.name}', '${tool.description}', ${tool.cost})">
-                            <i class="fas fa-info-circle"></i> Details
-                        </button>
-                    </div>
-                `;
-                grid.appendChild(card);
+            // 1. Process Tool Definitions
+            const subTools = tool.tool_definitions || [];
+        
+            let toolsListHtml = '';
+            if (subTools.length > 0) {
+                toolsListHtml = `<div class="tools-section" style="margin: 15px 0;">
+                <div style="font-size: 12px; font-weight: 600; color: #888; margin-bottom: 8px;">
+                    <i class="fas fa-wrench"></i> INCLUDED TOOLS (${subTools.length})
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    ${subTools.slice(0, 3).map(t => `
+                        <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-size: 13px; color: #eee; font-weight: 500;">${t.name}</span>
+                            <span style="font-size: 11px; background: rgba(76, 201, 240, 0.2); color: #4cc9f0; padding: 2px 6px; border-radius: 4px;">
+                                ${tool.cost > 0 ? '$' + tool.cost : 'Free'}
+                            </span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>`;
+            } else {
+             toolsListHtml = `<div style="margin: 15px 0; font-size: 13px; color: #666; font-style: italic;">
+                No specific tools discovered yet.
+             </div>`;
+            }
+
+            // 2. Determine Config Button State
+            const hasUrl = !!tool.url;
+            const configBtnClass = hasUrl ? 'btn-secondary' : 'btn-secondary disabled';
+            const configBtnStyle = hasUrl ? 'width: 100%; justify-content: center;' : 'width: 100%; justify-content: center; opacity: 0.5; cursor: not-allowed;';
+
+            const card = document.createElement('div');
+            card.className = 'mcp-card';
+            card.innerHTML = `
+            <div class="mcp-header">
+                <div class="mcp-title">${tool.name}</div>
+                ${tool.url 
+                    ? `<div class="mcp-badge" style="background: rgba(76, 201, 240, 0.2); color: #4cc9f0;">Live</div>`
+                    : `<div class="mcp-badge" style="background: rgba(255, 193, 7, 0.2); color: #ffc107;">Deploying</div>`
+                }
+            </div>
+            
+            <div class="mcp-config" style="text-align: left; font-size: 13px; padding: 15px;">
+                <div style="margin-bottom: 5px;"><strong>Description:</strong></div>
+                <div style="color: #ccc; margin-bottom: 10px; line-height: 1.4;">${tool.description}</div>
+            </div>
+
+            ${toolsListHtml}
+            
+            <div class="action-buttons">
+                <button class="btn ${configBtnClass}" style="${configBtnStyle}" 
+                    onclick="copyConfig('${tool.name}', '${tool.url || ''}')">
+                    <i class="fas fa-copy"></i> Copy Config
+                </button>
+            </div>
+            
+            <div class="mcp-date" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                <span><i class="far fa-clock"></i> Recent</span>
+                <span style="font-weight: bold; color: #fff;">${tool.cost > 0 ? tool.cost + ' USDC' : 'Free'}</span>
+            </div>
+            `;
+            grid.appendChild(card);
             });
         }
 

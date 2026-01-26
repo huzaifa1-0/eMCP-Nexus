@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from datetime import datetime
 from pydantic import field_validator, Field
+from typing import Optional, List, Any
 
 class ToolBase(BaseModel):
     name: str
@@ -18,6 +19,8 @@ class ToolCreate(ToolBase):
 class Tool(ToolBase):
     id: int
     owner_id: int
+    url: Optional[str] = None              
+    tool_definitions: Optional[List[Any]]
     
     model_config = ConfigDict(from_attributes=True) 
 
