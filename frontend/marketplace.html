@@ -608,12 +608,16 @@
             }
         }
 
-        async function copyConfig(name, url) {
+        // --- NEW MODAL LOGIC ---
+        let currentConfigText = "";
+
+        function openConfigModal(name, url) {
             if (!url) {
                 showAlert("No deployment URL available for this tool.", "error");
                 return;
             }
 
+            // 1. Generate the JSON Config
             const config = {
                 "mcpServers": {
                     [name.toLowerCase().replace(/\s+/g, '-')]: {
@@ -623,12 +627,39 @@
                 }
             };
 
+            // 2. Format it prettily
+            currentConfigText = JSON.stringify(config, null, 2);
+
+            // 3. Inject into the modal
+            const codeBlock = document.getElementById('configCodeBlock');
+            if(codeBlock) codeBlock.textContent = currentConfigText;
+
+            // 4. Show the modal
+            const modal = document.getElementById('configModal');
+            if(modal) modal.style.display = 'flex';
+        }
+
+        function closeConfigModal() {
+            const modal = document.getElementById('configModal');
+            if(modal) modal.style.display = 'none';
+        }
+
+        async function copyFromModal() {
             try {
-                await navigator.clipboard.writeText(JSON.stringify(config, null, 2));
-                showAlert("Config copied to clipboard!", "success");
+                await navigator.clipboard.writeText(currentConfigText);
+                showAlert("Configuration copied!", "success");
+                closeConfigModal();
             } catch (err) {
                 console.error('Failed to copy:', err);
-                showAlert("Failed to copy config.", "error");
+                showAlert("Failed to copy", "error");
+            }
+        }
+
+        // Close modal if clicking outside the content box
+        window.onclick = function(event) {
+            const modal = document.getElementById('configModal');
+            if (event.target === modal) {
+                closeConfigModal();
             }
         }
 
@@ -704,7 +735,7 @@
             
             <div class="action-buttons">
                 <button class="btn ${configBtnClass}" style="${configBtnStyle}" 
-                    onclick="copyConfig('${tool.name}', '${tool.url || ''}')">
+                    onclick="openConfigModal('${tool.name}', '${tool.url || ''}')">
                     <i class="fas fa-copy"></i> Copy Config
                 </button>
             </div>
