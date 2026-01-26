@@ -53,7 +53,7 @@ async def get_dashboard_stats(
         tool_revenue = tool_rev_res.scalar() or 0.0
 
         performance_data.append({
-            "name": f"{tool.name} ({tool.status})",
+            "name": f"{tool.name}",
             "installs": 1, 
             "runs": tool_runs,
             "tokens": tool_runs * 150, 
