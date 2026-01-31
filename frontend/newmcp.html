@@ -471,6 +471,18 @@
                 showAlert('Please fill in all required fields.', 'error');
                 return;
             }
+
+            // --- NEW: Collect Environment Variables ---
+            const envVars = {};
+            document.querySelectorAll('.env-var-item').forEach(item => {
+                const inputs = item.querySelectorAll('input');
+                const key = inputs[0].value.trim();
+                const value = inputs[1].value.trim();
+                
+                if (key && value) {
+                    envVars[key] = value;
+                }
+            });
             
             try {
             const response = await fetch('/api/tools/', {
@@ -487,7 +499,8 @@
                     branch: branch,
                     build_command: buildCommand,
                     start_command: startCommand,
-                    root_dir: rootDir
+                    root_dir: rootDir,
+                    env_vars: envVars
                 })
             });
 
