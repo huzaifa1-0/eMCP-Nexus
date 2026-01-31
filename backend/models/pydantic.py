@@ -14,7 +14,7 @@ class ToolBase(BaseModel):
     root_dir: str = ""
 
 class ToolCreate(ToolBase):
-    pass 
+    env_vars: Optional[dict] = None 
 
 class Tool(ToolBase):
     id: int
