@@ -14,7 +14,7 @@ from backend.ai_services.monitoring import log_tool_usage
 import random 
 import time
 
-from backend.services.deployment import deploy_tool, get_service_status
+from backend.services.deployment import deploy_tool, get_service_status, fetch_repo_readme
 from backend.services.discovery import discover_tools
 
 router = APIRouter()
@@ -97,12 +97,18 @@ async def create_tool(
         root_dir=tool_data.root_dir,
         env_vars=tool_data.env_vars
         )
+    
+    readme_context = await fetch_repo_readme(tool_data.repo_url, tool_data.branch)
+
+    final_description = tool_data.description
+    if readme_context:
+        final_description += f" | README Context: {readme_context}"
 
     service_id = deployment_info.get("serviceId", "unknown")
 
     db_tool = DBTool(
         name = tool_data.name,
-        description = tool_data.description,
+        description = final_description,
         cost = tool_data.cost,
         repo_url = tool_data.repo_url,
         branch = tool_data.branch,
