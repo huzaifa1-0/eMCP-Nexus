@@ -464,6 +464,7 @@
             e.preventDefault();
             
             const serviceName = document.getElementById('serviceName').value;
+            const serviceDescription = document.getElementById('serviceDescription').value;
             const repoUrl = document.getElementById('repoUrl').value;
             const branch = document.getElementById('branch').value;
             const buildCommand = document.getElementById('buildCommand').value;
@@ -499,7 +500,7 @@
                 },
                 body: JSON.stringify({
                     name: serviceName,
-                    description: "A new eMCP tool", // You can add a description field to your form
+                    description: serviceDescription,
                     cost: 0.0, // You can add a cost field
                     repo_url: repoUrl,
                     branch: branch,
