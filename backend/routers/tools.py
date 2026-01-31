@@ -90,7 +90,8 @@ async def create_tool(
         branch=tool_data.branch,
         build_command=tool_data.build_command,
         start_command=tool_data.start_command,
-        root_dir=tool_data.root_dir
+        root_dir=tool_data.root_dir,
+        env_vars=tool_data.env_vars
         )
 
     service_id = deployment_info.get("serviceId", "unknown")
