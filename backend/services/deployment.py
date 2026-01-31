@@ -2,11 +2,12 @@ import os
 import httpx
 import uuid
 from dotenv import load_dotenv  # Import dotenv
+from typing import Optional, Dict
 
 # Load environment variables from .env file
 load_dotenv()
 
-async def deploy_tool(repo_url: str, branch: str, build_command: str, start_command: str, root_dir: str):
+async def deploy_tool(repo_url: str, branch: str, build_command: str, start_command: str, root_dir: str, env_vars: Optional[Dict[str, str]] = None):
     api_key = os.getenv("RENDER_API_KEY")
     owner_id = os.getenv("RENDER_OWNER_ID")
     
