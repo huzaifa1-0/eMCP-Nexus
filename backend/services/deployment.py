@@ -25,6 +25,10 @@ async def deploy_tool(repo_url: str, branch: str, build_command: str, start_comm
     unique_suffix = str(uuid.uuid4())[:8]
     service_name = f"{base_name}-{unique_suffix}"
     
+    render_env_vars = []
+    if env_vars:
+        for key, value in env_vars.items():
+            render_env_vars.append({"key": key, "value": value})
     # Simple payload to deploy a Python service from a public repo
     payload = {
         "serviceDetails": {
