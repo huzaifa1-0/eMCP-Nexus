@@ -107,3 +107,40 @@ async def get_service_status(service_id: str) -> str:
         except Exception as e:
             print(f"❌ Error checking service status: {e}")
             return "error"
+        
+
+# ... (keep existing imports and code) ...
+
+async def fetch_repo_readme(repo_url: str, branch: str = "main") -> str:
+    """
+    Fetches the README.md from a GitHub repository to use as context for the AI.
+    """
+    # 1. Clean the URL (remove .git suffix if present)
+    clean_url = repo_url.strip().rstrip(".git")
+    
+    # 2. Convert standard GitHub URL to Raw User Content URL
+    # From: https://github.com/username/repo
+    # To:   https://raw.githubusercontent.com/username/repo/{branch}/README.md
+    if "github.com" in clean_url:
+        raw_url = clean_url.replace("github.com", "raw.githubusercontent.com")
+        raw_url = f"{raw_url}/{branch}/README.md"
+    else:
+        # If it's not a GitHub URL, we skip it for now
+        return ""
+
+    async with httpx.AsyncClient() as client:
+        try:
+            print(f"📥 Fetching README context from: {raw_url}")
+            response = await client.get(raw_url, follow_redirects=True, timeout=5.0)
+            
+            if response.status_code == 200:
+                # Limit to 1000 characters to prevent overloading the vector embedding model
+                # and strip excessive whitespace
+                content = response.text[:1000].strip()
+                return content
+            else:
+                print(f"⚠️ README not found (Status: {response.status_code})")
+                return ""
+        except Exception as e:
+            print(f"⚠️ Failed to fetch README: {e}")
+            return ""
