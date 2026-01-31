@@ -50,8 +50,12 @@ async def monitor_deployment_and_discover(service_id: str, db_tool_id: int, db_s
 
                 if discovered_tools:
                     tool.tool_definitions = discovered_tools
-                    
-                    tool.description = f"{tool.description} | Includes: {', '.join([t['name'] for t in discovered_tools])}"
+                    discovered_summaries = [
+                        f"{t['name']} ({t.get('description', 'No description')})" 
+                        for t in discovered_tools
+                    ]
+
+                    tool.description = f"{tool.description} | Capabilities: {'; '.join(discovered_summaries)}"
                     await session.commit()
                     await add_tool_to_faiss(tool.id, tool.name, tool.description)
                 
