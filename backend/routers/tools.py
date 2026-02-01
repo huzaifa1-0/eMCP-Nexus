@@ -46,18 +46,31 @@ async def monitor_deployment_and_discover(service_id: str, db_tool_id: int, db_s
 
                 await asyncio.sleep(10)
 
-                discovered_tools = await discover_tools(tool.url)
+                # 1. Fetch README for AI (but don't save to DB)
+                readme_text = await fetch_repo_readme(tool.repo_url, tool.branch)
 
+                # 2. Discover Tools
+                discovered_tools = await discover_tools(tool.url)
+                
+                # 3. Prepare Display Description (For UI - keep it relatively short)
                 if discovered_tools:
                     tool.tool_definitions = discovered_tools
                     discovered_summaries = [
                         f"{t['name']} ({t.get('description', 'No description')})" 
                         for t in discovered_tools
                     ]
-
+                    # We append discovered capabilities to DB so users see what tools are inside
                     tool.description = f"{tool.description} | Capabilities: {'; '.join(discovered_summaries)}"
                     await session.commit()
-                    await add_tool_to_faiss(tool.id, tool.name, tool.description)
+
+                # 4. Prepare Rich Search Context (For Vector DB - Include EVERYTHING)
+                # This combines: User Desc + Capabilities + Full README
+                search_context = tool.description 
+                if readme_text:
+                    search_context += f" | README Content: {readme_text}"
+
+                # 5. Index the RICH content, but keep the DB content CLEAN
+                await add_tool_to_faiss(tool.id, tool.name, search_context)
                 
                 break
             
@@ -98,17 +111,13 @@ async def create_tool(
         env_vars=tool_data.env_vars
         )
     
-    readme_context = await fetch_repo_readme(tool_data.repo_url, tool_data.branch)
-
-    final_description = tool_data.description
-    if readme_context:
-        final_description += f" | README Context: {readme_context}"
+    
 
     service_id = deployment_info.get("serviceId", "unknown")
 
     db_tool = DBTool(
         name = tool_data.name,
-        description = final_description,
+        description = tool_data.description,
         cost = tool_data.cost,
         repo_url = tool_data.repo_url,
         branch = tool_data.branch,
