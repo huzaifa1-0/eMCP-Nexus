@@ -447,6 +447,14 @@
     gap: 10px;
     justify-content: flex-end;
 }
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;      /* Show only 3 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;    /* Add '...' at the end */
+    height: 4.2em;              /* Force consistent height */
+}
     </style>
 </head>
 <body>
@@ -728,7 +736,9 @@
             
             <div class="mcp-config" style="text-align: left; font-size: 13px; padding: 15px;">
                 <div style="margin-bottom: 5px;"><strong>Description:</strong></div>
-                <div style="color: #ccc; margin-bottom: 10px; line-height: 1.4;">${tool.description}</div>
+                <div class="line-clamp-3" style="color: #ccc; margin-bottom: 10px; line-height: 1.4;">
+                ${tool.description}
+                </div>
             </div>
 
             ${toolsListHtml}
