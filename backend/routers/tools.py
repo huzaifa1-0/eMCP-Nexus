@@ -24,58 +24,76 @@ router = APIRouter()
 async def monitor_deployment_and_discover(service_id: str, db_tool_id: int, db_session_factory):
     """
     Polls Render API until service is live, then runs discovery.
+    Refactored to avoid holding DB sessions open during network calls.
     """
     print(f"⏳ Starting monitoring for Service ID: {service_id}")
 
-    async with db_session_factory() as session:
-        max_retries = 60
+    max_retries = 60
+    # Store these variables to use outside the DB session
+    tool_url = None
+    tool_name = ""
+    repo_url = ""
+    branch = ""
 
-        for i in range(max_retries):
-            status = await get_service_status(service_id)
-            print(f"   Status check {i+1}: {status}")
+    for i in range(max_retries):
+        # 1. Check Status (Network Call)
+        status = await get_service_status(service_id)
+        print(f"   Status check {i+1}: {status}")
 
+        # 2. Update Status in DB (Short-lived Session)
+        async with db_session_factory() as session:
             result = await session.execute(select(DBTool).where(DBTool.id == db_tool_id))
             tool = result.scalar_one_or_none()
-
+            
             if tool:
                 tool.status = status
                 await session.commit()
+                # Cache info for the discovery phase
+                tool_url = tool.url
+                tool_name = tool.name
+                repo_url = tool.repo_url
+                branch = tool.branch
+
+        if status == "live" and tool_url:
+            print(f"🚀 Service is LIVE! Waiting 15s for server warmup at {tool_url}...")
             
-            if status == "live":
-                print(f"🚀 Service is LIVE! Starting discovery on {tool.url}...")
+            # CRITICAL FIX: Wait for the app inside the container to actually boot
+            await asyncio.sleep(15)
 
-                await asyncio.sleep(10)
+            # 3. Network Discovery (NO DB SESSION HERE)
+            readme_text = await fetch_repo_readme(repo_url, branch)
+            discovered_tools = await discover_tools(tool_url)
+            
+            search_context = ""
 
-                # 1. Fetch README for AI (but don't save to DB)
-                readme_text = await fetch_repo_readme(tool.repo_url, tool.branch)
-
-                # 2. Discover Tools
-                discovered_tools = await discover_tools(tool.url)
+            # 4. Save Discovery Results (New Short-lived Session)
+            async with db_session_factory() as session:
+                result = await session.execute(select(DBTool).where(DBTool.id == db_tool_id))
+                tool = result.scalar_one_or_none()
                 
-                # 3. Prepare Display Description (For UI - keep it relatively short)
-                if discovered_tools:
-                    tool.tool_definitions = discovered_tools
-                    discovered_summaries = [
-                        f"{t['name']} ({t.get('description', 'No description')})" 
-                        for t in discovered_tools
-                    ]
-                    # We append discovered capabilities to DB so users see what tools are inside
-                    tool.description = f"{tool.description} | Capabilities: {'; '.join(discovered_summaries)}"
-                    await session.commit()
+                if tool:
+                    # Prepare Search Context
+                    search_context = tool.description
+                    
+                    if discovered_tools:
+                        tool.tool_definitions = discovered_tools
+                        discovered_summaries = [
+                            f"{t['name']} ({t.get('description', 'No description')})" 
+                            for t in discovered_tools
+                        ]
+                        tool.description = f"{tool.description} | Capabilities: {'; '.join(discovered_summaries)}"
+                        search_context = tool.description # Update context with new description
+                        await session.commit()
+                        print(f"✅ Saved {len(discovered_tools)} tools to DB.")
 
-                # 4. Prepare Rich Search Context (For Vector DB - Include EVERYTHING)
-                # This combines: User Desc + Capabilities + Full README
-                search_context = tool.description 
-                if readme_text:
-                    search_context += f" | README Content: {readme_text}"
-
-                # 5. Index the RICH content, but keep the DB content CLEAN
-                await add_tool_to_faiss(tool.id, tool.name, search_context)
+            # 5. Update Vector DB (In-memory operation)
+            if readme_text:
+                search_context += f" | README Content: {readme_text}"
                 
-                break
-            
-            
-            await asyncio.sleep(5)
+            await add_tool_to_faiss(db_tool_id, tool_name, search_context)
+            break
+        
+        await asyncio.sleep(5)
 
 @router.get("/", response_model=List[Tool])
 async def read_tools(
