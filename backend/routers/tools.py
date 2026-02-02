@@ -55,10 +55,10 @@ async def monitor_deployment_and_discover(service_id: str, db_tool_id: int, db_s
                 branch = tool.branch
 
         if status == "live" and tool_url:
-            print(f"🚀 Service is LIVE! Waiting 15s for server warmup at {tool_url}...")
+            print(f"🚀 Service is LIVE! Waiting 20s for server warmup at {tool_url}...")
             
             # CRITICAL FIX: Wait for the app inside the container to actually boot
-            await asyncio.sleep(15)
+            await asyncio.sleep(20)
 
             # 3. Network Discovery (NO DB SESSION HERE)
             readme_text = await fetch_repo_readme(repo_url, branch)
@@ -85,6 +85,9 @@ async def monitor_deployment_and_discover(service_id: str, db_tool_id: int, db_s
                         search_context = tool.description # Update context with new description
                         await session.commit()
                         print(f"✅ Saved {len(discovered_tools)} tools to DB.")
+                    else:
+                        # Commit empty transaction to suppress SQL ROLLBACK warning log
+                        await session.commit()
 
             # 5. Update Vector DB (In-memory operation)
             if readme_text:
