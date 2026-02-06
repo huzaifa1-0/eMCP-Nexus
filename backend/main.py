@@ -70,8 +70,14 @@ else:
     except Exception as e:
         print(f"Error listing frontend files: {e}")
 
-    # Serve static files (CSS, JS, etc.)
-    app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
+    # Serve static files from the 'static' subdirectory
+    static_dir = os.path.join(frontend_dir, "static")
+    
+    # Create the directory if it doesn't exist (safety check)
+    if not os.path.exists(static_dir):
+        os.makedirs(static_dir)
+
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 # ✅ FIXED: Define API routes BEFORE including routers to avoid conflicts
 @app.get("/api/health")
