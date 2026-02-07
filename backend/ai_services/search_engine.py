@@ -67,31 +67,53 @@ async def add_tool_to_faiss(tool_id: int, name: str, description: str):
     except Exception as e:
         print(f"❌ Error adding tool to FAISS: {e}")
 
-# --- THE CRITICAL FUNCTION FIX ---
+
+SIMILARITY_THRESHOLD = 1.0 
+
 async def search_tools(session: AsyncSession, query: str, k: int = 5) -> List[Dict[str, Any]]:
     """
     Hybrid Search: FAISS -> SQL Fallback
-    CRITICAL: This function MUST accept 'k' as an argument.
     """
     tools = []
+    found_ids = []
     
     # 1. Try Semantic Search (FAISS)
     if index.ntotal > 0:
         try:
             query_embedding = get_embedding(query)
             query_np = np.array([query_embedding]).astype('float32')
+            
+            # Search FAISS
             distances, indices = index.search(query_np, k)
             
-            found_ids = [index_to_tool_id.get(i) for i in indices[0] if i != -1 and i in index_to_tool_id]
+            # Filter results by distance threshold
+            # indices[0] is the list of IDs, distances[0] is the list of scores
+            for i, idx in enumerate(indices[0]):
+                dist = distances[0][i]
+                
+                # Check if valid index AND within similarity threshold
+                if idx != -1 and idx in index_to_tool_id:
+                    if dist < SIMILARITY_THRESHOLD:
+                        tool_id = index_to_tool_id[idx]
+                        found_ids.append(tool_id)
             
+            # If we found relevant semantic matches, fetch them
             if found_ids:
+                # Maintain order of relevance by fetching and re-sorting in Python if necessary,
+                # or just fetch where ID is in the list.
                 stmt = select(DBTool).where(DBTool.id.in_(found_ids))
                 result = await session.execute(stmt)
-                tools = result.scalars().all()
+                fetched_tools = result.scalars().all()
+                
+                # Sortfetched tools to match the order found by FAISS (most relevant first)
+                tools_map = {t.id: t for t in fetched_tools}
+                tools = [tools_map[tid] for tid in found_ids if tid in tools_map]
+                
         except Exception as e:
             print(f"⚠️ FAISS Error: {e}")
 
-    # 2. Fallback SQL Search (If FAISS failed or empty)
+    # 2. Fallback SQL Search (ONLY if FAISS found nothing)
+    # If FAISS returned results, we usually assume those are better than a simple text match.
     if not tools:
         print("ℹ️ Using SQL Fallback Search")
         stmt = select(DBTool).where(
@@ -101,11 +123,9 @@ async def search_tools(session: AsyncSession, query: str, k: int = 5) -> List[Di
         result = await session.execute(stmt)
         tools = result.scalars().all()
 
-    # 3. Last Resort (Show anything)
-    if not tools:
-        stmt = select(DBTool).order_by(DBTool.id.desc()).limit(k)
-        result = await session.execute(stmt)
-        tools = result.scalars().all()
+    # 3. REMOVED "Last Resort" BLOCK
+    # We deleted the block that returns random tools if nothing is found.
+    # Now, if the query matches nothing, it correctly returns an empty list [].
 
     # Format for JSON response
     return [
@@ -114,7 +134,7 @@ async def search_tools(session: AsyncSession, query: str, k: int = 5) -> List[Di
             "name": t.name,
             "description": t.description,
             "cost": t.cost,
-            "url": getattr(t, 'url', ''), # Safe access
+            "url": getattr(t, 'url', ''),
             "owner_id": t.owner_id
         } 
         for t in tools
