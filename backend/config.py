@@ -13,6 +13,11 @@ class Settings(BaseSettings):
     # 2. Use the absolute path for the database connection
     # The 'f' string inserts the calculate path dynamically
     DATABASE_URL: str = f"sqlite+aiosqlite:///{db_path}"
+
+    RECEIVER_WALLET_ADDRESS: str = "0xYOUR_WALLET_ADDRESS_HERE" 
+    
+    # Base Sepolia RPC URL (Get one from Alchemy or Infura, or use a public one)
+    WEB3_RPC_URL: str = "https://sepolia.base.org"
     
     # --- JWT Settings ---
     SECRET_KEY: str = "your-super-secret-key-that-is-long-and-random"
