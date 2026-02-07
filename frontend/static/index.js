@@ -394,8 +394,8 @@ async function fetchStats() {
         
         // Update the DOM elements
         // We use data.active_users || 0 to handle cases where DB might be empty
-        document.getElementById('stat-users').innerText = (data.active_users || 0) + "+";
-        document.getElementById('stat-tools').innerText = (data.mcp_tools || 0) + "+";
+        document.getElementById('stat-users').innerText = data.active_users ?? 0;
+        document.getElementById('stat-tools').innerText = data.mcp_tools ?? 0;
         
         // Optional: Update uptime if you decided to make it dynamic later
         if(data.uptime) {

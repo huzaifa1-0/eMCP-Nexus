@@ -1,7 +1,17 @@
+import os
 from pydantic_settings import BaseSettings
 
+
+
+# Calculate the project root directory strictly
+# This gets the folder containing config.py (backend/)
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# This gets the parent folder (project root)
+project_root = os.path.dirname(current_dir)
+# This points specifically to the marketplace.db in the root
+db_path = os.path.join(project_root, "marketplace.db")
 class Settings(BaseSettings):
-    DATABASE_URL: str = "sqlite+aiosqlite:///./marketplace.db"
+    DATABASE_URL: str = f"sqlite+aiosqlite:///{db_path}"
     
     # --- JWT Settings ---
     SECRET_KEY: str = "your-super-secret-key-that-is-long-and-random"  # Replace with a real secret key
