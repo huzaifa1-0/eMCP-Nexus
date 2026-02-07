@@ -380,3 +380,32 @@
             alert('Verification code has been resent to your email.');
         });
     });
+
+    document.addEventListener('DOMContentLoaded', () => {
+    fetchStats();
+});
+
+async function fetchStats() {
+    try {
+        const response = await fetch('/api/stats');
+        if (!response.ok) throw new Error('Failed to fetch stats');
+        
+        const data = await response.json();
+        
+        // Update the DOM elements
+        // We use data.active_users || 0 to handle cases where DB might be empty
+        document.getElementById('stat-users').innerText = (data.active_users || 0) + "+";
+        document.getElementById('stat-tools').innerText = (data.mcp_tools || 0) + "+";
+        
+        // Optional: Update uptime if you decided to make it dynamic later
+        if(data.uptime) {
+             document.getElementById('stat-uptime').innerText = data.uptime;
+        }
+
+    } catch (error) {
+        console.error('Error loading stats:', error);
+        // Fallback to default values if API fails
+        document.getElementById('stat-users').innerText = "100+";
+        document.getElementById('stat-tools').innerText = "50+";
+    }
+}

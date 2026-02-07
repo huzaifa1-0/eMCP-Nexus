@@ -8,6 +8,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import os 
 import sys
+from backend.db import get_async_session
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import Depends
+from backend import crud
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
@@ -167,3 +171,19 @@ async def catch_all(full_path: str):
         return FileResponse(index_path)
     else:
         return {"error": "Frontend not available"}
+    
+@app.get("/api/stats")
+async def read_stats(session: AsyncSession = Depends(get_async_session)):
+    """
+    Returns platform statistics:
+    - Active Users (from DB)
+    - MCP Tools (from DB)
+    - Uptime (Static/Calculated)
+    """
+    stats = await crud.get_stats(session)
+    
+    return {
+        "active_users": stats["user_count"],
+        "mcp_tools": stats["tool_count"],
+        "uptime": "99.9%"  # Keeping this static as it's usually calculated by external monitoring
+    }

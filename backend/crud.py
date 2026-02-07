@@ -2,8 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from backend.models.db import DBUser, DBTool, DBTransaction
 from backend.models.pydantic import ToolCreate, UserCreate, TransactionCreate
-
-
+from sqlalchemy import func
 
 
 async def get_user(db: AsyncSession, user_id: str):
@@ -37,7 +36,7 @@ async def create_user(db: AsyncSession, user: UserCreate):
 
 # ==================================
 # CRUD for Tools
-# =-================================
+# ==================================
 
 async def get_tools(db: AsyncSession, skip: int = 0, limit: int = 100):
     """Fetch multiple tools with pagination."""
@@ -66,3 +65,21 @@ async def create_transaction(db: AsyncSession, transaction: TransactionCreate, u
     await db.commit()
     await db.refresh(db_transaction)
     return db_transaction
+
+
+
+
+async def get_stats(db: AsyncSession):
+    """Fetch counts of users and tools."""
+    # Count total users
+    user_result = await db.execute(select(func.count(DBUser.id)))
+    user_count = user_result.scalar()
+
+    # Count total tools
+    tool_result = await db.execute(select(func.count(DBTool.id)))
+    tool_count = tool_result.scalar()
+
+    return {
+        "user_count": user_count,
+        "tool_count": tool_count
+    }
