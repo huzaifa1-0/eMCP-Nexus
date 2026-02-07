@@ -18,3 +18,4 @@ mcp
 httpx
 aiohttp
 groq
+web3==6.11.3
