@@ -127,6 +127,22 @@ app.include_router(seller_dashboard.router, prefix="/api/seller_dashboard", tags
 app.include_router(chat.router, prefix="/api/chat", tags=["AI Chat"])
 
 
+@app.get("/api/stats")
+async def read_stats(session: AsyncSession = Depends(get_async_session)):
+    """
+    Returns platform statistics:
+    - Active Users (from DB)
+    - MCP Tools (from DB)
+    - Uptime (Static/Calculated)
+    """
+    stats = await crud.get_stats(session)
+    
+    return {
+        "active_users": stats["user_count"],
+        "mcp_tools": stats["tool_count"],
+        "uptime": "99.9%"  # Keeping this static as it's usually calculated by external monitoring
+    }
+
 @app.get("/")
 async def serve_index():
     index_path = os.path.join(frontend_dir, "index.html")
@@ -172,18 +188,3 @@ async def catch_all(full_path: str):
     else:
         return {"error": "Frontend not available"}
     
-@app.get("/api/stats")
-async def read_stats(session: AsyncSession = Depends(get_async_session)):
-    """
-    Returns platform statistics:
-    - Active Users (from DB)
-    - MCP Tools (from DB)
-    - Uptime (Static/Calculated)
-    """
-    stats = await crud.get_stats(session)
-    
-    return {
-        "active_users": stats["user_count"],
-        "mcp_tools": stats["tool_count"],
-        "uptime": "99.9%"  # Keeping this static as it's usually calculated by external monitoring
-    }
