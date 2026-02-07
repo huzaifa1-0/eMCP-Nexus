@@ -1,7 +1,7 @@
 import asyncio
 from typing import List
 from backend import crud
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, Header
 from ..models.db import DBTool, DBUser
 from ..models.pydantic import ToolCreate, Tool
 from ..security import get_current_user
@@ -13,6 +13,8 @@ from backend.ai_services.search_engine import add_tool_to_faiss
 from backend.ai_services.monitoring import log_tool_usage
 import random 
 import time
+from backend.config import settings
+from backend.services.cypto import verify_payment
 
 from backend.services.deployment import deploy_tool, get_service_status, fetch_repo_readme
 from backend.services.discovery import discover_tools
@@ -171,6 +173,7 @@ async def create_tool(
 async def use_tool(
     tool_id: int, 
     background_tasks: BackgroundTasks,
+    x_transaction_hash: str = Header(None),
     user: DBUser = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_session)
 ):
@@ -180,6 +183,31 @@ async def use_tool(
     tool = await get_tool(tool_id, session)
     if not tool:
         raise HTTPException(status_code=404, detail="Tool not found")
+    
+    if tool.cost > 0:
+        # A. If no payment proof provided
+        if not x_transaction_hash:
+            raise HTTPException(
+                status_code=402, # Payment Required
+                detail={
+                    "message": "Payment required",
+                    "amount": tool.cost,
+                    "currency": "ETH",
+                    "receiver": settings.RECEIVER_WALLET_ADDRESS
+                }
+            )
+        
+        # B. Verify the provided hash
+        is_valid = verify_payment(
+            tx_hash=x_transaction_hash,
+            required_amount=tool.cost,
+            receiver_address=settings.RECEIVER_WALLET_ADDRESS
+        )
+        
+        if not is_valid:
+            raise HTTPException(status_code=400, detail="Invalid payment transaction")
+
+        
 
     # 1. Simulate the tool's execution
     start_time = time.time()
