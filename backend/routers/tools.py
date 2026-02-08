@@ -14,7 +14,7 @@ from backend.ai_services.monitoring import log_tool_usage
 import random 
 import time
 from backend.config import settings
-from backend.services.cypto import verify_payment
+from backend.services.crypto import verify_payment
 
 from backend.services.deployment import deploy_tool, get_service_status, fetch_repo_readme
 from backend.services.discovery import discover_tools
