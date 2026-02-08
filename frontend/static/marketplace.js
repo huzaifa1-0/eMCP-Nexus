@@ -237,36 +237,119 @@ const API_BASE_URL = '/api';
         }
 
         // 4. Functionality: Use/Run the Tool
-        async function useTool(toolId, toolName) {
-            const token = localStorage.getItem('accessToken');
-            if (!token) {
-                showAlert("Please log in first!", "error");
+       // 4. Functionality: Use/Run the Tool (Now with Crypto Payment Support)
+async function useTool(toolId, toolName) {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+        showAlert("Please log in first!", "error");
+        return;
+    }
+
+    showAlert(`Running ${toolName}...`, "info");
+    
+    try {
+        // ATTEMPT 1: Try to use the tool normally
+        let response = await fetch(`${API_BASE_URL}/tools/use/${toolId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        // 🛑 CHECK: Did we get a 402 Payment Required?
+        if (response.status === 402) {
+            const errorData = await response.json();
+            const paymentDetails = errorData.detail; // { amount, receiver, currency }
+
+            // Close the "Running..." alert
+            const existingAlert = document.querySelector('.alert-popup');
+            if (existingAlert) existingAlert.remove();
+
+            // Ask user to pay
+            const confirmPay = confirm(`💰 Payment Required\n\nThis tool costs ${paymentDetails.amount} ETH.\n\nClick OK to pay with MetaMask.`);
+            
+            if (!confirmPay) {
+                showAlert("Payment cancelled.", "error");
                 return;
             }
 
-            showAlert(`Running ${toolName}...`, "success");
+            showAlert("Opening MetaMask...", "info");
+
+            // 1. Trigger Crypto Payment
+            const txHash = await handleCryptoPayment(paymentDetails.amount, paymentDetails.receiver);
             
-            try {
-                const response = await fetch(`${API_BASE_URL}/tools/use/${toolId}`, {
+            if (txHash) {
+                showAlert("Payment sent! Verifying...", "success");
+                
+                // ATTEMPT 2: Retry request with Proof of Payment
+                response = await fetch(`${API_BASE_URL}/tools/use/${toolId}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
+                        'Authorization': `Bearer ${token}`,
+                        'X-Transaction-Hash': txHash // <--- The Proof
                     }
                 });
-
-                const data = await response.json();
-                
-                if (response.ok) {
-                    const statusMsg = data.status === 'success' ? 'Success' : 'Failed';
-                    alert(`✅ Execution Result:\n\nStatus: ${statusMsg}\nMessage: ${data.message}\nTime: ${data.processing_time}s`);
-                } else {
-                    throw new Error(data.detail || "Execution failed");
-                }
-            } catch (error) {
-                showAlert(error.message, "error");
+            } else {
+                return; // Payment failed or cancelled
             }
         }
+
+        // Handle final success/failure
+        const data = await response.json();
+        
+        if (response.ok) {
+            const statusMsg = data.status === 'success' ? 'Success' : 'Failed';
+            alert(`✅ Execution Result:\n\nStatus: ${statusMsg}\nMessage: ${data.message}\nTime: ${data.processing_time}s`);
+        } else {
+            throw new Error(data.detail || "Execution failed");
+        }
+
+    } catch (error) {
+        console.error(error);
+        showAlert(error.message, "error");
+    }
+}
+
+// --- Helper: Handle MetaMask Payment ---
+async function handleCryptoPayment(amountEth, receiverAddress) {
+    // Check if MetaMask is installed
+    if (typeof window.ethereum === 'undefined') {
+        alert("MetaMask is not installed! You need a crypto wallet to pay for this tool.");
+        return null;
+    }
+
+    try {
+        // Request account access
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const sender = accounts[0];
+
+        // Convert ETH to Wei (Hex format). 1 ETH = 10^18 Wei.
+        // using BigInt ensures precision for crypto math
+        const weiValue = BigInt(Math.floor(amountEth * 1e18)).toString(16);
+
+        // Send Transaction
+        const txHash = await window.ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [
+                {
+                    from: sender,
+                    to: receiverAddress,
+                    value: "0x" + weiValue, // Hex value
+                },
+            ],
+        });
+
+        console.log("Tx Hash:", txHash);
+        return txHash;
+
+    } catch (error) {
+        console.error("Payment Error:", error);
+        showAlert("Payment failed: " + error.message, "error");
+        return null;
+    }
+}
 
         function showDetails(name, desc, cost) {
             alert(`Details for ${name}:\n\n${desc}\n\nCost per run: $${cost}\n\nThis tool is hosted on eMCP Nexus.`);
