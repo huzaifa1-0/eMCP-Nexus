@@ -1,24 +1,30 @@
-# Start with a Python 3.12 image
+# Start with a Python 3.12 slim image
 FROM python:3.12-slim
 
-# Set the working directory inside the container
+# Set the working directory
 WORKDIR /code
 
-# Copy the requirements file from the build context (the 'backend' folder)
+# Install the C compiler and build tools
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements (Source: requirements.txt, Dest: .)
 COPY requirements.txt .
 
-# Install the Python dependencies
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code from the build context
-# (which includes the routers, services, ai_services, etc.)
+# Copy the rest of the app (Source: ., Dest: .)
+# ✅ FIXED: This must have two dots separated by a space
 COPY . .
 
-# Set the PYTHONPATH to include the root directory
+# Set python path
 ENV PYTHONPATH="/code"
 
-# Expose the port the app runs on
+# Expose port
 EXPOSE 8000
 
-# Command to run the application
+# Run the app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
