@@ -1,30 +1,30 @@
 # Start with a Python 3.12 slim image
 FROM python:3.12-slim
 
-# Set the working directory
-WORKDIR /code
+# Set the working directory to the root of the app
+WORKDIR /app
 
-# Install the C compiler and build tools
+# Install C compiler and build tools (for asyncpg/web3)
 RUN apt-get update && apt-get install -y \
     build-essential \
     gcc \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements (Source: requirements.txt, Dest: .)
+# Copy requirements file to the root (/app)
 COPY requirements.txt .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the app (Source: ., Dest: .)
-# ✅ FIXED: This must have two dots separated by a space
-COPY . .
+# ✅ FIX: Copy the code INTO a 'backend' folder
+# This creates /app/backend/main.py, allowing "from backend import..." to work
+COPY . ./backend
 
-# Set python path
-ENV PYTHONPATH="/code"
+# ✅ FIX: Add /app to the Python path so it can find the 'backend' package
+ENV PYTHONPATH=/app
 
 # Expose port
 EXPOSE 8000
 
-# Run the app
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# ✅ FIX: Run the app as a module (backend.main)
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
