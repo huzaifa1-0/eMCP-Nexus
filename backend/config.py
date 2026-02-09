@@ -12,7 +12,7 @@ db_path = os.path.join(project_root, "marketplace.db")
 class Settings(BaseSettings):
     POSTGRES_USER: str = os.getenv("POSTGRES_USER", "admin")
     POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "password")
-    POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER", "db") # 'db' is the service name in docker-compose
+    POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER", "localhost") 
     POSTGRES_PORT: str = os.getenv("POSTGRES_PORT", "5432")
     POSTGRES_DB: str = os.getenv("POSTGRES_DB", "marketplace")
 
