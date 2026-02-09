@@ -6,6 +6,7 @@ pydantic-settings
 python-dotenv
 faiss-cpu
 transformers
+sentence-transformers
 pinecone-client
 stripe
 requests
