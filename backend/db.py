@@ -6,8 +6,7 @@ from backend.config import settings
 
 engine = create_async_engine(
     settings.DATABASE_URL, 
-    echo=True,
-    connect_args={"check_same_thread": False}  # Only for SQLite
+    echo=True, 
 )
 async_session_factory = async_sessionmaker(
     bind=engine, 
