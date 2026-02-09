@@ -1,13 +1,7 @@
 import os
 from pydantic_settings import BaseSettings
 
-# 1. Calculate the absolute path to the project root
-# This gets the folder containing this config file (backend/)
-current_file_dir = os.path.dirname(os.path.abspath(__file__))
-# This gets the parent folder (project root)
-project_root = os.path.dirname(current_file_dir)
-# This points specifically to the marketplace.db in the root
-db_path = os.path.join(project_root, "marketplace.db")
+
 
 class Settings(BaseSettings):
     POSTGRES_USER: str = os.getenv("POSTGRES_USER", "admin")
