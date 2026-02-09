@@ -10,9 +10,15 @@ project_root = os.path.dirname(current_file_dir)
 db_path = os.path.join(project_root, "marketplace.db")
 
 class Settings(BaseSettings):
-    # 2. Use the absolute path for the database connection
-    # The 'f' string inserts the calculate path dynamically
-    DATABASE_URL: str = f"sqlite+aiosqlite:///{db_path}"
+    POSTGRES_USER: str = os.getenv("POSTGRES_USER", "admin")
+    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "password")
+    POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER", "db") # 'db' is the service name in docker-compose
+    POSTGRES_PORT: str = os.getenv("POSTGRES_PORT", "5432")
+    POSTGRES_DB: str = os.getenv("POSTGRES_DB", "marketplace")
+
+    # Construct the PostgreSQL Connection String
+    # Format: postgresql+asyncpg://user:password@host:port/dbname
+    DATABASE_URL: str = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
 
     RECEIVER_WALLET_ADDRESS: str = "0xYOUR_WALLET_ADDRESS_HERE" 
     
