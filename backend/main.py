@@ -12,6 +12,7 @@ from backend.db import get_async_session
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
 from backend import crud
+from backend.routers import proxy
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)
