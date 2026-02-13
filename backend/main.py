@@ -126,6 +126,7 @@ app.include_router(monetization.router, prefix="/api/monetization", tags=["Monet
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"]) 
 app.include_router(seller_dashboard.router, prefix="/api/seller_dashboard", tags=["Seller Dashboard"])
 app.include_router(chat.router, prefix="/api/chat", tags=["AI Chat"])
+app.include_router(proxy.router, prefix="/api/proxy", tags=["MCP Proxy"])  # Proxy router should be last to avoid conflicts
 
 
 @app.get("/api/stats")
