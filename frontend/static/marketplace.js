@@ -55,30 +55,31 @@ const API_BASE_URL = '/api';
         // --- NEW MODAL LOGIC ---
         let currentConfigText = "";
 
-        function openConfigModal(name, url) {
+        function openConfigModal(name, url, toolId) { // <--- Note: Added toolId
             if (!url) {
                 showAlert("No deployment URL available for this tool.", "error");
                 return;
             }
 
-            // 1. Generate the JSON Config
+            // [YOUR CHANGE]
+            // Instead of giving them the direct URL, give them the Proxy URL.
+            // This forces their client to go through your 'proxy.py' check.
+            const proxyUrl = `${window.location.origin}/api/proxy/${toolId}/sse`;
+
             const config = {
                 "mcpServers": {
-                    [name.toLowerCase().replace(/\s+/g, '-')]: {
-                        "url": url,
-                        "type": "sse"
+                [name.toLowerCase().replace(/\s+/g, '-')]: {
+                "url": proxyUrl, 
+                "transport": "sse"
                     }
                 }
             };
 
-            // 2. Format it prettily
             currentConfigText = JSON.stringify(config, null, 2);
 
-            // 3. Inject into the modal
             const codeBlock = document.getElementById('configCodeBlock');
             if(codeBlock) codeBlock.textContent = currentConfigText;
 
-            // 4. Show the modal
             const modal = document.getElementById('configModal');
             if(modal) modal.style.display = 'flex';
         }
@@ -181,7 +182,7 @@ const API_BASE_URL = '/api';
             
             <div class="action-buttons">
                 <button class="btn ${configBtnClass}" style="${configBtnStyle}" 
-                    onclick="openConfigModal('${tool.name}', '${tool.url || ''}')">
+                    onclick="openConfigModal('${tool.name}', '${tool.url || ''}', ${tool.id})">
                     <i class="fas fa-copy"></i> Copy Config
                 </button>
             </div>
