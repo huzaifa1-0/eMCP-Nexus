@@ -1,12 +1,17 @@
-# These are supported funding model platforms
+# GitHub Sponsors (1 org OR up to 4 users)
+github: [huzaifa1-0]
 
-github: [huzaifa1-0]        # GitHub Sponsors username (up to 4)
-patreon: huzaifarashid          # Patreon username
-open_collective: orhanix        # Open Collective project name
-ko_fi: huzaifa                  # Ko-fi username
-liberapay: huzaifarashid        # Liberapay username
-issuehunt: huzaifa              # IssueHunt username
-polar: huzaifa                  # Polar username
-buy_me_a_coffee: huzaifa        # Buy Me a Coffee username
-thanks_dev: huzaifa             # thanks.dev username
+# External funding platforms (ONLY one username per platform)
+patreon: huzaifarashid
+ko_fi: huzaifa
+liberapay: huzaifarashid
+open_collective: orhanix
+issuehunt: huzaifa
+polar: huzaifa
+buy_me_a_coffee: huzaifa
+thanks_dev: u/gh/huzaifa-rashid
 
+# Custom funding URLs (up to 4)
+custom:
+  - "https://paypal.me/huzaifarashid"
+  - "https://orhanix.com/support"
