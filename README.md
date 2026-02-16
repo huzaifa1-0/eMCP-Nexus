@@ -1,4 +1,4 @@
-# ⚡eMCP-Nexus
+ # ⚡eMCP-Nexus
 # AI-Powered Marketplace for MCP Tools
 
 eMCP Nexus is an AI-powered marketplace that connects AI engineers with users through a revolutionary **pay-per-task** model. Engineers can upload and monetize their Model Context Protocol (MCP) tools by simply connecting their GitHub repositories, while users discover and use these tools on-demand, paying only for what they consume.
