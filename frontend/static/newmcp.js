@@ -72,7 +72,7 @@
             });
             
             try {
-            const response = await fetch('/api/tools/', {
+            const response = await fetch('https://emcp-nexus-production.up.railway.app/api/tools/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
