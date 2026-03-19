@@ -1,4 +1,4 @@
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'https://emcp-nexus-production.up.railway.app/api';
         
         document.addEventListener('DOMContentLoaded', function() {
             fetchTools();
