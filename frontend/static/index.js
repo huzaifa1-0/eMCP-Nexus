@@ -1,7 +1,7 @@
 
     // Define the base URL for your backend API
 
-    let API_BASE_URL = '/api';
+    let API_BASE_URL = 'https://emcp-nexus-production.up.railway.app/api';
 
     // Modal functionality
     const modal = document.getElementById('loginModal');
