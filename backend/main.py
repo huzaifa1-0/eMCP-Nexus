@@ -58,30 +58,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ Frontend: Serve React build (frontend-react/dist/) or fallback to old HTML frontend
-react_dist_dir = os.path.join(project_root, "frontend-react", "dist")
-legacy_frontend_dir = os.path.join(project_root, "frontend")
+# ✅ Frontend: Serve React build (frontend-react/dist/)
+frontend_dir = os.path.join(project_root, "frontend-react", "dist")
 
-# Prefer React build if it exists
-if os.path.exists(react_dist_dir):
-    frontend_dir = react_dist_dir
+if os.path.exists(frontend_dir):
     print(f"✅ React build found: {frontend_dir}")
     
     # Serve React static assets
-    assets_dir = os.path.join(react_dist_dir, "assets")
+    assets_dir = os.path.join(frontend_dir, "assets")
     if os.path.exists(assets_dir):
         app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
-elif os.path.exists(legacy_frontend_dir):
-    frontend_dir = legacy_frontend_dir
-    print(f"✅ Legacy frontend found: {frontend_dir}")
-    
-    static_dir = os.path.join(frontend_dir, "static")
-    if not os.path.exists(static_dir):
-        os.makedirs(static_dir)
-    app.mount("/static", StaticFiles(directory=static_dir), name="static")
 else:
-    frontend_dir = legacy_frontend_dir
-    print(f"❌ ERROR: No frontend directory found")
+    print(f"⚠️ React build not found at {frontend_dir}. Run 'npm run build' in frontend-react/")
 
 # ✅ FIXED: Define API routes BEFORE including routers to avoid conflicts
 @app.get("/api/health")
