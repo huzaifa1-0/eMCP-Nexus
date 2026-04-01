@@ -58,31 +58,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ✅ FIXED: Better path handling
-frontend_dir = os.path.join(project_root, "frontend")
-print(f"Frontend directory: {frontend_dir}")
+# ✅ Frontend: Serve React build (frontend-react/dist/) or fallback to old HTML frontend
+react_dist_dir = os.path.join(project_root, "frontend-react", "dist")
+legacy_frontend_dir = os.path.join(project_root, "frontend")
 
-# Check if frontend directory exists
-if not os.path.exists(frontend_dir):
-    print(f"❌ ERROR: Frontend directory not found at {frontend_dir}")
-    print("Please make sure the 'frontend' folder exists in your project root")
-else:
-    print(f"✅ Frontend directory found: {frontend_dir}")
-    # List files in frontend directory for debugging
-    try:
-        frontend_files = os.listdir(frontend_dir)
-        print(f"Frontend files: {frontend_files}")
-    except Exception as e:
-        print(f"Error listing frontend files: {e}")
-
-    # Serve static files from the 'static' subdirectory
-    static_dir = os.path.join(frontend_dir, "static")
+# Prefer React build if it exists
+if os.path.exists(react_dist_dir):
+    frontend_dir = react_dist_dir
+    print(f"✅ React build found: {frontend_dir}")
     
-    # Create the directory if it doesn't exist (safety check)
+    # Serve React static assets
+    assets_dir = os.path.join(react_dist_dir, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+elif os.path.exists(legacy_frontend_dir):
+    frontend_dir = legacy_frontend_dir
+    print(f"✅ Legacy frontend found: {frontend_dir}")
+    
+    static_dir = os.path.join(frontend_dir, "static")
     if not os.path.exists(static_dir):
         os.makedirs(static_dir)
-
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
+else:
+    frontend_dir = legacy_frontend_dir
+    print(f"❌ ERROR: No frontend directory found")
 
 # ✅ FIXED: Define API routes BEFORE including routers to avoid conflicts
 @app.get("/api/health")

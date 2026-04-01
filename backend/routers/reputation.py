@@ -45,7 +45,7 @@ async def detect_anomalies(request: AnomalyRequest) -> dict:
 async def get_tool_reputation(tool_id: int, session: AsyncSession = Depends(get_async_session)):
     """Computes and returns the reputation score for a tool."""
     
-    # Fetch data from the database
+    
     txs_result = await session.execute(select(DBTransaction.amount).where(DBTransaction.tool_id == tool_id))
     txs = [row[0] for row in txs_result.all()]
     
@@ -54,7 +54,7 @@ async def get_tool_reputation(tool_id: int, session: AsyncSession = Depends(get_
     
     usage_logs = await get_tool_usage(session, tool_id)
     
-    # Calculate performance metrics
+    
     if usage_logs:
         total_runs = len(usage_logs)
         successful_runs = sum(1 for log in usage_logs if log.success)
@@ -66,7 +66,7 @@ async def get_tool_reputation(tool_id: int, session: AsyncSession = Depends(get_
         success_rate = 0.0
         avg_processing_time = 0.0
 
-    # Calculate the final score
+    
     score = reputation.calculate_reputation(
         transactions=txs, 
         ratings=ratings,

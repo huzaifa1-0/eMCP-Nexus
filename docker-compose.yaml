@@ -11,7 +11,7 @@ services:
         condition: service_healthy # <-- Add this condition
 
   frontend:
-    build: ./frontend
+    build: ./frontend-react
     ports:
       - "3000:80"
     stdin_open: true
