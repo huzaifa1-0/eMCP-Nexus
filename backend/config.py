@@ -27,10 +27,10 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str | None = None
 
     # --- Other Keys ---
-    STRIPE_KEY: str
-    COINBASE_KEY: str
-    RENDER_API_KEY: str
-    RENDER_OWNER_ID: str
+    STRIPE_KEY: str | None = None
+    COINBASE_KEY: str | None = None
+    RENDER_API_KEY: str | None = None
+    RENDER_OWNER_ID: str | None = None
 
     class Config:
         env_file = ".env"
