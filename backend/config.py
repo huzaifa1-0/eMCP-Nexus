@@ -19,16 +19,19 @@ class Settings(BaseSettings):
         super().__init__(**values)
         # If DATABASE_URL is provided in environment, ensure it uses the asyncpg driver
         if self.DATABASE_URL:
-            # Clean up empty ports (e.g., "host:/db" or "host: /db" -> "host/db")
-            import re
-            self.DATABASE_URL = re.sub(r':(?=/|@|$|\?)', '', self.DATABASE_URL)
-            self.DATABASE_URL = re.sub(r':\s+(?=/|@|$|\?)', '', self.DATABASE_URL)
-
-            # Handle protocol
+            # Handle protocol first
             if self.DATABASE_URL.startswith("postgres://"):
                 self.DATABASE_URL = self.DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
             elif self.DATABASE_URL.startswith("postgresql://") and "asyncpg" not in self.DATABASE_URL:
                 self.DATABASE_URL = self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+            # Clean up empty ports (e.g., "host:" followed by nothing or a slash)
+            # We split to avoid removing the colon from the "://" protocol part
+            if "://" in self.DATABASE_URL:
+                prefix, rest = self.DATABASE_URL.split("://", 1)
+                import re
+                rest = re.sub(r':(?=[/@$?]|$)', '', rest)
+                self.DATABASE_URL = f"{prefix}://{rest}"
             
             # Handle SSL for Railway Public URLs
             if (".railway.app" in self.DATABASE_URL or "railway" in self.DATABASE_URL) and "ssl=" not in self.DATABASE_URL:
