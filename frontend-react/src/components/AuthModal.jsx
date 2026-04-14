@@ -107,6 +107,14 @@ export default function AuthModal({ isOpen, onClose }) {
     setSuccess('Reset instructions sent! Check your email.');
   };
 
+  const handleGoogleLogin = () => {
+    setError('Google login integration coming soon!');
+  };
+
+  const handleGithubLogin = () => {
+    setError('GitHub login integration coming soon!');
+  };
+
   return (
     <div className="modal-backdrop" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal-content">
@@ -149,6 +157,17 @@ export default function AuthModal({ isOpen, onClose }) {
             <button type="submit" className="auth-btn" disabled={loading}>
               {loading ? 'LOGGING IN...' : 'Log In'}
             </button>
+
+            <div className="auth-divider">Or continue with</div>
+
+            <div className="social-auth-btns">
+              <button type="button" className="social-btn google" onClick={handleGoogleLogin}>
+                <i className="fab fa-google"></i> Google
+              </button>
+              <button type="button" className="social-btn github" onClick={handleGithubLogin}>
+                <i className="fab fa-github"></i> GitHub
+              </button>
+            </div>
 
             {error && <div className="message error-message"><i className="fas fa-exclamation-circle"></i> {error}</div>}
             {success && <div className="message success-message"><i className="fas fa-check-circle"></i> {success}</div>}
@@ -207,6 +226,17 @@ export default function AuthModal({ isOpen, onClose }) {
             <button type="submit" className="auth-btn" disabled={loading}>
               {loading ? 'CREATING ACCOUNT...' : 'Create Account'}
             </button>
+
+            <div className="auth-divider">Or sign up with</div>
+
+            <div className="social-auth-btns">
+              <button type="button" className="social-btn google" onClick={handleGoogleLogin}>
+                <i className="fab fa-google"></i> Google
+              </button>
+              <button type="button" className="social-btn github" onClick={handleGithubLogin}>
+                <i className="fab fa-github"></i> GitHub
+              </button>
+            </div>
 
             {error && <div className="message error-message"><i className="fas fa-exclamation-circle"></i> {error}</div>}
             {success && <div className="message success-message"><i className="fas fa-check-circle"></i> {success}</div>}
