@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AuthModal from '../components/AuthModal';
@@ -9,6 +11,8 @@ import ChatWidget from '../components/ChatWidget';
 import { API_BASE_URL } from '../api/config';
 
 export default function MarketplacePage() {
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
   const [tools, setTools] = useState([]);
   const [statusText, setStatusText] = useState('Loading...');
   const [resultsText, setResultsText] = useState('Loading...');
@@ -19,9 +23,14 @@ export default function MarketplacePage() {
   const recognitionRef = useRef(null);
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      showToast('Please log in to access the marketplace', 'error');
+      setTimeout(() => navigate('/'), 1500);
+      return;
+    }
     fetchTools();
     initVoice();
-  }, []);
+  }, [isLoggedIn, navigate]);
 
   async function fetchTools() {
     try {
