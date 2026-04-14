@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { showToast } from './AlertToast';
 
 export default function Navbar({ onSignIn }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -21,7 +22,24 @@ export default function Navbar({ onSignIn }) {
 
       <ul className={`nav-links ${menuOpen ? 'open' : ''}`}>
         <li><Link to="/" className={isActive('/')} onClick={() => setMenuOpen(false)}>Home</Link></li>
-        <li><Link to="/marketplace" className={isActive('/marketplace')} onClick={() => setMenuOpen(false)}>Marketplace</Link></li>
+        <li>
+          <Link 
+            to="/marketplace" 
+            className={isActive('/marketplace')} 
+            onClick={(e) => {
+              if (!isLoggedIn) {
+                e.preventDefault();
+                setMenuOpen(false);
+                showToast('Please sign in to access the Marketplace', 'info');
+                if (onSignIn) onSignIn();
+              } else {
+                setMenuOpen(false);
+              }
+            }}
+          >
+            Marketplace
+          </Link>
+        </li>
         {isLoggedIn && (
           <>
             <li><Link to="/dashboard" className={isActive('/dashboard')} onClick={() => setMenuOpen(false)}>Dashboard</Link></li>
