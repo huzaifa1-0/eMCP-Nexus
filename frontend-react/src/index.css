@@ -285,6 +285,22 @@ select.form-control {
   gap: 10px;
 }
 
+.card-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .card-header-actions {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
 /* ---------- Alert ---------- */
 .alert {
   padding: 14px 18px;
@@ -1358,6 +1374,18 @@ select.form-control {
   flex-wrap: wrap;
 }
 
+@media (max-width: 768px) {
+  .date-filter {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  
+  .date-filter span {
+    text-align: center;
+  }
+}
+
 .date-filter span {
   color: #666;
   font-size: 14px;
@@ -1423,13 +1451,18 @@ select.form-control {
   .page-header { flex-direction: column; gap: 16px; align-items: flex-start; }
   .search-box { flex-direction: column; }
   .mcp-grid { grid-template-columns: 1fr; }
-  .metrics-grid { grid-template-columns: 1fr 1fr; }
+  .metrics-grid { 
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+    gap: 16px;
+  }
   .date-filter { flex-direction: column; align-items: stretch; }
   .actions { flex-direction: column; }
   .env-var-item { flex-direction: column; align-items: stretch; }
   .modal-content { padding: 16px; width: 95%; max-width: calc(100vw - 20px); }
   .additional-options { flex-direction: column; gap: 12px; }
   .chat-window { width: calc(100vw - 40px); height: min(440px, calc(100vh - 100px)); }
+  .card { padding: 20px 16px; margin-bottom: 20px; }
+  .card-title { font-size: 18px; }
 }
 
 @media (max-width: 480px) {
@@ -1438,7 +1471,14 @@ select.form-control {
   .verification-code input { width: 36px; height: 36px; }
   .hero h1 { font-size: 28px; }
   .get-started { padding: 30px 20px; }
-  .metrics-table { display: block; overflow-x: auto; }
+  .metrics-table { font-size: 12px; }
+  .metrics-table th, .metrics-table td { padding: 10px 8px; }
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ---------- Scrollbar ---------- */

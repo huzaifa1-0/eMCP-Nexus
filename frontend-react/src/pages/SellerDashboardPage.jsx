@@ -77,7 +77,7 @@ export default function SellerDashboardPage() {
         </div>
 
         <div className="card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+          <div className="card-header-actions">
             <h2 className="card-title" style={{ marginBottom: 0 }}>
               <i className="fas fa-chart-line"></i> Seller Dashboard
             </h2>
@@ -133,41 +133,43 @@ export default function SellerDashboardPage() {
             <i className="fas fa-chart-bar"></i> eMCP Nexus Performance Metrics
           </h2>
 
-          <table className="metrics-table">
-            <thead>
-              <tr>
-                <th>eMCP Name</th>
-                <th>Installs</th>
-                <th>Runs</th>
-                <th>Tokens</th>
-                <th>Revenue</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {performanceData.length === 0 ? (
+          <div className="table-responsive">
+            <table className="metrics-table">
+              <thead>
                 <tr>
-                  <td colSpan="6">
-                    <div className="no-data">
-                      <i className="fas fa-inbox"></i>
-                      <div className="no-data-title">No metrics data available</div>
-                    </div>
-                  </td>
+                  <th>eMCP Name</th>
+                  <th>Installs</th>
+                  <th>Runs</th>
+                  <th>Tokens</th>
+                  <th>Revenue</th>
+                  <th>Date</th>
                 </tr>
-              ) : (
-                performanceData.map((item, i) => (
-                  <tr key={i}>
-                    <td><strong>{item.name}</strong></td>
-                    <td>{item.installs}</td>
-                    <td>{item.runs}</td>
-                    <td>{item.tokens?.toLocaleString()}</td>
-                    <td style={{ color: '#4cc9f0' }}>${item.revenue?.toFixed(2)}</td>
-                    <td>{item.date}</td>
+              </thead>
+              <tbody>
+                {performanceData.length === 0 ? (
+                  <tr>
+                    <td colSpan="6">
+                      <div className="no-data">
+                        <i className="fas fa-inbox"></i>
+                        <div className="no-data-title">No metrics data available</div>
+                      </div>
+                    </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  performanceData.map((item, i) => (
+                    <tr key={i}>
+                      <td><strong>{item.name}</strong></td>
+                      <td>{item.installs}</td>
+                      <td>{item.runs}</td>
+                      <td>{item.tokens?.toLocaleString()}</td>
+                      <td style={{ color: '#4cc9f0' }}>${item.revenue?.toFixed(2)}</td>
+                      <td>{item.date}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
