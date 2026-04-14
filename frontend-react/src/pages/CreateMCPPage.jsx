@@ -103,7 +103,7 @@ export default function CreateMCPPage() {
       <Navbar />
       <AlertToast />
 
-      <div className="page-container" style={{ maxWidth: '800px', padding: '20px' }}>
+      <div className="page-container">
         <header style={{ textAlign: 'center', padding: '30px 0' }}>
           <div className="page-title" style={{ justifyContent: 'center', fontSize: '28px' }}>
             <i className="fas fa-plus-circle"></i> Create New eMCP

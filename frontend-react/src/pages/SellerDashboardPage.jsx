@@ -70,7 +70,7 @@ export default function SellerDashboardPage() {
       <Navbar />
       <AlertToast />
 
-      <div className="page-container" style={{ padding: '20px', maxWidth: '1400px' }}>
+      <div className="page-container">
         <div className="alert">
           <i className="fas fa-info-circle"></i>
           Your dashboard metrics are updated in real-time.

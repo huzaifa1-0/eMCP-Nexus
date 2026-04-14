@@ -105,7 +105,7 @@ export default function MarketplacePage() {
       <Navbar onSignIn={() => setAuthModal(true)} />
       <AlertToast />
 
-      <div className="page-container" style={{ padding: '20px' }}>
+      <div className="page-container">
         <div className="alert">
           <i className="fas fa-info-circle"></i>
           Discover and integrate Modular Compute Protocol tools into your applications
