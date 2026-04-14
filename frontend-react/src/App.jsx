@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage'
 import MarketplacePage from './pages/MarketplacePage'
 import SellerDashboardPage from './pages/SellerDashboardPage'
 import CreateMCPPage from './pages/CreateMCPPage'
+import AuthCallback from './pages/AuthCallback'
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <Route path="/seller_dashboard.html" element={<SellerDashboardPage />} />
       <Route path="/create" element={<CreateMCPPage />} />
       <Route path="/newmcp.html" element={<CreateMCPPage />} />
+      <Route path="/auth-callback" element={<AuthCallback />} />
     </Routes>
   )
 }

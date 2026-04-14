@@ -65,6 +65,11 @@ class Settings(BaseSettings):
     RENDER_API_KEY: str | None = None
     RENDER_OWNER_ID: str | None = None
 
+    # --- GitHub OAuth Settings ---
+    GITHUB_CLIENT_ID: str | None = os.getenv("GITHUB_CLIENT_ID")
+    GITHUB_CLIENT_SECRET: str | None = os.getenv("GITHUB_CLIENT_SECRET")
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL") or "http://localhost:5173"
+
     class Config:
         env_file = ".env"
         

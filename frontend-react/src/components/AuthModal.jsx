@@ -107,12 +107,9 @@ export default function AuthModal({ isOpen, onClose }) {
     setSuccess('Reset instructions sent! Check your email.');
   };
 
-  const handleGoogleLogin = () => {
-    setError('Google login integration coming soon!');
-  };
-
   const handleGithubLogin = () => {
-    setError('GitHub login integration coming soon!');
+    // Redirect to backend OAuth route
+    window.location.href = `${API_BASE_URL}/auth/github/login`;
   };
 
   return (
@@ -158,14 +155,11 @@ export default function AuthModal({ isOpen, onClose }) {
               {loading ? 'LOGGING IN...' : 'Log In'}
             </button>
 
-            <div className="auth-divider">Or continue with</div>
+            <div className="auth-divider">Sign in with</div>
 
-            <div className="social-auth-btns">
-              <button type="button" className="social-btn google" onClick={handleGoogleLogin}>
-                <i className="fab fa-google"></i> Google
-              </button>
-              <button type="button" className="social-btn github" onClick={handleGithubLogin}>
-                <i className="fab fa-github"></i> GitHub
+            <div className="social-auth-icons">
+              <button type="button" className="social-icon-btn github" title="Login with GitHub" onClick={handleGithubLogin}>
+                <i className="fab fa-github"></i>
               </button>
             </div>
 
@@ -227,14 +221,11 @@ export default function AuthModal({ isOpen, onClose }) {
               {loading ? 'CREATING ACCOUNT...' : 'Create Account'}
             </button>
 
-            <div className="auth-divider">Or sign up with</div>
+            <div className="auth-divider">Sign up with</div>
 
-            <div className="social-auth-btns">
-              <button type="button" className="social-btn google" onClick={handleGoogleLogin}>
-                <i className="fab fa-google"></i> Google
-              </button>
-              <button type="button" className="social-btn github" onClick={handleGithubLogin}>
-                <i className="fab fa-github"></i> GitHub
+            <div className="social-auth-icons">
+              <button type="button" className="social-icon-btn github" title="Login with GitHub" onClick={handleGithubLogin}>
+                <i className="fab fa-github"></i>
               </button>
             </div>
 

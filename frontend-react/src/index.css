@@ -706,47 +706,41 @@ select.form-control {
   margin-left: 15px;
 }
 
-.social-auth-btns {
+.social-auth-icons {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  justify-content: center;
+  gap: 20px;
   margin-bottom: 24px;
 }
 
-.social-btn {
+.social-icon-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  width: 100%;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.04);
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border-radius: 50%;
   color: #fff;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 22px;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.social-btn.google:hover {
+.social-icon-btn:hover {
+  transform: translateY(-3px) scale(1.05);
   background: rgba(255, 255, 255, 0.08);
-  border-color: #4285F4;
-  color: #4285F4;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(66, 133, 244, 0.2);
+  border-color: #4cc9f0;
+  color: #4cc9f0;
+  box-shadow: 0 6px 20px rgba(76, 201, 240, 0.3);
 }
 
-.social-btn.github:hover {
-  background: rgba(255, 255, 255, 0.08);
+.social-icon-btn.github:hover {
   border-color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
-}
-
-.social-btn i {
-  font-size: 18px;
+  color: #fff;
+  box-shadow: 0 6px 20px rgba(255, 255, 255, 0.15);
 }
 
 .additional-options {
