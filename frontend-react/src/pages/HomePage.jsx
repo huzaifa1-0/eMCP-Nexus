@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AuthModal from '../components/AuthModal';
@@ -8,10 +10,15 @@ import { API_BASE_URL } from '../api/config';
 export default function HomePage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [stats, setStats] = useState({ users: '...', tools: '...', uptime: '99.9%' });
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/marketplace');
+    }
     fetchStats();
-  }, []);
+  }, [isLoggedIn, navigate]);
 
   async function fetchStats() {
     try {

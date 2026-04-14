@@ -12,7 +12,7 @@ export default function Navbar({ onSignIn }) {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="logo">
+      <Link to={isLoggedIn ? "/marketplace" : "/"} className="logo">
         ⚡ <span>eMCP</span> Nexus
       </Link>
 
@@ -21,7 +21,7 @@ export default function Navbar({ onSignIn }) {
       </button>
 
       <ul className={`nav-links ${menuOpen ? 'open' : ''}`}>
-        <li><Link to="/" className={isActive('/')} onClick={() => setMenuOpen(false)}>Home</Link></li>
+        {!isLoggedIn && <li><Link to="/" className={isActive('/')} onClick={() => setMenuOpen(false)}>Home</Link></li>}
         <li>
           <Link 
             to="/marketplace" 
