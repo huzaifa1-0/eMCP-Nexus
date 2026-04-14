@@ -68,9 +68,15 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={"detail": str(exc), "traceback": traceback.format_exc() if os.getenv("DEBUG") else None},
     )
 
+origins = [
+    "https://e-mcp-nexus.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

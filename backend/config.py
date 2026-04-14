@@ -30,11 +30,15 @@ class Settings(BaseSettings):
             if "://" in self.DATABASE_URL:
                 prefix, rest = self.DATABASE_URL.split("://", 1)
                 import re
-                rest = re.sub(r':(?=[/@$?]|$)', '', rest)
+                # Only remove the colon if it's at the end of the host/port part (followed by / or ?)
+                # This prevents stripping the colon from the user:pass section
+                rest = re.sub(r':(?=[/?]|$)', '', rest)
                 self.DATABASE_URL = f"{prefix}://{rest}"
             
             # Handle SSL for Railway Public URLs
-            if (".railway.app" in self.DATABASE_URL or "railway" in self.DATABASE_URL) and "ssl=" not in self.DATABASE_URL:
+            # WARNING: Internal Railway networking does NOT support SSL.
+            # We ONLY add ssl=require if it's a public .railway.app domain.
+            if (".railway.app" in self.DATABASE_URL) and "ssl=" not in self.DATABASE_URL:
                 separator = "&" if "?" in self.DATABASE_URL else "?"
                 self.DATABASE_URL += f"{separator}ssl=require"
         else:

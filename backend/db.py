@@ -26,9 +26,18 @@ async def init_db():
     from backend.config import settings
     import asyncio
     
-    # Redact password for logging
-    redacted_url = settings.DATABASE_URL.split("@")[-1] if "@" in settings.DATABASE_URL else settings.DATABASE_URL
-    print(f"Connecting to database: ...@{redacted_url}")
+    # Redact password for logging but show host/port/db
+    try:
+        if "@" in settings.DATABASE_URL:
+            # Format: protocol://user:pass@host:port/db
+            prefix_part, rest_part = settings.DATABASE_URL.split("@", 1)
+            protocol_user = prefix_part.split(":", 1)[0] + "://***"
+            print(f"Connecting to database: {protocol_user}@{rest_part}")
+        else:
+            print(f"Connecting to database: {settings.DATABASE_URL}")
+    except Exception:
+        # Fallback if parsing fails
+        print("Connecting to database: [Hidden URL]")
     
     max_retries = 10
     retry_delay = 2
