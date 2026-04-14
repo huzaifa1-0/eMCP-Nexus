@@ -12,7 +12,21 @@ class Settings(BaseSettings):
 
     # Construct the PostgreSQL Connection String
     # Format: postgresql+asyncpg://user:password@host:port/dbname
-    DATABASE_URL: str = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
+    DATABASE_URL: str | None = os.getenv("DATABASE_URL")
+
+    def __init__(self, **values):
+        super().__init__(**values)
+        # If DATABASE_URL is provided in environment, ensure it uses the asyncpg driver
+        if self.DATABASE_URL:
+            if self.DATABASE_URL.startswith("postgres://"):
+                self.DATABASE_URL = self.DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
+            elif self.DATABASE_URL.startswith("postgresql://"):
+                self.DATABASE_URL = self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+            elif "asyncpg" not in self.DATABASE_URL:
+                self.DATABASE_URL = self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+        else:
+            # Fallback to constructed URL if no DATABASE_URL is provided
+            self.DATABASE_URL = f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
     RECEIVER_WALLET_ADDRESS: str = "0xYOUR_WALLET_ADDRESS_HERE" 
     

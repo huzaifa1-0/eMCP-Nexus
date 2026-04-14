@@ -43,12 +43,30 @@ async def lifespan(app: FastAPI):
     
     print("Application shutdown...")
 
+from fastapi import Request
+from fastapi.responses import JSONResponse
+import traceback
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 app = FastAPI(
     title="eMCP Nexus Backend",
     description="A modern backend for the eMCP Nexus marketplace.",
     version="1.0.0",
     lifespan=lifespan
 )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Global exception caught: {exc}")
+    logger.error(traceback.format_exc())
+    return JSONResponse(
+        status_code=500,
+        content={"detail": str(exc), "traceback": traceback.format_exc() if os.getenv("DEBUG") else None},
+    )
 
 app.add_middleware(
     CORSMiddleware,

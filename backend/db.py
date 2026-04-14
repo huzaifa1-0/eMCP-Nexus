@@ -23,5 +23,15 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def init_db():
+    from backend.config import settings
+    # Redact password for logging
+    redacted_url = settings.DATABASE_URL.split("@")[-1] if "@" in settings.DATABASE_URL else settings.DATABASE_URL
+    print(f"Connecting to database: ...@{redacted_url}")
+    
     async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+        try:
+            await conn.run_sync(Base.metadata.create_all)
+            print("Database tables created/verified.")
+        except Exception as e:
+            print(f"Error during database initialization: {e}")
+            raise e
