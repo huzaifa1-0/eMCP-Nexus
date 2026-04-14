@@ -13,7 +13,7 @@ pinecone-client
 stripe
 requests
 python-jose[cryptography]
-passlib[bcrypt]
+bcrypt
 asyncpg
 authlib
 aiosqlite
