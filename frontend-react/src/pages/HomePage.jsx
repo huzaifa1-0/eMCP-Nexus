@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AuthModal from '../components/AuthModal';
-import ConnectionStatus from '../components/ConnectionStatus';
 import AlertToast from '../components/AlertToast';
 import { API_BASE_URL } from '../api/config';
 
@@ -91,7 +90,6 @@ export default function HomePage() {
       </section>
 
       <Footer />
-      <ConnectionStatus />
       <AuthModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
     </>
   );

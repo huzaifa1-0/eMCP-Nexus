@@ -471,6 +471,7 @@ select.form-control {
 
 .features {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 20px;
   max-width: 1200px;
@@ -481,7 +482,8 @@ select.form-control {
   background: rgba(255, 255, 255, 0.1);
   padding: 20px;
   border-radius: 10px;
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
   text-align: left;
 }
 
@@ -1388,7 +1390,6 @@ select.form-control {
 
 /* ============ Responsive ============ */
 @media (max-width: 1024px) {
-  .features { grid-template-columns: repeat(2, 1fr); }
   .mcp-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
 }
 
@@ -1398,7 +1399,6 @@ select.form-control {
   .hero p { font-size: 16px; }
   .stats { gap: 40px; flex-wrap: wrap; }
   .stat h2 { font-size: 32px; }
-  .features { grid-template-columns: 1fr; max-width: 500px; }
   .features-section { padding: 50px 20px; }
   .page-header { flex-direction: column; gap: 16px; align-items: flex-start; }
   .search-box { flex-direction: column; }
