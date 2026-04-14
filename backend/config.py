@@ -5,11 +5,11 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     # Look for both POSTGRES_ and standard PG prefix
-    POSTGRES_USER: str = os.getenv("POSTGRES_USER", os.getenv("PGUSER", "admin"))
-    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", os.getenv("PGPASSWORD", "password"))
-    POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER", os.getenv("PGHOST", "localhost")) 
-    POSTGRES_PORT: str = os.getenv("POSTGRES_PORT", os.getenv("PGPORT", "5432"))
-    POSTGRES_DB: str = os.getenv("POSTGRES_DB", os.getenv("PGDATABASE", "marketplace"))
+    POSTGRES_USER: str = os.getenv("POSTGRES_USER") or os.getenv("PGUSER") or "admin"
+    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD") or os.getenv("PGPASSWORD") or "password"
+    POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER") or os.getenv("PGHOST") or "localhost" 
+    POSTGRES_PORT: str = os.getenv("POSTGRES_PORT") or os.getenv("PGPORT") or "5432"
+    POSTGRES_DB: str = os.getenv("POSTGRES_DB") or os.getenv("PGDATABASE") or "marketplace"
 
     # Construct the PostgreSQL Connection String
     # Prioritize DATABASE_URL, then DATABASE_PUBLIC_URL
@@ -19,6 +19,11 @@ class Settings(BaseSettings):
         super().__init__(**values)
         # If DATABASE_URL is provided in environment, ensure it uses the asyncpg driver
         if self.DATABASE_URL:
+            # Clean up empty ports (e.g., "host:/db" or "host: /db" -> "host/db")
+            import re
+            self.DATABASE_URL = re.sub(r':(?=/|@|$|\?)', '', self.DATABASE_URL)
+            self.DATABASE_URL = re.sub(r':\s+(?=/|@|$|\?)', '', self.DATABASE_URL)
+
             # Handle protocol
             if self.DATABASE_URL.startswith("postgres://"):
                 self.DATABASE_URL = self.DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
@@ -31,7 +36,9 @@ class Settings(BaseSettings):
                 self.DATABASE_URL += f"{separator}ssl=require"
         else:
             # Fallback to constructed URL
-            self.DATABASE_URL = f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+            # Ensure port is a valid number otherwise exclude it
+            port_str = f":{self.POSTGRES_PORT}" if self.POSTGRES_PORT and self.POSTGRES_PORT.strip() else ""
+            self.DATABASE_URL = f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}{port_str}/{self.POSTGRES_DB}"
 
     RECEIVER_WALLET_ADDRESS: str = "0xYOUR_WALLET_ADDRESS_HERE" 
     
