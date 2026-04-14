@@ -133,7 +133,7 @@ export default function SellerDashboardPage() {
             <i className="fas fa-chart-bar"></i> eMCP Nexus Performance Metrics
           </h2>
 
-          <div className="table-responsive">
+          <div className="table-responsive desktop-only">
             <table className="metrics-table">
               <thead>
                 <tr>
@@ -169,6 +169,42 @@ export default function SellerDashboardPage() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          <div className="mobile-only performance-list">
+            {performanceData.length === 0 ? (
+              <div className="no-data">
+                <i className="fas fa-inbox"></i>
+                <div className="no-data-title">No metrics data available</div>
+              </div>
+            ) : (
+              performanceData.map((item, i) => (
+                <div key={i} className="performance-item-card">
+                  <div className="performance-item-header">
+                    <strong>{item.name}</strong>
+                    <span className="performance-item-date">{item.date}</span>
+                  </div>
+                  <div className="performance-item-stats">
+                    <div className="p-stat">
+                      <span>Installs</span>
+                      <strong>{item.installs}</strong>
+                    </div>
+                    <div className="p-stat">
+                      <span>Runs</span>
+                      <strong>{item.runs}</strong>
+                    </div>
+                    <div className="p-stat">
+                      <span>Tokens</span>
+                      <strong>{item.tokens?.toLocaleString()}</strong>
+                    </div>
+                    <div className="p-stat revenue">
+                      <span>Revenue</span>
+                      <strong>${item.revenue?.toFixed(2)}</strong>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
