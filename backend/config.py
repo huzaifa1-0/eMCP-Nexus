@@ -4,15 +4,16 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    POSTGRES_USER: str = os.getenv("POSTGRES_USER", "admin")
-    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", "password")
-    POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER", "localhost") 
-    POSTGRES_PORT: str = os.getenv("POSTGRES_PORT", "5432")
-    POSTGRES_DB: str = os.getenv("POSTGRES_DB", "marketplace")
+    # Look for both POSTGRES_ and standard PG prefix
+    POSTGRES_USER: str = os.getenv("POSTGRES_USER", os.getenv("PGUSER", "admin"))
+    POSTGRES_PASSWORD: str = os.getenv("POSTGRES_PASSWORD", os.getenv("PGPASSWORD", "password"))
+    POSTGRES_SERVER: str = os.getenv("POSTGRES_SERVER", os.getenv("PGHOST", "localhost")) 
+    POSTGRES_PORT: str = os.getenv("POSTGRES_PORT", os.getenv("PGPORT", "5432"))
+    POSTGRES_DB: str = os.getenv("POSTGRES_DB", os.getenv("PGDATABASE", "marketplace"))
 
     # Construct the PostgreSQL Connection String
-    # Format: postgresql+asyncpg://user:password@host:port/dbname
-    DATABASE_URL: str | None = os.getenv("DATABASE_URL")
+    # Prioritize DATABASE_URL, then DATABASE_PUBLIC_URL
+    DATABASE_URL: str | None = os.getenv("DATABASE_URL") or os.getenv("DATABASE_PUBLIC_URL")
 
     def __init__(self, **values):
         super().__init__(**values)
@@ -21,15 +22,15 @@ class Settings(BaseSettings):
             # Handle protocol
             if self.DATABASE_URL.startswith("postgres://"):
                 self.DATABASE_URL = self.DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
-            elif self.DATABASE_URL.startswith("postgresql://"):
+            elif self.DATABASE_URL.startswith("postgresql://") and "asyncpg" not in self.DATABASE_URL:
                 self.DATABASE_URL = self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
             
             # Handle SSL for Railway Public URLs
-            if ".railway.app" in self.DATABASE_URL and "ssl=" not in self.DATABASE_URL:
+            if (".railway.app" in self.DATABASE_URL or "railway" in self.DATABASE_URL) and "ssl=" not in self.DATABASE_URL:
                 separator = "&" if "?" in self.DATABASE_URL else "?"
                 self.DATABASE_URL += f"{separator}ssl=require"
         else:
-            # Fallback to constructed URL if no DATABASE_URL is provided
+            # Fallback to constructed URL
             self.DATABASE_URL = f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
 
     RECEIVER_WALLET_ADDRESS: str = "0xYOUR_WALLET_ADDRESS_HERE" 
