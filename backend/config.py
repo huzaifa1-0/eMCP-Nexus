@@ -18,12 +18,16 @@ class Settings(BaseSettings):
         super().__init__(**values)
         # If DATABASE_URL is provided in environment, ensure it uses the asyncpg driver
         if self.DATABASE_URL:
+            # Handle protocol
             if self.DATABASE_URL.startswith("postgres://"):
                 self.DATABASE_URL = self.DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
             elif self.DATABASE_URL.startswith("postgresql://"):
                 self.DATABASE_URL = self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
-            elif "asyncpg" not in self.DATABASE_URL:
-                self.DATABASE_URL = self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+            
+            # Handle SSL for Railway Public URLs
+            if ".railway.app" in self.DATABASE_URL and "ssl=" not in self.DATABASE_URL:
+                separator = "&" if "?" in self.DATABASE_URL else "?"
+                self.DATABASE_URL += f"{separator}ssl=require"
         else:
             # Fallback to constructed URL if no DATABASE_URL is provided
             self.DATABASE_URL = f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"

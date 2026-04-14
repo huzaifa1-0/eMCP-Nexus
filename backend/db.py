@@ -24,14 +24,24 @@ async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
 
 async def init_db():
     from backend.config import settings
+    import asyncio
+    
     # Redact password for logging
     redacted_url = settings.DATABASE_URL.split("@")[-1] if "@" in settings.DATABASE_URL else settings.DATABASE_URL
     print(f"Connecting to database: ...@{redacted_url}")
     
-    async with engine.begin() as conn:
+    max_retries = 10
+    retry_delay = 2
+    
+    for attempt in range(1, max_retries + 1):
         try:
-            await conn.run_sync(Base.metadata.create_all)
-            print("Database tables created/verified.")
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            print(f"✅ Database tables created/verified on attempt {attempt}.")
+            return
         except Exception as e:
-            print(f"Error during database initialization: {e}")
-            raise e
+            if attempt == max_retries:
+                print(f"❌ Could not connect to database after {max_retries} attempts: {e}")
+                raise e
+            print(f"⚠️ Connection attempt {attempt}/{max_retries} failed. Retrying in {retry_delay}s...")
+            await asyncio.sleep(retry_delay)
