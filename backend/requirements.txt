@@ -1,0 +1,25 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+pydantic-settings
+python-dotenv
+faiss-cpu
+transformers
+sentence-transformers
+pinecone-client
+stripe
+requests
+python-jose[cryptography]
+passlib[bcrypt]
+asyncpg
+authlib
+aiosqlite
+mcp
+httpx
+aiohttp
+groq
+web3==6.11.3
+setuptools
