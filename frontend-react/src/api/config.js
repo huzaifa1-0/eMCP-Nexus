@@ -3,7 +3,7 @@
 export const API_BASE_URL =
   import.meta.env.DEV
     ? '/api'
-    : (import.meta.env.VITE_API_BASE_URL || 'https://emcp-nexus-production.up.railway.app/api');
+    : (import.meta.env.VITE_API_BASE_URL || 'https://emcp-nexus-production-b0cc.up.railway.app/api');
 
 export async function fetchWithTimeout(url, options = {}, timeout = 8000) {
   const controller = new AbortController();

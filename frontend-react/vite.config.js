@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://emcp-nexus-production.up.railway.app',
+        target: 'https://emcp-nexus-production-b0cc.up.railway.app',
         changeOrigin: true,
         secure: true,
       },
