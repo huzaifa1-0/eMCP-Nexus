@@ -268,6 +268,55 @@ input, textarea, select { font-family: inherit; }
     left: 20px;
     width: auto;
   }
+
+  .mobile-only-profile {
+    display: flex !important;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 10px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .mobile-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #888;
+    font-size: 14px;
+  }
+
+  .avatar-circle.small {
+    width: 24px;
+    height: 24px;
+    font-size: 10px;
+  }
+
+  .mobile-profile-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .mobile-nav-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .mobile-nav-item.logout {
+    color: #ff4d4d;
+    background: rgba(255, 77, 77, 0.1);
+    border: none;
+    cursor: pointer;
+  }
 }
 
 /* ---------- Buttons ---------- */
@@ -1716,7 +1765,7 @@ select.form-control {
 
 /* Display Helpers */
 .desktop-only { display: block; }
-.mobile-only { display: none; }
+.mobile-only, .mobile-only-profile { display: none; }
 
 @media (max-width: 768px) {
   .desktop-only { display: none !important; }
