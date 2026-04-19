@@ -132,17 +132,29 @@ async def github_callback(request: Request, session: AsyncSession = Depends(get_
             emails_resp = await oauth.github.get('user/emails', token=token)
             emails = emails_resp.json()
             
-            if isinstance(emails, list):
-                # Find primary email
+            if isinstance(emails, list) and len(emails) > 0:
+                # 1. Try to find primary verified
                 for e in emails:
-                    if isinstance(e, dict) and e.get("primary") and e.get("verified"):
+                    if isinstance(e, dict) and e.get("verified") and e.get("primary"):
                         email = e.get("email")
                         break
-                if not email and len(emails) > 0:
-                    email = emails[0].get("email")
-        
+                
+                # 2. Try to find any verified
+                if not email:
+                    for e in emails:
+                        if isinstance(e, dict) and e.get("verified"):
+                            email = e.get("email")
+                            break
+                
+                # 3. Just take the first one
+                if not email:
+                    email = emails[0].get("email") if isinstance(emails[0], dict) else None
+
+        # 4. Fallback: Create a placeholder email if GitHub gives us absolutely nothing
         if not email:
-            return RedirectResponse(url=f"{settings.FRONTEND_URL}/auth-callback?error=Could not retrieve a verified email from your GitHub account")
+            username = user_info.get("login", "github_user")
+            email = f"{username}@github.user"
+            print(f"⚠️ No email found for {username}, using fallback: {email}")
 
         # Check if user exists
         db_user = await crud.get_user_by_email(session, email=email)
