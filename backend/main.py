@@ -5,6 +5,11 @@ from backend.db import init_db
 from backend.ai_services.search_engine import load_faiss_index
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+from uvloop import install as uvloop_install
+try:
+    from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
+except ImportError:
+    ProxyHeadersMiddleware = None
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 import os 
@@ -74,6 +79,10 @@ origins = [
     "http://localhost:5173",
     "http://localhost:3000",
 ]
+
+# ✅ ADD: Proxy headers support for production (Railway/Render)
+if ProxyHeadersMiddleware:
+    app.add_middleware(ProxyHeadersMiddleware, trusted_hosts="*")
 
 app.add_middleware(
     CORSMiddleware,

@@ -111,10 +111,6 @@ async def github_login(request: Request):
     Redirect the user to GitHub for authentication.
     """
     redirect_uri = request.url_for('github_callback')
-    # If running behind a proxy (like on Render/Vercel), we might need to force https
-    if "localhost" not in str(redirect_uri):
-        redirect_uri = str(redirect_uri).replace("http://", "https://")
-    
     return await oauth.github.authorize_redirect(request, str(redirect_uri))
 
 @router.get("/github/callback", name="github_callback")
@@ -123,13 +119,7 @@ async def github_callback(request: Request, session: AsyncSession = Depends(get_
     Handle the callback from GitHub, get user info, and log them in.
     """
     try:
-        # Use the same logic for redirect_uri as in the login route
-        # GitHub requires the redirect_uri to match EXACTLY what was sent in the first step
-        redirect_uri = request.url_for('github_callback')
-        if "localhost" not in str(redirect_uri):
-            redirect_uri = str(redirect_uri).replace("http://", "https://")
-        
-        token = await oauth.github.authorize_access_token(request, redirect_uri=str(redirect_uri))
+        token = await oauth.github.authorize_access_token(request)
         resp = await oauth.github.get('user', token=token)
         user_info = resp.json()
         
