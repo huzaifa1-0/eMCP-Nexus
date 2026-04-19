@@ -2,7 +2,7 @@ import asyncio
 from typing import List
 from backend import crud
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, Header
-from ..models.db import DBTool, DBUser, DBSubscription  # ← ADDED DBSubscription
+from ..models.db import DBTool, DBUser, DBSubscription, DBRating
 from ..models.pydantic import ToolCreate, Tool
 from ..security import get_current_user
 from ..db import get_async_session
