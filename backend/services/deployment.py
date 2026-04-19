@@ -21,7 +21,11 @@ async def deploy_tool(repo_url: str, branch: str, build_command: str, start_comm
         "Content-Type": "application/json"
     }
 
-    base_name = repo_url.split("/")[-1]
+    # Sanitize service name: lowercase, no .git, alphanumeric and hyphens only
+    base_name = repo_url.split("/")[-1].replace(".git", "").lower()
+    import re
+    base_name = re.sub(r'[^a-z0-9]', '-', base_name)
+    
     unique_suffix = str(uuid.uuid4())[:8]
     service_name = f"{base_name}-{unique_suffix}"
     
