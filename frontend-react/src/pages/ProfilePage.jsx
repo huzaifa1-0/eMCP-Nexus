@@ -70,7 +70,71 @@ export default function ProfilePage() {
     }
   };
 
-  if (loading) return <div className="loading-spinner">Loading...</div>;
+  if (loading) return (
+    <div className="profile-loading-overlay">
+      <div className="spinner-wrap">
+        <div className="premium-spinner"></div>
+        <div className="spinner-glow"></div>
+      </div>
+      <p>Fetching your profile...</p>
+      <style>{`
+        .profile-loading-overlay {
+          height: 100vh;
+          width: 100vw;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          background: #000;
+          color: #fff;
+          font-family: 'Inter', sans-serif;
+        }
+        .spinner-wrap {
+          position: relative;
+          width: 80px;
+          height: 80px;
+          margin-bottom: 20px;
+        }
+        .premium-spinner {
+          width: 100%;
+          height: 100%;
+          border: 3px solid rgba(76, 201, 240, 0.1);
+          border-top: 3px solid #4cc9f0;
+          border-radius: 50%;
+          animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        .spinner-glow {
+          position: absolute;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          background: #4cc9f0;
+          filter: blur(25px);
+          opacity: 0.2;
+          border-radius: 50%;
+          animation: pulse 2s infinite;
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+          0%, 100% { transform: scale(0.8); opacity: 0.1; }
+          50% { transform: scale(1.2); opacity: 0.3; }
+        }
+        .profile-loading-overlay p {
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          font-size: 12px;
+          font-weight: 600;
+          color: #4cc9f0;
+          animation: blink 1.5s infinite;
+        }
+        @keyframes blink {
+          0%, 100% { opacity: 0.5; }
+          50% { opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
 
   return (
     <div className="profile-container">
