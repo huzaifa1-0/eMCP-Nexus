@@ -123,25 +123,36 @@ async def github_callback(request: Request, session: AsyncSession = Depends(get_
     Handle the callback from GitHub, get user info, and log them in.
     """
     try:
-        token = await oauth.github.authorize_access_token(request)
+        # Use the same logic for redirect_uri as in the login route
+        # GitHub requires the redirect_uri to match EXACTLY what was sent in the first step
+        redirect_uri = request.url_for('github_callback')
+        if "localhost" not in str(redirect_uri):
+            redirect_uri = str(redirect_uri).replace("http://", "https://")
+        
+        token = await oauth.github.authorize_access_token(request, redirect_uri=str(redirect_uri))
         resp = await oauth.github.get('user', token=token)
         user_info = resp.json()
         
-        # Get user email (might need a separate call if not in public profile)
+        if not isinstance(user_info, dict):
+            return RedirectResponse(url=f"{settings.FRONTEND_URL}/auth-callback?error=GitHub returned an invalid profile response")
+
+        # Get user email
         email = user_info.get("email")
         if not email:
             emails_resp = await oauth.github.get('user/emails', token=token)
             emails = emails_resp.json()
-            # Find primary email
-            for e in emails:
-                if e.get("primary") and e.get("verified"):
-                    email = e.get("email")
-                    break
-            if not email and emails:
-                email = emails[0].get("email")
+            
+            if isinstance(emails, list):
+                # Find primary email
+                for e in emails:
+                    if isinstance(e, dict) and e.get("primary") and e.get("verified"):
+                        email = e.get("email")
+                        break
+                if not email and len(emails) > 0:
+                    email = emails[0].get("email")
         
         if not email:
-            return RedirectResponse(url=f"{settings.FRONTEND_URL}/auth-callback?error=Could not retrieve email from GitHub")
+            return RedirectResponse(url=f"{settings.FRONTEND_URL}/auth-callback?error=Could not retrieve a verified email from your GitHub account")
 
         # Check if user exists
         db_user = await crud.get_user_by_email(session, email=email)
