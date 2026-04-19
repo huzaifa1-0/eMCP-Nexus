@@ -45,8 +45,27 @@ async def init_db():
     for attempt in range(1, max_retries + 1):
         try:
             async with engine.begin() as conn:
+                from sqlalchemy import text
                 await conn.run_sync(Base.metadata.create_all)
-            print(f"✅ Database tables created/verified on attempt {attempt}.")
+                
+                # Manual migration for new columns
+                try:
+                    # PostgreSQL supports 'ADD COLUMN IF NOT EXISTS'
+                    if "postgresql" in settings.DATABASE_URL:
+                        await conn.execute(text("ALTER TABLE ratings ADD COLUMN IF NOT EXISTS comment TEXT;"))
+                        await conn.execute(text("ALTER TABLE tools ADD COLUMN IF NOT EXISTS readme TEXT;"))
+                    else:
+                        # SQLite (Local) fallback
+                        try:
+                            await conn.execute(text("ALTER TABLE ratings ADD COLUMN comment TEXT;"))
+                        except Exception: pass
+                        try:
+                            await conn.execute(text("ALTER TABLE tools ADD COLUMN readme TEXT;"))
+                        except Exception: pass
+                except Exception as me:
+                    print(f"Migration info: {me}")
+            
+            print(f"✅ Database tables created/verified/migrated on attempt {attempt}.")
             return
         except Exception as e:
             if attempt == max_retries:
