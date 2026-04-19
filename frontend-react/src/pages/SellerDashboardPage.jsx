@@ -272,6 +272,23 @@ export default function SellerDashboardPage() {
           from { opacity: 0; transform: translateX(-20px); }
           to { opacity: 1; transform: translateX(0); }
         }
+
+        @media (max-width: 768px) {
+          .welcome-section {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 16px;
+            border-left-width: 3px;
+          }
+          .user-name {
+            font-size: 22px;
+          }
+          .status-badge {
+            width: auto;
+            align-self: flex-start;
+          }
+        }
       `}</style>
     </>
   );
