@@ -14,17 +14,22 @@ export default function AuthCallback() {
     const email = params.get('email');
     const error = params.get('error');
 
+    console.log("Auth Callback Params:", { hasToken: !!token, email, error });
+
     if (error) {
+      console.error("Auth Error from Backend:", error);
       showToast(error, 'error');
       navigate('/');
       return;
     }
 
     if (token && email) {
+      console.log("Login successful, saving credentials...");
       login(token, email);
       showToast('Successfully logged in with GitHub!', 'success');
       navigate('/marketplace');
     } else {
+      console.error("Missing token or email in URL");
       showToast('Authentication failed. No token received.', 'error');
       navigate('/');
     }
