@@ -21,5 +21,6 @@ mcp
 httpx
 aiohttp
 groq
-web3==6.11.3
+web3>=7.15.0
 setuptools
+itsdangerous
