@@ -65,6 +65,30 @@ export default function SellerDashboardPage() {
     }
   }
 
+  async function handleDelete(toolId, toolName) {
+    if (!window.confirm(`Are you sure you want to permanently delete "${toolName}"? This cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/tools/${toolId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) throw new Error('Failed to delete tool');
+      
+      showToast(`Successfully deleted ${toolName}`, 'success');
+      // Refresh data
+      fetchDashboardData();
+    } catch (err) {
+      showToast(err.message || 'Error deleting tool', 'error');
+    }
+  }
+
   return (
     <>
       <Navbar />
@@ -138,14 +162,14 @@ export default function SellerDashboardPage() {
 
         <div className="card">
           <h2 className="card-title">
-            <i className="fas fa-chart-bar"></i> eMCP Nexus Performance Metrics
+            <i className="fas fa-chart-bar"></i> My eMCP Tools
           </h2>
 
           {performanceData.length === 0 ? (
             <div className="no-data">
               <i className="fas fa-inbox"></i>
-              <div className="no-data-title">No metrics data available</div>
-              <p style={{ fontSize: '14px', color: '#444' }}>Metrics will appear here once your eMCPs start getting installs.</p>
+              <div className="no-data-title">No tools found</div>
+              <p style={{ fontSize: '14px', color: '#444' }}>You haven't deployed any eMCP tools yet. Click "Create eMCP" to get started!</p>
             </div>
           ) : (
             <>
@@ -160,6 +184,7 @@ export default function SellerDashboardPage() {
                       <th>Tokens</th>
                       <th>Revenue</th>
                       <th>Date</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -171,6 +196,15 @@ export default function SellerDashboardPage() {
                         <td>{item.tokens?.toLocaleString()}</td>
                         <td style={{ color: '#4cc9f0' }}>${item.revenue?.toFixed(2)}</td>
                         <td>{item.date}</td>
+                        <td>
+                          <button 
+                            className="btn-delete"
+                            onClick={() => handleDelete(item.id, item.name)}
+                            title="Delete Tool"
+                          >
+                            <i className="fas fa-trash-alt"></i>
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -183,7 +217,15 @@ export default function SellerDashboardPage() {
                   <div key={i} className="performance-item-card">
                     <div className="performance-item-header">
                       <strong>{item.name}</strong>
-                      <span className="performance-item-date">{item.date}</span>
+                      <div className="h-actions">
+                        <span className="performance-item-date">{item.date}</span>
+                        <button 
+                          className="btn-delete-sm"
+                          onClick={() => handleDelete(item.id, item.name)}
+                        >
+                          <i className="fas fa-trash-alt"></i>
+                        </button>
+                      </div>
                     </div>
                     <div className="performance-item-stats">
                       <div className="p-stat">
@@ -213,6 +255,37 @@ export default function SellerDashboardPage() {
 
       <Footer />
       <style>{`
+        .btn-delete {
+          background: rgba(255, 71, 87, 0.1);
+          color: #ff4757;
+          border: 1px solid rgba(255, 71, 87, 0.2);
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .btn-delete:hover {
+          background: #ff4757;
+          color: white;
+          transform: scale(1.1);
+          box-shadow: 0 4px 15px rgba(255, 71, 87, 0.3);
+        }
+        .btn-delete-sm {
+          background: none;
+          border: none;
+          color: #ff4757;
+          cursor: pointer;
+          padding: 5px;
+        }
+        .h-actions {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+        }
         .welcome-section {
           margin: 25px 0;
           padding: 20px;

@@ -53,12 +53,13 @@ async def get_dashboard_stats(
         tool_revenue = tool_rev_res.scalar() or 0.0
 
         performance_data.append({
+            "id": tool.id,
             "name": f"{tool.name}",
             "installs": 1, 
             "runs": tool_runs,
             "tokens": tool_runs * 150, 
             "revenue": tool_revenue,
-            "date": tool.created_at.strftime("%Y-%m-%d") if hasattr(tool, 'created_at') else "2025-01-01" 
+            "date": tool.created_at.strftime("%Y-%m-%d") if hasattr(tool, 'created_at') and tool.created_at else "2025-01-01" 
         })
 
     return {

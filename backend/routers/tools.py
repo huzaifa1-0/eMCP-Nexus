@@ -169,7 +169,38 @@ async def create_tool(
     return full_tool
 
 
-# ============ PROTECTED ENDPOINTS FOR SUBSCRIPTIONS ============
+@router.delete("/{tool_id}")
+async def delete_tool(
+    tool_id: int,
+    user: DBUser = Depends(get_current_user),
+    session: AsyncSession = Depends(get_async_session)
+):
+    """Delete a tool owned by the current user and update the search index."""
+    # 1. Fetch tool and check ownership
+    result = await session.execute(select(DBTool).where(DBTool.id == tool_id))
+    tool = result.scalar_one_or_none()
+    
+    if not tool:
+        raise HTTPException(status_code=404, detail="Tool not found")
+    
+    if tool.owner_id != user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this tool")
+    
+    # 2. Delete from DB (Cascade will handle ratings if configured, or we do it manually)
+    # Since we didn't specify cascade="all, delete-orphan", let's handle ratings manually
+    from ..models.db import DBRating, DBSubscription
+    await session.execute(sqlalchemy.delete(DBRating).where(DBRating.tool_id == tool_id))
+    await session.execute(sqlalchemy.delete(DBSubscription).where(DBSubscription.tool_id == tool_id))
+    
+    await session.delete(tool)
+    await session.commit()
+    
+    # 3. Sync Search Index
+    from backend.ai_services.search_engine import reindex_all_tools
+    # Re-indexing is the safest way to ensure the tool is removed from the FAISS in-memory index
+    await reindex_all_tools(session)
+    
+    return {"message": "Tool deleted successfully"}
 
 @router.get("/protected/{tool_id}")
 async def access_protected_tool(
