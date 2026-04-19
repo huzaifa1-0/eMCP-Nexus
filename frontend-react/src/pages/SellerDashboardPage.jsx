@@ -141,79 +141,73 @@ export default function SellerDashboardPage() {
             <i className="fas fa-chart-bar"></i> eMCP Nexus Performance Metrics
           </h2>
 
-          <div className="table-responsive desktop-only">
-            <table className="metrics-table">
-              <thead>
-                <tr>
-                  <th>eMCP Name</th>
-                  <th>Installs</th>
-                  <th>Runs</th>
-                  <th>Tokens</th>
-                  <th>Revenue</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {performanceData.length === 0 ? (
-                  <tr>
-                    <td colSpan="6">
-                      <div className="no-data">
-                        <i className="fas fa-inbox"></i>
-                        <div className="no-data-title">No metrics data available</div>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  performanceData.map((item, i) => (
-                    <tr key={i}>
-                      <td><strong>{item.name}</strong></td>
-                      <td>{item.installs}</td>
-                      <td>{item.runs}</td>
-                      <td>{item.tokens?.toLocaleString()}</td>
-                      <td style={{ color: '#4cc9f0' }}>${item.revenue?.toFixed(2)}</td>
-                      <td>{item.date}</td>
+          {performanceData.length === 0 ? (
+            <div className="no-data">
+              <i className="fas fa-inbox"></i>
+              <div className="no-data-title">No metrics data available</div>
+              <p style={{ fontSize: '14px', color: '#444' }}>Metrics will appear here once your eMCPs start getting installs.</p>
+            </div>
+          ) : (
+            <>
+              {/* Desktop View */}
+              <div className="table-responsive desktop-only">
+                <table className="metrics-table">
+                  <thead>
+                    <tr>
+                      <th>eMCP Name</th>
+                      <th>Installs</th>
+                      <th>Runs</th>
+                      <th>Tokens</th>
+                      <th>Revenue</th>
+                      <th>Date</th>
                     </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="mobile-only performance-list">
-            {performanceData.length === 0 ? (
-              <div className="no-data">
-                <i className="fas fa-inbox"></i>
-                <div className="no-data-title">No metrics data available</div>
+                  </thead>
+                  <tbody>
+                    {performanceData.map((item, i) => (
+                      <tr key={i}>
+                        <td><strong>{item.name}</strong></td>
+                        <td>{item.installs}</td>
+                        <td>{item.runs}</td>
+                        <td>{item.tokens?.toLocaleString()}</td>
+                        <td style={{ color: '#4cc9f0' }}>${item.revenue?.toFixed(2)}</td>
+                        <td>{item.date}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            ) : (
-              performanceData.map((item, i) => (
-                <div key={i} className="performance-item-card">
-                  <div className="performance-item-header">
-                    <strong>{item.name}</strong>
-                    <span className="performance-item-date">{item.date}</span>
+
+              {/* Mobile View */}
+              <div className="mobile-only performance-list">
+                {performanceData.map((item, i) => (
+                  <div key={i} className="performance-item-card">
+                    <div className="performance-item-header">
+                      <strong>{item.name}</strong>
+                      <span className="performance-item-date">{item.date}</span>
+                    </div>
+                    <div className="performance-item-stats">
+                      <div className="p-stat">
+                        <span>Installs</span>
+                        <strong>{item.installs}</strong>
+                      </div>
+                      <div className="p-stat">
+                        <span>Runs</span>
+                        <strong>{item.runs}</strong>
+                      </div>
+                      <div className="p-stat">
+                        <span>Tokens</span>
+                        <strong>{item.tokens?.toLocaleString()}</strong>
+                      </div>
+                      <div className="p-stat revenue">
+                        <span>Revenue</span>
+                        <strong>${item.revenue?.toFixed(2)}</strong>
+                      </div>
+                    </div>
                   </div>
-                  <div className="performance-item-stats">
-                    <div className="p-stat">
-                      <span>Installs</span>
-                      <strong>{item.installs}</strong>
-                    </div>
-                    <div className="p-stat">
-                      <span>Runs</span>
-                      <strong>{item.runs}</strong>
-                    </div>
-                    <div className="p-stat">
-                      <span>Tokens</span>
-                      <strong>{item.tokens?.toLocaleString()}</strong>
-                    </div>
-                    <div className="p-stat revenue">
-                      <span>Revenue</span>
-                      <strong>${item.revenue?.toFixed(2)}</strong>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
 
