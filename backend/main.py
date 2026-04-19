@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from backend.routers import tools, payments, search, monitoring, reputation, monetization, auth, seller_dashboard, chat
+from backend.routers import tools, payments, search, monitoring, reputation, monetization, auth, seller_dashboard, chat, stripe_payments
 from backend.db import init_db
 from backend.ai_services.search_engine import load_faiss_index
 from fastapi.middleware.cors import CORSMiddleware
@@ -95,6 +95,17 @@ if os.path.exists(frontend_dir):
 else:
     print(f"⚠️ React build not found at {frontend_dir}. Run 'npm run build' in frontend-react/")
 
+# ============ TOOL PAGE ROUTE - MUST BE FIRST (BEFORE ANY HTML ROUTES) ============
+@app.get("/tool/background-remover")
+async def serve_background_remover():
+    """Serve the background remover tool page for paid subscribers"""
+    tool_path = os.path.join(frontend_dir, "tool", "background-remover.html")
+    print(f"🔍 Looking for tool at: {tool_path}")
+    print(f"📁 File exists: {os.path.exists(tool_path)}")
+    if os.path.exists(tool_path):
+        return FileResponse(tool_path)
+    return {"error": "Tool page not found", "path": tool_path}
+
 # ✅ FIXED: Define API routes BEFORE including routers to avoid conflicts
 @app.get("/api/health")
 async def health_check():
@@ -137,8 +148,9 @@ app.include_router(monetization.router, prefix="/api/monetization", tags=["Monet
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"]) 
 app.include_router(seller_dashboard.router, prefix="/api/seller_dashboard", tags=["Seller Dashboard"])
 app.include_router(chat.router, prefix="/api/chat", tags=["AI Chat"])
-app.include_router(proxy.router, prefix="/api/proxy", tags=["MCP Proxy"])  # Proxy router should be last to avoid conflicts
+app.include_router(stripe_payments.router, prefix="/api/stripe", tags=["stripe"])
 
+app.include_router(proxy.router, prefix="/api/proxy", tags=["MCP Proxy"])  # Proxy router should be last to avoid conflicts
 
 @app.get("/api/stats")
 async def read_stats(session: AsyncSession = Depends(get_async_session)):
@@ -171,7 +183,6 @@ async def serve_marketplace():
         return FileResponse(marketplace_path)
     else:
         return {"error": "marketplace.html not found", "path": marketplace_path}
-    
 
 @app.get("/seller_dashboard.html")
 async def serve_seller_dashboard():
@@ -200,4 +211,3 @@ async def catch_all(full_path: str):
         return FileResponse(index_path)
     else:
         return {"error": "Frontend not available"}
-    

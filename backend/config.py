@@ -62,6 +62,7 @@ class Settings(BaseSettings):
     # --- Other Keys ---
     STRIPE_KEY: str | None = None
     COINBASE_KEY: str | None = None
+    STRIPE_WEBHOOK_SECRET: str | None = None
     RENDER_API_KEY: str | None = None
     RENDER_OWNER_ID: str | None = None
 

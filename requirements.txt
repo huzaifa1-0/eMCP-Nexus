@@ -10,7 +10,7 @@ faiss-cpu
 transformers
 sentence-transformers
 pinecone-client
-stripe
+stripe==7.5.0
 requests
 python-jose[cryptography]
 passlib[bcrypt]

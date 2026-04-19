@@ -2,7 +2,7 @@ import asyncio
 from typing import List
 from backend import crud
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, Header
-from ..models.db import DBTool, DBUser
+from ..models.db import DBTool, DBUser, DBSubscription  # ← ADDED DBSubscription
 from ..models.pydantic import ToolCreate, Tool
 from ..security import get_current_user
 from ..db import get_async_session
@@ -13,6 +13,7 @@ from backend.ai_services.search_engine import add_tool_to_faiss
 from backend.ai_services.monitoring import log_tool_usage
 import random 
 import time
+from backend.middleware.subscription_check import check_subscription_access, get_user_subscriptions
 from backend.config import settings
 from backend.services.crypto import verify_payment
 
@@ -169,6 +170,110 @@ async def create_tool(
     return db_tool
 
 
+# ============ PROTECTED ENDPOINTS FOR SUBSCRIPTIONS ============
+
+@router.get("/protected/{tool_id}")
+async def access_protected_tool(
+    tool_id: int,
+    subscription = Depends(check_subscription_access),
+    session: AsyncSession = Depends(get_async_session)
+):
+    """
+    Protected endpoint that only users with active subscription can access.
+    Returns tool details and grants access to the paid tool.
+    """
+    # Get tool details
+    result = await session.execute(select(DBTool).where(DBTool.id == tool_id))
+    tool = result.scalar_one_or_none()
+    
+    if not tool:
+        raise HTTPException(status_code=404, detail="Tool not found")
+    
+    return {
+        "access_granted": True,
+        "tool_id": tool.id,
+        "tool_name": tool.name,
+        "tool_description": tool.description,
+        "message": f"You have access to {tool.name}",
+        "redirect_url": tool.url
+    }
+
+
+@router.get("/my-subscriptions")
+async def my_subscriptions(
+    subscriptions = Depends(get_user_subscriptions)
+):
+    """
+    Get all active subscriptions for the logged-in user.
+    Returns list of tools the user has subscribed to.
+    """
+    return subscriptions
+
+
+@router.get("/check-access/{tool_id}")
+async def check_tool_access(
+    tool_id: int,
+    user: DBUser = Depends(get_current_user),
+    session: AsyncSession = Depends(get_async_session)
+):
+    """
+    Check if current user has access to a specific tool.
+    Returns access status without blocking.
+    """
+    try:
+        # First, check if tool exists
+        tool_result = await session.execute(select(DBTool).where(DBTool.id == tool_id))
+        tool = tool_result.scalar_one_or_none()
+        
+        if not tool:
+            return {
+                "has_access": False,
+                "tool_exists": False,
+                "message": "Tool not found"
+            }
+        
+        # Check for active subscription
+        sub_result = await session.execute(
+            select(DBSubscription).where(
+                DBSubscription.user_id == user.id,
+                DBSubscription.tool_id == tool_id,
+                DBSubscription.status == "active"
+            )
+        )
+        subscription = sub_result.scalar_one_or_none()
+        
+        if subscription:
+            return {
+                "has_access": True,
+                "tool_exists": True,
+                "tool_id": tool.id,
+                "tool_name": tool.name,
+                "plan": subscription.plan,
+                "status": subscription.status,
+                "message": "You have an active subscription"
+            }
+        else:
+            return {
+                "has_access": False,
+                "tool_exists": True,
+                "tool_id": tool.id,
+                "tool_name": tool.name,
+                "requires_payment": True,
+                "price": tool.cost,
+                "currency": "USD",
+                "message": f"Subscription required. ${tool.cost}/month"
+            }
+    except Exception as e:
+        print(f"Error in check_access: {e}")
+        return {
+            "has_access": False,
+            "error": str(e),
+            "message": "Error checking access"
+        }
+
+
+# ============ EXISTING USE TOOL ENDPOINT ============
+
 @router.post("/use/{tool_id}", tags=["Tools"])
 async def use_tool(
     tool_id: int, 
@@ -231,5 +336,3 @@ async def use_tool(
         "processing_time": round(processing_time, 3),
         "result": "Sample output data from tool..."
     }
-
-
