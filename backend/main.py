@@ -5,7 +5,6 @@ from backend.db import init_db
 from backend.ai_services.search_engine import load_faiss_index
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
-from uvloop import install as uvloop_install
 try:
     from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 except ImportError:
