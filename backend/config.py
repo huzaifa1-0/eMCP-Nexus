@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     # Construct the PostgreSQL Connection String
     # Format: postgresql+asyncpg://user:password@host:port/dbname
     DATABASE_URL: str = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:{POSTGRES_PORT}/{POSTGRES_DB}"
-
+    FRONTEND_URL: str = "http://localhost:8000"
     RECEIVER_WALLET_ADDRESS: str = "0xYOUR_WALLET_ADDRESS_HERE" 
     
     # Base Sepolia RPC URL (Get one from Alchemy or Infura, or use a public one)
@@ -29,6 +29,7 @@ class Settings(BaseSettings):
     # --- Other Keys ---
     STRIPE_KEY: str
     COINBASE_KEY: str
+    STRIPE_WEBHOOK_SECRET: str | None = None 
     RENDER_API_KEY: str
     RENDER_OWNER_ID: str
 

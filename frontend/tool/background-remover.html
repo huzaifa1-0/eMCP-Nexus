@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Background Remover Pro - Paid Tool</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #000, #001f3f);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .nav-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        
+        .nav-links a:hover {
+            color: #fff;
+        }
+        
+        .tool-header {
+            background: rgba(18, 18, 18, 0.9);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .tool-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .subscription-info {
+            background: rgba(40, 167, 69, 0.15);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #28a745;
+        }
+        
+        .tool-content {
+            background: rgba(18, 18, 18, 0.9);
+            border-radius: 12px;
+            padding: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            padding: 60px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            border-color: #4cc9f0;
+            background: rgba(76, 201, 240, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .result-area {
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .image-preview {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .image-card {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .image-card h4 {
+            margin-bottom: 15px;
+        }
+        
+        .image-card img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        
+        .btn-process {
+            background: linear-gradient(45deg, #4cc9f0, #4361ee);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn-process:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 201, 240, 0.4);
+        }
+        
+        .btn-back {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #4cc9f0;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            background: rgba(40, 167, 69, 0.2);
+            color: #28a745;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #ccc;
+            margin-top: 40px;
+        }
+        
+        @media (max-width: 768px) {
+            .image-preview {
+                flex-direction: column;
+            }
+            .main-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="main-header">
+            <div class="logo">⚡ eMCP Nexus</div>
+            <nav class="nav-links">
+                <a href="/marketplace">Marketplace</a>
+                <a href="/seller_dashboard.html">Seller Dashboard</a>
+                <a href="#">Support</a>
+            </nav>
+        </header>
+        
+        <button class="btn-back" onclick="window.location.href='/marketplace'">
+            <i class="fas fa-arrow-left"></i> Back to Marketplace
+        </button>
+        
+        <div class="tool-header">
+            <h1>🎨 Background Remover Pro</h1>
+            <p>AI-powered background removal • Instant results • HD quality</p>
+            <div class="badge" id="subscriptionBadge">✓ Active Subscription</div>
+        </div>
+        
+        <div class="tool-content">
+            <div class="subscription-info" id="subscriptionInfo">
+                <div>
+                    <i class="fas fa-crown"></i>
+                    <strong> Premium Access</strong><br>
+                    You have an active subscription to this tool
+                </div>
+                <div id="planDisplay">
+                    Loading...
+                </div>
+            </div>
+            
+            <div class="upload-area" onclick="document.getElementById('imageInput').click()">
+                <div class="upload-icon">📸</div>
+                <h3>Click or drag to upload an image</h3>
+                <p>Supports JPG, PNG, WEBP (Max 10MB)</p>
+                <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="previewImage(this)">
+            </div>
+            
+            <div class="result-area" id="resultArea">
+                <div class="image-preview" id="imagePreview"></div>
+                <button class="btn-process" onclick="removeBackground()">
+                    <i class="fas fa-magic"></i> Remove Background
+                </button>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 10px;">Processing your image...</p>
+            </div>
+        </div>
+        
+        <footer>
+            © 2025 eMCP Nexus. All rights reserved.
+        </footer>
+    </div>
+    
+    <script>
+        const TOOL_ID = 3;
+        const TOOL_NAME = "Background Remover Pro";
+        let currentImageFile = null;
+        let currentImagePreview = null;
+        
+        // Get token from localStorage (same as marketplace)
+        function getToken() {
+            return localStorage.getItem('accessToken');
+        }
+        
+        async function checkAccess() {
+            const token = getToken();
+            
+            if (!token) {
+                alert('Please login first');
+                window.location.href = '/';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/tools/check-access/${TOOL_ID}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to check access');
+                }
+                
+                const data = await response.json();
+                
+                if (!data.has_access) {
+                    alert('You need an active subscription to access this tool!');
+                    window.location.href = '/marketplace';
+                    return;
+                }
+                
+                // Update plan display
+                if (data.plan) {
+                    document.getElementById('planDisplay').innerHTML = `
+                        Plan: <strong>${data.plan.charAt(0).toUpperCase() + data.plan.slice(1)}</strong>
+                        <i class="fas fa-check-circle" style="color: #28a745; margin-left: 5px;"></i>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Error checking access:', error);
+                alert('Error verifying subscription. Please try again.');
+                window.location.href = '/marketplace';
+            }
+        }
+        
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                currentImageFile = input.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    currentImagePreview = e.target.result;
+                    document.getElementById('imagePreview').innerHTML = `
+                        <div class="image-card">
+                            <h4>Original Image</h4>
+                            <img src="${currentImagePreview}" alt="Original">
+                        </div>
+                        <div class="image-card" id="resultCard">
+                            <h4>Result (Background Removed)</h4>
+                            <div style="background: rgba(255,255,255,0.05); border-radius: 10px; padding: 40px; text-align: center;">
+                                <p>✨ Click "Remove Background" to process</p>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('resultArea').style.display = 'block';
+                };
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        
+        async function removeBackground() {
+            if (!currentImageFile) {
+                alert('Please upload an image first');
+                return;
+            }
+            
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+            
+            // Simulate API processing (replace with actual API call)
+            setTimeout(() => {
+                loading.style.display = 'none';
+                
+                const resultCard = document.getElementById('resultCard');
+                resultCard.innerHTML = `
+                    <h4>Result (Background Removed)</h4>
+                    <img src="${currentImagePreview}" alt="Processed" style="background: repeating-linear-gradient(45deg, #333 0px, #333 10px, #444 10px, #444 20px); border-radius: 10px;">
+                    <div style="margin-top: 15px;">
+                        <button onclick="downloadImage()" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                            <i class="fas fa-download"></i> Download Result
+                        </button>
+                    </div>
+                    <div class="success-message">
+                        <i class="fas fa-check-circle"></i> Background removed successfully!
+                    </div>
+                `;
+            }, 2000);
+        }
+        
+        function downloadImage() {
+            alert('In production, this would download your processed image.');
+        }
+        
+        // Check access on page load
+        checkAccess();
+    </script>
+</body>
+</html>

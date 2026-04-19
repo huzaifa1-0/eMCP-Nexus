@@ -1,147 +1,119 @@
 const API_BASE_URL = '/api';
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            fetchTools();
-            
-            // Search functionality
-            document.getElementById('searchBtn').addEventListener('click', performSearch);
-            document.getElementById('searchInput').addEventListener('keyup', function(e) {
-                if (e.key === 'Enter') performSearch();
-            });
+
+document.addEventListener('DOMContentLoaded', function() {
+    fetchTools();
+    
+    // Search functionality
+    const searchBtn = document.getElementById('searchBtn');
+    const searchInput = document.getElementById('searchInput');
+    
+    if (searchBtn) searchBtn.addEventListener('click', performSearch);
+    if (searchInput) {
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') performSearch();
         });
+    }
+    
+    // Handle payment redirect
+    handlePaymentRedirect();
+});
 
-        let allTools = [];
+let allTools = [];
 
-        // 1. Fetch Tools from Backend
-        async function fetchTools() {
-            const grid = document.getElementById('mcpGrid');
-            const statusBadge = document.getElementById('statusBadge');
-            const resultsCount = document.getElementById('resultsCount');
+// 1. Fetch Tools from Backend
+async function fetchTools() {
+    const grid = document.getElementById('mcpGrid');
+    const statusBadge = document.getElementById('statusBadge');
+    const resultsCount = document.getElementById('resultsCount');
 
-            try {
-                const response = await fetch(`${API_BASE_URL}/tools/`);
-                if (!response.ok) throw new Error("Failed to fetch tools");
-                
-                allTools = await response.json();
-                const count = allTools.length;
+    if (!grid) return;
 
-                const label = count === 1 ? 'eMCP tool available' : 'eMCP tools available';
-                
-                // Update counts
-                if (statusBadge) {
-                    statusBadge.innerHTML = `<i class="fas fa-check-circle"></i> ${count} ${label}`;
-                }
+    try {
+        const response = await fetch(`${API_BASE_URL}/tools/`);
+        if (!response.ok) throw new Error("Failed to fetch tools");
         
-                if (resultsCount) {
-                    resultsCount.innerText = `${count} ${label}`;
-                }
-
-                // Render
-                renderTools(allTools);
-                
-            } catch (error) {
-                console.error(error);
-                if (statusBadge) statusBadge.innerHTML = `<i class="fas fa-times-circle"></i> System Offline`;
-                grid.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ff6b6b;">
-                        <i class="fas fa-exclamation-circle" style="font-size: 48px; margin-bottom: 15px;"></i>
-                        <h3>Failed to load marketplace</h3>
-                        <p>Could not connect to the backend.</p>
-                    </div>`;
-                if (statusBadge) statusBadge.innerHTML = `<i class="fas fa-times-circle"></i> Offline`;
-            }
-        }
-
-        // --- NEW MODAL LOGIC ---
-        let currentConfigText = "";
-
-        function openConfigModal(name, url, toolId) { // <--- Note: Added toolId
-            if (!url) {
-                showAlert("No deployment URL available for this tool.", "error");
-                return;
-            }
-
-            // [YOUR CHANGE]
-            // Instead of giving them the direct URL, give them the Proxy URL.
-            // This forces their client to go through your 'proxy.py' check.
-            const proxyUrl = `${window.location.origin}/api/proxy/${toolId}/sse`;
-
-            const config = {
-                "mcpServers": {
-                [name.toLowerCase().replace(/\s+/g, '-')]: {
-                "url": proxyUrl, 
-                "transport": "sse"
-                    }
-                }
-            };
-
-            currentConfigText = JSON.stringify(config, null, 2);
-
-            const codeBlock = document.getElementById('configCodeBlock');
-            if(codeBlock) codeBlock.textContent = currentConfigText;
-
-            const modal = document.getElementById('configModal');
-            if(modal) modal.style.display = 'flex';
-        }
-
-        function closeConfigModal() {
-            const modal = document.getElementById('configModal');
-            if(modal) modal.style.display = 'none';
-        }
-
-        async function copyFromModal() {
-            try {
-                await navigator.clipboard.writeText(currentConfigText);
-                showAlert("Configuration copied!", "success");
-                closeConfigModal();
-            } catch (err) {
-                console.error('Failed to copy:', err);
-                showAlert("Failed to copy", "error");
-            }
-        }
-
-        // Close modal if clicking outside the content box
-        window.onclick = function(event) {
-            const modal = document.getElementById('configModal');
-            if (event.target === modal) {
-                closeConfigModal();
-            }
-        }
-
-        // 2. Render Tools (Handles Empty State)
-        function renderTools(tools) {
-            const grid = document.getElementById('mcpGrid');
-            grid.innerHTML = ''; 
-
-            // ✅ SHOW THIS IF NO TOOLS EXIST
-            if (tools.length === 0) {
-            grid.innerHTML = `
-                <div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: #ccc;">
-                <i class="fas fa-box-open" style="font-size: 48px; margin-bottom: 20px; color: #4cc9f0;"></i>
-                <h3 style="font-size: 24px; margin-bottom: 10px;">No tools yet</h3>
-                <p style="margin-bottom: 20px;">The marketplace is empty. Be the first to publish a tool!</p>
-                <a href="seller_dashboard.html" class="btn btn-primary" style="text-decoration: none; display: inline-block;">
-                    <i class="fas fa-plus"></i> Go to Dashboard
-                </a>
-                </div>`;
-            return;
-            }
-
-            // ✅ RENDER CARDS IF TOOLS EXIST
-            tools.forEach(tool => {
-            // 1. Process Tool Definitions
-            const subTools = tool.tool_definitions || [];
+        allTools = await response.json();
+        const count = allTools.length;
+        const label = count === 1 ? 'eMCP tool available' : 'eMCP tools available';
         
-            let toolsListHtml = '';
-            if (subTools.length > 0) {
-                toolsListHtml = `<div class="tools-section" style="margin: 15px 0;">
+        if (statusBadge) {
+            statusBadge.innerHTML = `<i class="fas fa-check-circle"></i> ${count} ${label}`;
+        }
+        if (resultsCount) {
+            resultsCount.innerText = `${count} ${label}`;
+        }
+        
+        // Check user subscriptions and render
+        await renderToolsWithSubscriptions(allTools);
+        
+    } catch (error) {
+        console.error(error);
+        if (statusBadge) statusBadge.innerHTML = `<i class="fas fa-times-circle"></i> System Offline`;
+        if (grid) {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ff6b6b;">
+                <i class="fas fa-exclamation-circle" style="font-size: 48px; margin-bottom: 15px;"></i>
+                <h3>Failed to load marketplace</h3>
+                <p>Could not connect to the backend.</p>
+            </div>`;
+        }
+    }
+}
+
+// Get user subscriptions
+async function getUserSubscriptions() {
+    const token = localStorage.getItem('accessToken');
+    if (!token) return [];
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/tools/my-subscriptions`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            return await response.json();
+        }
+    } catch (error) {
+        console.error('Error fetching subscriptions:', error);
+    }
+    return [];
+}
+
+// Render tools with subscription status
+async function renderToolsWithSubscriptions(tools) {
+    const grid = document.getElementById('mcpGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    if (tools.length === 0) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px 20px; color: #ccc;">
+            <i class="fas fa-box-open" style="font-size: 48px; margin-bottom: 20px; color: #4cc9f0;"></i>
+            <h3 style="font-size: 24px; margin-bottom: 10px;">No tools yet</h3>
+            <p style="margin-bottom: 20px;">The marketplace is empty. Be the first to publish a tool!</p>
+            <a href="seller_dashboard.html" class="btn btn-primary" style="text-decoration: none; display: inline-block;">
+                <i class="fas fa-plus"></i> Go to Dashboard
+            </a>
+        </div>`;
+        return;
+    }
+    
+    // Get user's subscriptions
+    const subscriptions = await getUserSubscriptions();
+    const subscribedToolIds = new Set(subscriptions.map(s => s.tool_id));
+    
+    tools.forEach(tool => {
+        const hasAccess = subscribedToolIds.has(tool.id);
+        const subTools = tool.tool_definitions || [];
+        
+        let toolsListHtml = '';
+        if (subTools.length > 0) {
+            toolsListHtml = `<div class="tools-section" style="margin: 15px 0;">
                 <div style="font-size: 12px; font-weight: 600; color: #888; margin-bottom: 8px;">
                     <i class="fas fa-wrench"></i> INCLUDED TOOLS (${subTools.length})
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                     ${subTools.slice(0, 3).map(t => `
                         <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 13px; color: #eee; font-weight: 500;">${t.name}</span>
+                            <span style="font-size: 13px; color: #eee; font-weight: 500;">${typeof t === 'string' ? t : (t.name || 'Tool')}</span>
                             <span style="font-size: 11px; background: rgba(76, 201, 240, 0.2); color: #4cc9f0; padding: 2px 6px; border-radius: 4px;">
                                 ${tool.cost > 0 ? '$' + tool.cost : 'Free'}
                             </span>
@@ -149,20 +121,68 @@ const API_BASE_URL = '/api';
                     `).join('')}
                 </div>
             </div>`;
-            } else {
-             toolsListHtml = `<div style="margin: 15px 0; font-size: 13px; color: #666; font-style: italic;">
-                No specific tools discovered yet.
-             </div>`;
-            }
-
-            // 2. Determine Config Button State
-            const hasUrl = !!tool.url;
-            const configBtnClass = hasUrl ? 'btn-secondary' : 'btn-secondary disabled';
-            const configBtnStyle = hasUrl ? 'width: 100%; justify-content: center;' : 'width: 100%; justify-content: center; opacity: 0.5; cursor: not-allowed;';
-
-            const card = document.createElement('div');
-            card.className = 'mcp-card';
-            card.innerHTML = `
+        }
+        
+        // Determine action buttons
+        let actionButtonsHtml = '';
+        
+        if (hasAccess) {
+            actionButtonsHtml = `
+                <div class="action-buttons">
+                    <button class="btn btn-primary" style="width: 100%; justify-content: center;" 
+                        onclick="usePaidTool(${tool.id}, '${tool.name.replace(/'/g, "\\'")}', '${tool.url || ''}')">
+                        <i class="fas fa-play"></i> Use Tool
+                    </button>
+                </div>
+            `;
+        } else if (tool.cost > 0) {
+            const weeklyPrice = (tool.cost / 4).toFixed(2);
+            const yearlyPrice = (tool.cost * 10).toFixed(2);
+            
+            actionButtonsHtml = `
+                <div style="margin-top: 15px;">
+                    <div style="font-size: 12px; color: #888; margin-bottom: 8px; font-weight: 600;">
+                        <i class="fas fa-credit-card"></i> SUBSCRIBE TO USE
+                    </div>
+                    <div style="display: flex; gap: 6px;">
+                        <button onclick="subscribeToTool(${tool.id}, 'weekly', '${tool.name.replace(/'/g, "\\'")}')" 
+                            style="flex: 1; padding: 8px 4px; background: rgba(108, 117, 125, 0.2); border: 1px solid rgba(108, 117, 125, 0.5); border-radius: 6px; color: #adb5bd; font-size: 11px; font-weight: 600; cursor: pointer;">
+                            Weekly ($${weeklyPrice})
+                        </button>
+                        <button onclick="subscribeToTool(${tool.id}, 'monthly', '${tool.name.replace(/'/g, "\\'")}')" 
+                            style="flex: 1; padding: 8px 4px; background: rgba(76, 201, 240, 0.15); border: 1px solid rgba(76, 201, 240, 0.4); border-radius: 6px; color: #4cc9f0; font-size: 11px; font-weight: 600; cursor: pointer;">
+                            Monthly ($${tool.cost})
+                        </button>
+                        <button onclick="subscribeToTool(${tool.id}, 'yearly', '${tool.name.replace(/'/g, "\\'")}')" 
+                            style="flex: 1; padding: 8px 4px; background: rgba(40, 167, 69, 0.15); border: 1px solid rgba(40, 167, 69, 0.4); border-radius: 6px; color: #28a745; font-size: 11px; font-weight: 600; cursor: pointer;">
+                            Yearly ($${yearlyPrice})
+                        </button>
+                    </div>
+                </div>
+            `;
+        } else {
+            actionButtonsHtml = `
+                <div class="action-buttons">
+                    <button class="btn btn-primary" style="width: 100%; justify-content: center;" 
+                        onclick="useTool(${tool.id}, '${tool.name.replace(/'/g, "\\'")}')">
+                        <i class="fas fa-play"></i> Use Tool
+                    </button>
+                </div>
+            `;
+        }
+        
+        const configBtnHtml = `
+            <div class="action-buttons" style="margin-top: 10px;">
+                <button class="btn btn-secondary" style="width: 100%; justify-content: center;" 
+                    onclick="openConfigModal('${tool.name.replace(/'/g, "\\'")}', '${tool.url || ''}', ${tool.id})">
+                    <i class="fas fa-copy"></i> Copy Config
+                </button>
+            </div>
+        `;
+        
+        const card = document.createElement('div');
+        card.className = 'mcp-card';
+        card.innerHTML = `
             <div class="mcp-header">
                 <div class="mcp-title">${tool.name}</div>
                 ${tool.url 
@@ -174,372 +194,216 @@ const API_BASE_URL = '/api';
             <div class="mcp-config" style="text-align: left; font-size: 13px; padding: 15px;">
                 <div style="margin-bottom: 5px;"><strong>Description:</strong></div>
                 <div class="line-clamp-3" style="color: #ccc; margin-bottom: 10px; line-height: 1.4;">
-                ${tool.description}
+                    ${tool.description || 'No description available'}
                 </div>
+                ${tool.cost > 0 ? `<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <span style="color: #4cc9f0; font-weight: 600;">💰 Price: $${tool.cost}/month</span>
+                </div>` : '<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1);"><span style="color: #28a745;">✨ Free Tool</span></div>'}
             </div>
 
             ${toolsListHtml}
             
-            <div class="action-buttons">
-                <button class="btn ${configBtnClass}" style="${configBtnStyle}" 
-                    onclick="openConfigModal('${tool.name}', '${tool.url || ''}', ${tool.id})">
-                    <i class="fas fa-copy"></i> Copy Config
-                </button>
-            </div>
+            ${actionButtonsHtml}
+            ${configBtnHtml}
             
             <div class="mcp-date" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                <span><i class="far fa-clock"></i> Recent</span>
-                <span style="font-weight: bold; color: #fff;">${tool.cost > 0 ? tool.cost + ' USDC' : 'Free'}</span>
+                <span><i class="far fa-clock"></i> ${new Date(tool.created_at).toLocaleDateString() || 'Recent'}</span>
+                <span style="font-weight: bold; color: ${hasAccess ? '#28a745' : (tool.cost > 0 ? '#4cc9f0' : '#fff')};">
+                    ${hasAccess ? '✓ Subscribed' : (tool.cost > 0 ? `$${tool.cost}/month` : 'Free')}
+                </span>
             </div>
-            `;
-            grid.appendChild(card);
-            });
-        }
+        `;
+        grid.appendChild(card);
+    });
+}
 
-        // 3. Search/Filter Logic
-        async function performSearch() {
-            const query = document.getElementById('searchInput').value.trim();
-            const grid = document.getElementById('mcpGrid');
-            const resultsCount = document.getElementById('resultsCount');
-            
-            if (!query) {
-                fetchTools(); // Reloads the full list
-                return;
-            }
-            grid.innerHTML = `
-                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ccc;">
-                    <i class="fas fa-spinner fa-spin" style="font-size: 32px; margin-bottom: 15px; color: #4cc9f0;"></i>
-                    <p>AI is analyzing your request...</p>
-                </div>`;
-            
-            try {
-                // Call the AI Search Endpoint
-                const response = await fetch(`${API_BASE_URL}/search/?query=${encodeURIComponent(query)}`);
-                
-                if (!response.ok) throw new Error("Search failed");
-                
-                const data = await response.json();
-                const results = data.results;
-
-                if (resultsCount) {
-                    const label = results.length === 1 ? 'match found' : 'matches found';
-                    resultsCount.innerText = `${results.length} AI ${label}`;
-                }
-
-                renderTools(results);
-            } catch (error) {
-                console.error("Search Error:", error);
-                grid.innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ff6b6b;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 32px; margin-bottom: 15px;"></i>
-                        <p>Search failed. Please try again.</p>
-                    </div>`;
-            }
-        }
-
-        // 4. Functionality: Use/Run the Tool
-       // 4. Functionality: Use/Run the Tool (Now with Crypto Payment Support)
-async function useTool(toolId, toolName) {
+// Subscribe to a tool
+async function subscribeToTool(toolId, plan, toolName) {
     const token = localStorage.getItem('accessToken');
     if (!token) {
-        showAlert("Please log in first!", "error");
+        alert("Please login first!");
+        window.location.href = '/';
         return;
     }
 
-    showAlert(`Running ${toolName}...`, "info");
+    alert(`Starting subscription for ${toolName} (${plan})...`);
     
     try {
-        // ATTEMPT 1: Try to use the tool normally
-        let response = await fetch(`${API_BASE_URL}/tools/use/${toolId}`, {
+        const response = await fetch(`${API_BASE_URL}/stripe/create-checkout-session`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ tool_id: toolId, plan: plan })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.checkout_url) {
+            localStorage.setItem('pending_subscription_tool', toolId);
+            window.location.href = data.checkout_url;
+        } else {
+            alert(data.detail || "Failed to create checkout session");
+        }
+    } catch (error) {
+        console.error('Subscription error:', error);
+        alert("Error starting subscription");
+    }
+}
+
+// Use a paid tool
+function usePaidTool(toolId, toolName, toolUrl) {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+        alert("Please login first!");
+        window.location.href = '/';
+        return;
+    }
+    
+    if (toolUrl) {
+        window.location.href = toolUrl;
+    } else {
+        window.location.href = `/tool/${toolName.toLowerCase().replace(/\s+/g, '-')}`;
+    }
+}
+
+// Handle payment redirect
+async function handlePaymentRedirect() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    if (urlParams.get('payment') === 'success') {
+        localStorage.removeItem('pending_subscription_tool');
+        alert("✅ Payment successful! Your subscription is now active.");
+        setTimeout(() => {
+            window.location.href = '/marketplace';
+        }, 2000);
+    } else if (urlParams.get('payment') === 'cancelled') {
+        localStorage.removeItem('pending_subscription_tool');
+        alert("Payment was cancelled. You can try again anytime.");
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}
+
+// Search functionality
+async function performSearch() {
+    const query = document.getElementById('searchInput').value.trim();
+    const grid = document.getElementById('mcpGrid');
+    const resultsCount = document.getElementById('resultsCount');
+    
+    if (!query) {
+        fetchTools();
+        return;
+    }
+    
+    if (grid) {
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ccc;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 32px; margin-bottom: 15px; color: #4cc9f0;"></i>
+            <p>AI is analyzing your request...</p>
+        </div>`;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/search/?query=${encodeURIComponent(query)}`);
+        if (!response.ok) throw new Error("Search failed");
+        
+        const data = await response.json();
+        const results = data.results || [];
+        
+        if (resultsCount) {
+            const label = results.length === 1 ? 'match found' : 'matches found';
+            resultsCount.innerText = `${results.length} AI ${label}`;
+        }
+        
+        await renderToolsWithSubscriptions(results);
+    } catch (error) {
+        console.error("Search Error:", error);
+        if (grid) {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ff6b6b;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 32px; margin-bottom: 15px;"></i>
+                <p>Search failed. Please try again.</p>
+            </div>`;
+        }
+    }
+}
+
+// Open config modal (existing function)
+function openConfigModal(name, url, toolId) {
+    if (!url) {
+        alert("No deployment URL available for this tool.");
+        return;
+    }
+
+    const proxyUrl = `${window.location.origin}/api/proxy/${toolId}/sse`;
+    const config = {
+        "mcpServers": {
+            [name.toLowerCase().replace(/\s+/g, '-')]: {
+                "url": proxyUrl,
+                "transport": "sse"
+            }
+        }
+    };
+
+    window.currentConfigText = JSON.stringify(config, null, 2);
+    const codeBlock = document.getElementById('configCodeBlock');
+    if(codeBlock) codeBlock.textContent = window.currentConfigText;
+
+    const modal = document.getElementById('configModal');
+    if(modal) modal.style.display = 'flex';
+}
+
+function closeConfigModal() {
+    const modal = document.getElementById('configModal');
+    if(modal) modal.style.display = 'none';
+}
+
+async function copyFromModal() {
+    try {
+        await navigator.clipboard.writeText(window.currentConfigText);
+        alert("Configuration copied!");
+        closeConfigModal();
+    } catch (err) {
+        console.error('Failed to copy:', err);
+        alert("Failed to copy");
+    }
+}
+
+// Use free tool
+async function useTool(toolId, toolName) {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+        alert("Please login first!");
+        return;
+    }
+
+    alert(`Running ${toolName}...`);
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/tools/use/${toolId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             }
         });
-
-        // 🛑 CHECK: Did we get a 402 Payment Required?
-        if (response.status === 402) {
-            const errorData = await response.json();
-            const paymentDetails = errorData.detail; // { amount, receiver, currency }
-
-            // Close the "Running..." alert
-            const existingAlert = document.querySelector('.alert-popup');
-            if (existingAlert) existingAlert.remove();
-
-            // Ask user to pay
-            const confirmPay = confirm(`💰 Payment Required\n\nThis tool costs ${paymentDetails.amount} ETH.\n\nClick OK to pay with MetaMask.`);
-            
-            if (!confirmPay) {
-                showAlert("Payment cancelled.", "error");
-                return;
-            }
-
-            showAlert("Opening MetaMask...", "info");
-
-            // 1. Trigger Crypto Payment
-            const txHash = await handleCryptoPayment(paymentDetails.amount, paymentDetails.receiver);
-            
-            if (txHash) {
-                showAlert("Payment sent! Verifying...", "success");
-                
-                // ATTEMPT 2: Retry request with Proof of Payment
-                response = await fetch(`${API_BASE_URL}/tools/use/${toolId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                        'X-Transaction-Hash': txHash // <--- The Proof
-                    }
-                });
-            } else {
-                return; // Payment failed or cancelled
-            }
-        }
-
-        // Handle final success/failure
+        
         const data = await response.json();
         
         if (response.ok) {
-            const statusMsg = data.status === 'success' ? 'Success' : 'Failed';
-            alert(`✅ Execution Result:\n\nStatus: ${statusMsg}\nMessage: ${data.message}\nTime: ${data.processing_time}s`);
+            alert(`✅ Execution Result:\n\nStatus: ${data.status}\nMessage: ${data.message}\nTime: ${data.processing_time}s`);
         } else {
             throw new Error(data.detail || "Execution failed");
         }
-
     } catch (error) {
         console.error(error);
-        showAlert(error.message, "error");
+        alert(error.message);
     }
 }
 
-// --- Helper: Handle MetaMask Payment ---
-async function handleCryptoPayment(amountEth, receiverAddress) {
-    // Check if MetaMask is installed
-    if (typeof window.ethereum === 'undefined') {
-        alert("MetaMask is not installed! You need a crypto wallet to pay for this tool.");
-        return null;
-    }
-
-    try {
-        // Request account access
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const sender = accounts[0];
-
-        // Convert ETH to Wei (Hex format). 1 ETH = 10^18 Wei.
-        // using BigInt ensures precision for crypto math
-        const weiValue = BigInt(Math.floor(amountEth * 1e18)).toString(16);
-
-        // Send Transaction
-        const txHash = await window.ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [
-                {
-                    from: sender,
-                    to: receiverAddress,
-                    value: "0x" + weiValue, // Hex value
-                },
-            ],
-        });
-
-        console.log("Tx Hash:", txHash);
-        return txHash;
-
-    } catch (error) {
-        console.error("Payment Error:", error);
-        showAlert("Payment failed: " + error.message, "error");
-        return null;
+// Close modal if clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('configModal');
+    if (event.target === modal) {
+        closeConfigModal();
     }
 }
-
-        function showDetails(name, desc, cost) {
-            alert(`Details for ${name}:\n\n${desc}\n\nCost per run: $${cost}\n\nThis tool is hosted on eMCP Nexus.`);
-        }
-
-        // Helper to show floating alerts
-        function showAlert(message, type) {
-            const existing = document.querySelector('.alert-popup');
-            if (existing) existing.remove();
-
-            const alert = document.createElement('div');
-            alert.className = 'alert alert-popup';
-            alert.style.background = 'rgba(18, 18, 18, 0.95)';
-            alert.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-            alert.style.borderLeft = `4px solid ${type === 'error' ? '#ff4d4d' : '#4cc9f0'}`;
-            alert.style.padding = '15px 20px';
-            alert.style.borderRadius = '8px';
-            alert.style.color = '#fff';
-            alert.style.position = 'fixed';
-            alert.style.top = '20px';
-            alert.style.right = '20px';
-            alert.style.zIndex = '9999';
-            alert.style.display = 'flex';
-            alert.style.alignItems = 'center';
-            alert.style.gap = '10px';
-            alert.style.boxShadow = '0 5px 15px rgba(0,0,0,0.5)';
-            alert.style.minWidth = '300px';
-            
-            alert.innerHTML = `
-                <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : 'info-circle'}" style="color: ${type === 'error' ? '#ff4d4d' : '#4cc9f0'}"></i>
-                <span>${message}</span>
-            `;
-            document.body.appendChild(alert);
-
-            setTimeout(() => {
-                alert.style.opacity = '0';
-                alert.style.transition = 'opacity 0.5s ease';
-                setTimeout(() => alert.remove(), 500);
-            }, 4000);
-        }
-        // --- Voice Search Feature ---
-    const voiceBtn = document.getElementById('voiceBtn');
-    const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchBtn');
-
-    // Check browser support
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
-
-        recognition.continuous = false; // Stop listening after one sentence
-        recognition.lang = 'en-US';     // Default language
-        recognition.interimResults = false;
-
-        voiceBtn.addEventListener('click', () => {
-            if (voiceBtn.classList.contains('listening')) {
-                recognition.stop();
-            } else {
-                try {
-                    recognition.start();
-                    // Visual feedback: Add 'listening' class
-                    voiceBtn.classList.add('listening');
-                    searchInput.placeholder = "Listening...";
-                } catch (error) {
-                    console.error("Speech recognition start error:", error);
-                }
-            }
-        });
-
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            searchInput.value = transcript;
-            
-            // Automatically trigger the search
-            performSearch();
-        };
-
-        recognition.onend = () => {
-            // Reset UI when finished
-            voiceBtn.classList.remove('listening');
-            searchInput.placeholder = "Search eMCPs, tools, or descriptions...";
-        };
-
-        recognition.onerror = (event) => {
-            console.error("Speech recognition error", event.error);
-            voiceBtn.classList.remove('listening');
-            searchInput.placeholder = "Error. Try again.";
-        };
-    } else {
-        // Hide microphone if browser doesn't support API
-        voiceBtn.style.display = 'none';
-        console.log("Web Speech API not supported in this browser.");
-    }
-
-    // --- NEXUS CHAT LOGIC ---
-    document.addEventListener('DOMContentLoaded', () => {
-        // Ensure API_BASE_URL is defined
-        const API_BASE_URL = '/api'; 
-
-        const widget = document.getElementById('nexus-chat-widget');
-        const toggleBtn = document.getElementById('chat-toggle');
-        const windowEl = document.getElementById('chat-window');
-        const closeBtn = document.getElementById('close-chat');
-        const input = document.getElementById('chat-input');
-        const sendBtn = document.getElementById('send-btn');
-        const messages = document.getElementById('chat-messages');
-
-        // Check if elements exist to prevent errors
-        if (!toggleBtn || !windowEl || !input || !sendBtn) return;
-
-        // 1. Toggle Chat Window
-        const toggleChat = () => {
-            const isVisible = windowEl.style.display === 'flex';
-            windowEl.style.display = isVisible ? 'none' : 'flex';
-            if (!isVisible) setTimeout(() => input.focus(), 100);
-        };
-
-        toggleBtn.addEventListener('click', toggleChat);
-        closeBtn.addEventListener('click', toggleChat);
-
-        // 2. Send Message Logic
-        const sendMessage = async () => {
-            const text = input.value.trim();
-            if (!text) return;
-
-            // Add User Message
-            appendMessage(text, 'user');
-            input.value = '';
-
-            // Add "Thinking..." bubble
-            const loadingId = 'loading-' + Date.now();
-            appendMessage('Thinking...', 'bot', loadingId);
-
-            try {
-                // Call Backend API
-                const res = await fetch(`${API_BASE_URL}/chat/`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text })
-                });
-                
-                const data = await res.json();
-                
-                // Remove loading and show response
-                const loader = document.getElementById(loadingId);
-                if (loader) loader.remove();
-                
-                // Handle different response formats
-                const replyText = data.response || data.reply || "I didn't get a response.";
-                appendMessage(replyText, 'bot');
-
-            } catch (error) {
-                console.error(error);
-                const loader = document.getElementById(loadingId);
-                if(loader) loader.innerText = "Error connecting to NexusAI.";
-            }
-        };
-
-        // 3. Helper to append messages
-        function appendMessage(text, sender, id = null) {
-            const div = document.createElement('div');
-            if (id) div.id = id;
-            div.style.padding = '10px 15px';
-            div.style.borderRadius = '15px';
-            div.style.maxWidth = '80%';
-            div.style.lineHeight = '1.4';
-            div.style.fontSize = '14px';
-            div.style.marginBottom = '10px';
-            
-            if (sender === 'user') {
-                div.style.alignSelf = 'flex-end';
-                div.style.background = '#4cc9f0';
-                div.style.color = '#fff';
-                div.style.borderRadius = '15px 15px 0 15px';
-            } else {
-                div.style.alignSelf = 'flex-start';
-                div.style.background = '#2a2a2a';
-                div.style.color = '#ddd';
-                div.style.borderRadius = '15px 15px 15px 0';
-            }
-            
-            div.innerHTML = text.replace(/\n/g, '<br>');
-            messages.appendChild(div);
-            messages.scrollTop = messages.scrollHeight;
-        }
-
-        // Listeners
-        sendBtn.addEventListener('click', sendMessage);
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-    });

@@ -2,6 +2,7 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, CheckConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column, declarative_base
 from sqlalchemy import JSON
+from typing import List,Optional
 
 
 Base = declarative_base()
@@ -16,6 +17,7 @@ class DBUser(Base):
     tools: Mapped[list["DBTool"]] = relationship("DBTool", back_populates="owner")
     transactions: Mapped[list["DBTransaction"]] = relationship("DBTransaction", back_populates="user")
     ratings: Mapped[list["DBRating"]] = relationship("DBRating", back_populates="user")
+    subscriptions: Mapped[List["DBSubscription"]] = relationship("DBSubscription", back_populates="user")
 
 class DBTool(Base):
     __tablename__ = "tools"
@@ -32,6 +34,7 @@ class DBTool(Base):
     url: Mapped[str] = mapped_column(String)
     tool_definitions: Mapped[dict] = mapped_column(JSON, nullable=True)
     deploy_id: Mapped[str] = mapped_column(String, nullable=True)
+    subscriptions: Mapped[List["DBSubscription"]] = relationship("DBSubscription", back_populates="tool")
     
     owner: Mapped["DBUser"] = relationship("DBUser", back_populates="tools")
     transactions: Mapped[list["DBTransaction"]] = relationship("DBTransaction", back_populates="tool")
@@ -78,3 +81,19 @@ class DBUsageLog(Base):
 
     tool: Mapped["DBTool"] = relationship()
     user: Mapped["DBUser"] = relationship()
+
+class DBSubscription(Base):
+    __tablename__ = "subscriptions"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
+    tool_id: Mapped[int] = mapped_column(Integer, ForeignKey("tools.id"))
+    stripe_session_id: Mapped[str] = mapped_column(String, nullable=True)
+    stripe_subscription_id: Mapped[str] = mapped_column(String, nullable=True)
+    plan: Mapped[str] = mapped_column(String)  # weekly, monthly, yearly
+    status: Mapped[str] = mapped_column(String, default="pending")  # pending, active, cancelled
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    user: Mapped["DBUser"] = relationship("DBUser", back_populates="subscriptions")
+    tool: Mapped["DBTool"] = relationship("DBTool", back_populates="subscriptions")
