@@ -145,6 +145,18 @@ async def create_tool(
     await session.commit()
     await session.refresh(db_tool)
 
+    # Re-fetch with all relationships loaded to satisfy Pydantic serialization
+    from sqlalchemy.orm import selectinload
+    stmt = (
+        select(DBTool)
+        .options(
+            selectinload(DBTool.owner).selectinload(DBUser.tools),
+            selectinload(DBTool.ratings).selectinload(DBRating.user)
+        )
+        .where(DBTool.id == db_tool.id)
+    )
+    result = await session.execute(stmt)
+    full_tool = result.scalar_one()
 
     from backend.db import async_session_factory
     background_tasks.add_task(
@@ -154,8 +166,7 @@ async def create_tool(
         async_session_factory
     )
     
-    
-    return db_tool
+    return full_tool
 
 
 # ============ PROTECTED ENDPOINTS FOR SUBSCRIPTIONS ============
