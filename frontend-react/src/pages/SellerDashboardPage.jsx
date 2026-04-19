@@ -8,7 +8,7 @@ import { API_BASE_URL } from '../api/config';
 import { useAuth } from '../hooks/useAuth';
 
 export default function SellerDashboardPage() {
-  const { token, isLoggedIn } = useAuth();
+  const { token, isLoggedIn, userEmail } = useAuth();
   const navigate = useNavigate();
 
   const [metrics, setMetrics] = useState({
@@ -86,7 +86,15 @@ export default function SellerDashboardPage() {
             </button>
           </div>
 
-          <div className="welcome">Welcome back, Client!</div>
+          <div className="welcome-section">
+            <div className="welcome-text">
+              <span className="greeting">Welcome back,</span>
+              <span className="user-name">{userEmail?.split('@')[0] || 'Seller'}</span>
+            </div>
+            <div className="status-badge">
+              <span className="pulse-dot"></span> Active Session
+            </div>
+          </div>
 
           <div className="form-group">
             <label><i className="fas fa-filter"></i> Date Filter</label>
@@ -210,6 +218,67 @@ export default function SellerDashboardPage() {
       </div>
 
       <Footer />
+      <style>{`
+        .welcome-section {
+          margin: 25px 0;
+          padding: 20px;
+          background: rgba(255, 255, 255, 0.03);
+          border-left: 4px solid #4cc9f0;
+          border-radius: 0 16px 16px 0;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          animation: slideIn 0.5s ease-out;
+        }
+        .welcome-text {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+        .greeting {
+          font-size: 14px;
+          color: #888;
+          text-transform: uppercase;
+          letter-spacing: 1.5px;
+        }
+        .user-name {
+          font-size: 28px;
+          font-weight: 800;
+          background: linear-gradient(90deg, #fff, #4cc9f0);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        .status-badge {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 16px;
+          background: rgba(76, 201, 240, 0.1);
+          border: 1px solid rgba(76, 201, 240, 0.2);
+          border-radius: 30px;
+          color: #4cc9f0;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+        }
+        .pulse-dot {
+          width: 8px;
+          height: 8px;
+          background: #4cc9f0;
+          border-radius: 50%;
+          box-shadow: 0 0 10px #4cc9f0;
+          animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+          0% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.5); opacity: 0.5; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateX(-20px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+      `}</style>
     </>
   );
 }
