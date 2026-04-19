@@ -4,8 +4,9 @@ from backend.routers import tools, payments, search, monitoring, reputation, mon
 from backend.db import init_db
 from backend.ai_services.search_engine import load_faiss_index
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 import os 
 import sys
 from backend.db import get_async_session
@@ -81,6 +82,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY") or "oauth-session-secret-key")
 
 # ✅ Frontend: Serve React build (frontend-react/dist/)
 frontend_dir = os.path.join(project_root, "frontend-react", "dist")
@@ -203,7 +206,7 @@ async def serve_new_mcp():
 async def catch_all(full_path: str):
     # If it's an API route that doesn't exist, return 404
     if full_path.startswith('api/'):
-        return {"detail": "Not Found"}, 404
+        return JSONResponse(status_code=404, content={"detail": "Not Found"})
     
     # Otherwise, try to serve the frontend
     index_path = os.path.join(frontend_dir, "index.html")

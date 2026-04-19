@@ -48,9 +48,32 @@ export default function Navbar({ onSignIn }) {
         )}
         <li>
           {isLoggedIn ? (
-            <button className="nav-auth-btn" onClick={() => { logout(); setMenuOpen(false); }}>
-              Logout
-            </button>
+            <div className="profile-dropdown-container">
+              <button 
+                className="profile-trigger" 
+                onClick={() => setMenuOpen(!menuOpen)}
+                title={userEmail}
+              >
+                <div className="avatar-circle">
+                  {userEmail?.charAt(0).toUpperCase()}
+                </div>
+                <i className={`fas fa-chevron-down ${menuOpen ? 'rotate' : ''}`}></i>
+              </button>
+              
+              {menuOpen && (
+                <div className="profile-dropdown">
+                  <div className="dropdown-header">
+                    <p className="user-email">{userEmail}</p>
+                  </div>
+                  <Link to="/profile" className="dropdown-item" onClick={() => setMenuOpen(false)}>
+                    <i className="fas fa-user"></i> My Profile
+                  </Link>
+                  <button className="dropdown-item logout" onClick={() => { logout(); setMenuOpen(false); }}>
+                    <i className="fas fa-sign-out-alt"></i> Logout
+                  </button>
+                </div>
+              )}
+            </div>
           ) : (
             <button className="nav-auth-btn" onClick={() => { onSignIn?.(); setMenuOpen(false); }}>
               Sign In

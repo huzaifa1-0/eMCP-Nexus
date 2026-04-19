@@ -34,6 +34,18 @@ async def create_user(db: AsyncSession, user: UserCreate):
     await db.refresh(db_user)
     return db_user
 
+async def update_user_password(db: AsyncSession, user_id: str, new_password: str):
+    """Update a user's password with a new hash."""
+    from backend.security import get_password_hash
+    hashed_password = get_password_hash(new_password)
+    result = await db.execute(select(DBUser).filter(DBUser.id == user_id))
+    db_user = result.scalars().first()
+    if db_user:
+        db_user.hashed_password = hashed_password
+        await db.commit()
+        await db.refresh(db_user)
+    return db_user
+
 # ==================================
 # CRUD for Tools
 # ==================================
