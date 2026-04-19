@@ -39,6 +39,25 @@ class DBTool(Base):
     owner: Mapped["DBUser"] = relationship("DBUser", back_populates="tools")
     transactions: Mapped[list["DBTransaction"]] = relationship("DBTransaction", back_populates="tool")
     ratings: Mapped[list["DBRating"]] = relationship("DBRating", back_populates="tool")
+    @property
+    def author_tools_count(self) -> int:
+        return len(self.owner.tools) if self.owner else 0
+
+    @property
+    def author(self) -> str:
+        return self.owner.username if self.owner else "Unknown"
+
+    @property
+    def reviews(self) -> list:
+        return [
+            {
+                "user": r.user.username if r.user else "Anonymous",
+                "rating": r.rating,
+                "comment": r.comment,
+                "timestamp": r.timestamp
+            } for r in self.ratings
+        ]
+
     status: Mapped[str] = mapped_column(String, default="deploying")
 
 class DBTransaction(Base):
@@ -63,6 +82,7 @@ class DBRating(Base):
     )
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     rating: Mapped[int] = mapped_column(Integer)
+    comment: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     tool_id: Mapped[int] = mapped_column(Integer, ForeignKey("tools.id")) # Corrected to Integer
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id")) # Corrected to Integer

@@ -70,33 +70,22 @@ async def monitor_deployment_and_discover(service_id: str, db_tool_id: int, db_s
             search_context = ""
 
             # 4. Save Discovery Results (New Short-lived Session)
+            final_description = tool_name # Fallback
             async with db_session_factory() as session:
                 result = await session.execute(select(DBTool).where(DBTool.id == db_tool_id))
                 tool = result.scalar_one_or_none()
                 
                 if tool:
-                    # Prepare Search Context
-                    search_context = tool.description
-                    
+                    tool.readme = readme_text
                     if discovered_tools:
                         tool.tool_definitions = discovered_tools
-                        discovered_summaries = [
-                            f"{t['name']} ({t.get('description', 'No description')})" 
-                            for t in discovered_tools
-                        ]
-                        tool.description = f"{tool.description} | Capabilities: {'; '.join(discovered_summaries)}"
-                        search_context = tool.description # Update context with new description
-                        await session.commit()
-                        print(f"✅ Saved {len(discovered_tools)} tools to DB.")
-                    else:
-                        # Commit empty transaction to suppress SQL ROLLBACK warning log
-                        await session.commit()
+                        summaries = [f"{t['name']} ({t.get('description', 'No desc')})" for t in discovered_tools]
+                        tool.description = f"{tool.description} | Capabilities: {'; '.join(summaries)}"
+                    await session.commit()
+                    final_description = tool.description
 
             # 5. Update Vector DB (In-memory operation)
-            if readme_text:
-                search_context += f" | README Content: {readme_text}"
-                
-            await add_tool_to_faiss(db_tool_id, tool_name, search_context)
+            await add_tool_to_faiss(db_tool_id, tool_name, final_description, readme_text)
             break
         
         await asyncio.sleep(5)
@@ -124,8 +113,7 @@ async def create_tool(
     user: DBUser = Depends(get_current_user),
     session: AsyncSession = Depends(get_async_session)
 ) -> DBTool:
-    
-    
+    # 🚀 REAL MODE: Deploy to Render
     deployment_info = await deploy_tool(
         repo_url=tool_data.repo_url,
         branch=tool_data.branch,
@@ -133,7 +121,7 @@ async def create_tool(
         start_command=tool_data.start_command,
         root_dir=tool_data.root_dir,
         env_vars=tool_data.env_vars
-        )
+    )
     
     
 

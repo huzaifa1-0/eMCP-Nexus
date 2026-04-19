@@ -3,7 +3,11 @@ export default function MCPCard({ tool, onCopyConfig }) {
   const hasUrl = !!tool.url;
 
   return (
-    <div className="mcp-card">
+    <div 
+      className={`mcp-card ${!hasUrl ? 'mcp-card-disabled' : ''}`} 
+      onClick={() => hasUrl && onCopyConfig?.(tool)}
+      style={{ cursor: hasUrl ? 'pointer' : 'default' }}
+    >
       <div className="mcp-card-header">
         <div className="mcp-card-title">{tool.name}</div>
         <span className={`mcp-badge ${hasUrl ? 'live' : 'deploying'}`}>
@@ -36,24 +40,12 @@ export default function MCPCard({ tool, onCopyConfig }) {
         </p>
       )}
 
-      <div style={{ marginTop: '16px' }}>
-        <button
-          className={`btn btn-secondary ${!hasUrl ? 'disabled' : ''}`}
-          style={{
-            width: '100%',
-            justifyContent: 'center',
-            opacity: hasUrl ? 1 : 0.5,
-            cursor: hasUrl ? 'pointer' : 'not-allowed',
-          }}
-          onClick={() => hasUrl && onCopyConfig?.(tool)}
-        >
-          <i className="fas fa-copy"></i> Copy Config
-        </button>
-      </div>
-
       <div className="mcp-card-footer">
         <span><i className="far fa-clock"></i> Recent</span>
-        <span className="mcp-cost">{tool.cost > 0 ? `${tool.cost} USDC` : 'Free'}</span>
+        <span className="mcp-cost">
+          {tool.cost > 0 ? `${tool.cost} USDC` : 'Free'}
+          {hasUrl && <i className="fas fa-external-link-alt" style={{ marginLeft: '10px', fontSize: '12px', opacity: 0.6 }}></i>}
+        </span>
       </div>
     </div>
   );

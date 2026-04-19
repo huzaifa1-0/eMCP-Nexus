@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from backend.models.db import DBUser, DBTool, DBTransaction
+from backend.models.db import DBUser, DBTool, DBTransaction, DBRating
 from backend.models.pydantic import ToolCreate, UserCreate, TransactionCreate
 from sqlalchemy import func
 
@@ -51,8 +51,17 @@ async def update_user_password(db: AsyncSession, user_id: str, new_password: str
 # ==================================
 
 async def get_tools(db: AsyncSession, skip: int = 0, limit: int = 100):
-    """Fetch multiple tools with pagination."""
-    result = await db.execute(select(DBTool).offset(skip).limit(limit))
+    """Fetch multiple tools with pagination including owner, tools count and ratings info."""
+    from sqlalchemy.orm import selectinload
+    result = await db.execute(
+        select(DBTool)
+        .options(
+            selectinload(DBTool.owner).selectinload(DBUser.tools),
+            selectinload(DBTool.ratings).selectinload(DBRating.user)
+        )
+        .offset(skip)
+        .limit(limit)
+    )
     return result.scalars().all()
 
 async def create_user_tool(db: AsyncSession, tool: ToolCreate, user_id: int):

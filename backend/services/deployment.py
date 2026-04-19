@@ -48,10 +48,19 @@ async def deploy_tool(repo_url: str, branch: str, build_command: str, start_comm
         "rootDir": root_dir
     }
 
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=30.0) as client:
         try:
             print(f"🚀 Deploying to Render: {repo_url}")
+            print(f"📦 Service Name: {service_name}")
+            # Use sensitive data masking for logs
+            debug_payload = payload.copy()
+            print(f"📝 Payload: {debug_payload}")
+            
             response = await client.post(url, json=payload, headers=headers)
+            
+            if response.status_code >= 500:
+                print(f"❌ Render Server Error: {response.text}")
+                
             response.raise_for_status()
             data = response.json()
             
@@ -61,7 +70,9 @@ async def deploy_tool(repo_url: str, branch: str, build_command: str, start_comm
             }
             
         except httpx.HTTPError as e:
-            error_msg = e.response.text if e.response else str(e)
+            # Safely get response text if it exists
+            response = getattr(e, 'response', None)
+            error_msg = response.text if response is not None else str(e)
             print(f"❌ Render Deployment Error: {error_msg}")
             raise ValueError(f"Render API error: {error_msg}")
 

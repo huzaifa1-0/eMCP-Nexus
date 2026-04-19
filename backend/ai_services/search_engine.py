@@ -6,13 +6,14 @@ import numpy as np
 import faiss
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from backend.models.db import DBTool
+from backend.models.db import DBTool, DBRating, DBUser
 from backend.ai_services.embeddings import get_embedding
 
 # --- Configuration ---
 DIMENSION = 384
-FAISS_INDEX_PATH = "faiss_index.bin"
-MAP_PATH = "index_to_tool_id.json"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FAISS_INDEX_PATH = os.path.join(BASE_DIR, "faiss_index.bin")
+MAP_PATH = os.path.join(BASE_DIR, "index_to_tool_id.json")
 
 # --- Global State ---
 index = faiss.IndexFlatL2(DIMENSION)
@@ -49,13 +50,14 @@ load_faiss_index()
 
 # --- Core Functions ---
 
-async def add_tool_to_faiss(tool_id: int, name: str, description: str):
+async def add_tool_to_faiss(tool_id: int, name: str, description: str, readme: str = ""):
     """
-    Adds a tool to the FAISS index.
+    Adds a tool to the FAISS index. Combines name, description, and readme for better semantic matching.
     """
     try:
-        text = f"{name}. {description}"
-        embedding = get_embedding(text)
+        # Combine all metadata for a rich search context
+        rich_text = f"Name: {name}. Description: {description}. Details: {readme or ''}"
+        embedding = get_embedding(rich_text)
         embedding_np = np.array([embedding]).astype('float32')
 
         async with faiss_lock:
@@ -63,9 +65,35 @@ async def add_tool_to_faiss(tool_id: int, name: str, description: str):
             new_position = index.ntotal - 1
             index_to_tool_id[new_position] = tool_id
             save_faiss_index()
-            print(f"✅ Tool {tool_id} added to Semantic Search.")
+            print(f"✅ Tool {tool_id} indexed in Semantic Search (Context length: {len(rich_text)} chars).")
     except Exception as e:
         print(f"❌ Error adding tool to FAISS: {e}")
+
+async def reindex_all_tools(session: AsyncSession):
+    """
+    Clears the FAISS index and rebuilds it from the database.
+    """
+    print("🔄 Re-indexing all tools from database...")
+    try:
+        global index, index_to_tool_id
+        
+        # 1. Reset index
+        async with faiss_lock:
+            index = faiss.IndexFlatL2(DIMENSION)
+            index_to_tool_id = {}
+        
+        # 2. Fetch all tools
+        stmt = select(DBTool)
+        result = await session.execute(stmt)
+        tools = result.scalars().all()
+        
+        # 3. Add each tool
+        for t in tools:
+            await add_tool_to_faiss(t.id, t.name, t.description, getattr(t, 'readme', ''))
+            
+        print(f"✅ Re-indexing complete. {index.ntotal} tools indexed.")
+    except Exception as e:
+        print(f"❌ Re-indexing failed: {e}")
 
 
 SIMILARITY_THRESHOLD = 1.0 
@@ -87,45 +115,41 @@ async def search_tools(session: AsyncSession, query: str, k: int = 5) -> List[Di
             distances, indices = index.search(query_np, k)
             
             # Filter results by distance threshold
-            # indices[0] is the list of IDs, distances[0] is the list of scores
             for i, idx in enumerate(indices[0]):
                 dist = distances[0][i]
-                
-                # Check if valid index AND within similarity threshold
                 if idx != -1 and idx in index_to_tool_id:
                     if dist < SIMILARITY_THRESHOLD:
                         tool_id = index_to_tool_id[idx]
                         found_ids.append(tool_id)
             
-            # If we found relevant semantic matches, fetch them
             if found_ids:
-                # Maintain order of relevance by fetching and re-sorting in Python if necessary,
-                # or just fetch where ID is in the list.
-                stmt = select(DBTool).where(DBTool.id.in_(found_ids))
+                from sqlalchemy.orm import selectinload
+                stmt = select(DBTool).options(
+                    selectinload(DBTool.owner).selectinload(DBUser.tools),
+                    selectinload(DBTool.ratings).selectinload(DBRating.user)
+                ).where(DBTool.id.in_(found_ids))
                 result = await session.execute(stmt)
                 fetched_tools = result.scalars().all()
                 
-                # Sortfetched tools to match the order found by FAISS (most relevant first)
                 tools_map = {t.id: t for t in fetched_tools}
                 tools = [tools_map[tid] for tid in found_ids if tid in tools_map]
                 
         except Exception as e:
             print(f"⚠️ FAISS Error: {e}")
 
-    # 2. Fallback SQL Search (ONLY if FAISS found nothing)
-    # If FAISS returned results, we usually assume those are better than a simple text match.
+    # 2. Fallback SQL Search
     if not tools:
         print("ℹ️ Using SQL Fallback Search")
-        stmt = select(DBTool).where(
+        from sqlalchemy.orm import selectinload
+        stmt = select(DBTool).options(
+            selectinload(DBTool.owner).selectinload(DBUser.tools),
+            selectinload(DBTool.ratings).selectinload(DBRating.user)
+        ).where(
             (DBTool.name.ilike(f"%{query}%")) | 
             (DBTool.description.ilike(f"%{query}%"))
         ).limit(k)
         result = await session.execute(stmt)
         tools = result.scalars().all()
-
-    # 3. REMOVED "Last Resort" BLOCK
-    # We deleted the block that returns random tools if nothing is found.
-    # Now, if the query matches nothing, it correctly returns an empty list [].
 
     # Format for JSON response
     return [
@@ -135,7 +159,10 @@ async def search_tools(session: AsyncSession, query: str, k: int = 5) -> List[Di
             "description": t.description,
             "cost": t.cost,
             "url": getattr(t, 'url', ''),
-            "owner_id": t.owner_id
+            "owner_id": t.owner_id,
+            "author": t.author,
+            "author_tools_count": t.author_tools_count,
+            "reviews": t.reviews
         } 
         for t in tools
     ]

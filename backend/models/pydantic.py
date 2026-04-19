@@ -16,11 +16,23 @@ class ToolBase(BaseModel):
 class ToolCreate(ToolBase):
     env_vars: Optional[dict] = None 
 
+class Review(BaseModel):
+    user: str
+    rating: int
+    comment: Optional[str] = None
+    timestamp: datetime
+    
+    model_config = ConfigDict(from_attributes=True)
+
 class Tool(ToolBase):
     id: int
     owner_id: int
     url: Optional[str] = None              
-    tool_definitions: Optional[List[Any]]
+    tool_definitions: Optional[List[Any]] = None
+    author: Optional[str] = None
+    author_tools_count: int = 0
+    status: str = "live"
+    reviews: List[Review] = []
     
     model_config = ConfigDict(from_attributes=True) 
 

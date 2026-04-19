@@ -37,12 +37,17 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         print(f"Database initialization error: {e}")
     
-    # Load FAISS index
+    # Load FAISS index and Re-index to ensure sync
     try:
-        load_faiss_index()
-        print("FAISS index loaded.")
+        from backend.ai_services.search_engine import reindex_all_tools
+        from backend.db import async_session_factory
+        
+        # We re-index on every startup to ensure the vectors match the current DB state
+        # especially if columns like 'readme' were just added.
+        async with async_session_factory() as session:
+            await reindex_all_tools(session)
     except Exception as e:
-        print(f"FAISS index loading error: {e}")
+        print(f"FAISS re-indexing error: {e}")
     
     yield
     
