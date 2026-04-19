@@ -358,9 +358,36 @@ export default function ProfilePage() {
           opacity: 0.7;
           cursor: not-allowed;
         }
-        @media (max-width: 480px) {
+        @media (max-width: 600px) {
+          .profile-container {
+            padding: 100px 15px 40px;
+          }
+          .profile-card {
+            padding: 40px 20px 25px;
+            border-radius: 20px;
+          }
+          .profile-header h1 {
+            font-size: 24px;
+          }
+          .profile-avatar {
+            font-size: 50px;
+          }
           .info-grid {
             grid-template-columns: 1fr;
+            gap: 15px;
+          }
+          .back-link {
+            top: 20px;
+            left: 20px;
+            font-size: 12px;
+          }
+          .save-btn {
+            padding: 12px;
+            font-size: 14px;
+          }
+          .info-value {
+            font-size: 14px;
+            padding: 10px;
           }
         }
       `}</style>
