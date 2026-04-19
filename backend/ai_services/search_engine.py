@@ -66,6 +66,9 @@ async def add_tool_to_faiss(tool_id: int, name: str, description: str, readme: s
             index_to_tool_id[new_position] = tool_id
             save_faiss_index()
             print(f"✅ Tool {tool_id} indexed in Semantic Search (Context length: {len(rich_text)} chars).")
+    except Exception as e:
+        print(f"❌ Error adding tool to FAISS: {e}")
+
 async def remove_tool_from_faiss(tool_id: int):
     """
     Removes a tool from the FAISS index by rebuilding the index without it.
