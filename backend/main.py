@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from backend.routers import tools, payments, search, monitoring, reputation, monetization, auth, seller_dashboard, chat, stripe_payments
+from backend.routers import tools, payments, search, monitoring, reputation, monetization, auth, seller_dashboard, chat, stripe_payments, web3_payments
 from backend.db import init_db
 from backend.ai_services.search_engine import load_faiss_index
 from fastapi.middleware.cors import CORSMiddleware
@@ -165,7 +165,7 @@ app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(seller_dashboard.router, prefix="/api/seller_dashboard", tags=["Seller Dashboard"])
 app.include_router(chat.router, prefix="/api/chat", tags=["AI Chat"])
 app.include_router(stripe_payments.router, prefix="/api/stripe", tags=["stripe"])
-
+app.include_router(web3_payments.router, prefix="/api/web3", tags=["Web3"])
 app.include_router(proxy.router, prefix="/api/proxy", tags=["MCP Proxy"])  # Proxy router should be last to avoid conflicts
 
 @app.get("/api/stats")

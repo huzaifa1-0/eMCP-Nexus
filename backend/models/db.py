@@ -13,6 +13,7 @@ class DBUser(Base):
     username: Mapped[str] = mapped_column(String, unique=True, index=True)
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
     hashed_password: Mapped[str] = mapped_column(String)
+    api_key: Mapped[str] = mapped_column(String, unique=True, nullable=True)
     
     tools: Mapped[list["DBTool"]] = relationship("DBTool", back_populates="owner")
     transactions: Mapped[list["DBTransaction"]] = relationship("DBTransaction", back_populates="user")

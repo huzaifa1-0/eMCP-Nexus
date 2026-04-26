@@ -4,7 +4,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from backend.db import get_async_session
-from backend.models.db import DBTool
+from backend.models.db import DBTool, DBUser, DBSubscription
 from backend.services.crypto import verify_payment
 from backend.config import settings
 from starlette.background import BackgroundTask
