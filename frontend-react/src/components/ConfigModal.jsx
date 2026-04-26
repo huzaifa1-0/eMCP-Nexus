@@ -1,9 +1,23 @@
 import { showToast } from './AlertToast';
 
+import { useState } from 'react';
+import { createWalletClient, custom, parseEther } from 'viem';
+import { baseSepolia } from 'viem/chains';
+import { useAuth } from '../hooks/useAuth';
+import { API_BASE_URL } from '../api/config';
+
 export default function ConfigModal({ tool, onClose }) {
+  const { token, isLoggedIn } = useAuth();
+  const [apiKey, setApiKey] = useState(null);
+  const [isUnlocking, setIsUnlocking] = useState(false);
+  
   if (!tool) return null;
 
-  const proxyUrl = `${window.location.origin}/api/proxy/${tool.id}/sse`;
+  // If tool is paid and not unlocked yet, we hide the config URL
+  const isPaidTool = tool.cost > 0;
+  const showConfig = !isPaidTool || apiKey;
+
+  const proxyUrl = `${window.location.origin}/api/proxy/${tool.id}/sse${apiKey ? `?api_key=${apiKey}` : ''}`;
   const config = {
     mcpServers: {
       [tool.name.toLowerCase().replace(/\s+/g, '-')]: {
@@ -20,6 +34,68 @@ export default function ConfigModal({ tool, onClose }) {
       showToast('Configuration copied!', 'success');
     } catch {
       showToast('Failed to copy', 'error');
+    }
+  };
+
+  const handleUnlock = async () => {
+    if (!isLoggedIn) {
+      showToast('Please log in first to unlock tools.', 'error');
+      return;
+    }
+    
+    if (!window.ethereum) {
+      showToast('No Web3 wallet found. Please install MetaMask.', 'error');
+      return;
+    }
+
+    setIsUnlocking(true);
+    try {
+      // 1. Connect Wallet
+      const walletClient = createWalletClient({
+        chain: baseSepolia,
+        transport: custom(window.ethereum)
+      });
+      
+      const [address] = await walletClient.requestAddresses();
+      
+      // 2. Send Payment Transaction
+      showToast('Please confirm the transaction in your wallet...', 'info');
+      const hash = await walletClient.sendTransaction({
+        account: address,
+        // Using a dummy receiver address for this prototype as per settings
+        to: '0x0000000000000000000000000000000000000000', 
+        value: parseEther(tool.cost.toString()),
+      });
+      
+      showToast('Transaction sent! Verifying payment...', 'info');
+      
+      // 3. Verify Payment with Backend
+      const res = await fetch(`${API_BASE_URL}/web3/unlock`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          tool_id: tool.id,
+          tx_hash: hash
+        })
+      });
+      
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.detail || 'Failed to unlock tool');
+      }
+      
+      const data = await res.json();
+      setApiKey(data.api_key);
+      showToast('Tool unlocked successfully!', 'success');
+      
+    } catch (error) {
+      console.error(error);
+      showToast(error.message || 'Payment failed', 'error');
+    } finally {
+      setIsUnlocking(false);
     }
   };
 
@@ -55,12 +131,40 @@ export default function ConfigModal({ tool, onClose }) {
             <div className="modal-column">
               <h3 className="section-title"><i className="fas fa-code"></i> JSON Configuration</h3>
               <p className="section-subtitle">Copy this into your Claude config file.</p>
-              <div className="config-block-wrapper">
-                <div className="config-block">{configText}</div>
-                <button className="btn btn-primary btn-copy-floating" onClick={handleCopy}>
-                  <i className="fas fa-copy"></i> Copy to Clipboard
-                </button>
-              </div>
+              
+              {showConfig ? (
+                <div className="config-block-wrapper">
+                  <div className="config-block">{configText}</div>
+                  <button className="btn btn-primary btn-copy-floating" onClick={handleCopy}>
+                    <i className="fas fa-copy"></i> Copy to Clipboard
+                  </button>
+                </div>
+              ) : (
+                <div className="config-block-wrapper" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '30px 20px', background: 'rgba(0,0,0,0.4)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                  <i className="fas fa-lock" style={{ fontSize: '32px', color: '#ffb703', marginBottom: '15px' }}></i>
+                  <h4 style={{ color: '#fff', marginBottom: '10px' }}>Premium Tool</h4>
+                  <p style={{ color: '#aaa', textAlign: 'center', marginBottom: '20px', fontSize: '14px' }}>
+                    This tool requires a one-time Web3 payment to unlock its configuration.
+                  </p>
+                  <button 
+                    className="btn btn-primary" 
+                    onClick={handleUnlock} 
+                    disabled={isUnlocking}
+                    style={{ width: '100%', padding: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px' }}
+                  >
+                    {isUnlocking ? (
+                      <><i className="fas fa-circle-notch fa-spin"></i> Processing...</>
+                    ) : (
+                      <>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                        Pay {tool.cost} ETH to Unlock
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Right Column: Instructions */}

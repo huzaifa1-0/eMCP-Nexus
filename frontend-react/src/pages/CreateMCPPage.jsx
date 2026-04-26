@@ -19,6 +19,7 @@ export default function CreateMCPPage() {
     buildCommand: 'pip install -r requirements.txt',
     startCommand: 'python main.py',
     dataSource: 'Select a data source',
+    price: '0',
   });
 
   const [envVars, setEnvVars] = useState([{ key: '', value: '' }]);
@@ -68,7 +69,7 @@ export default function CreateMCPPage() {
         body: JSON.stringify({
           name: formData.serviceName,
           description: formData.serviceDescription,
-          cost: 0.0,
+          cost: parseFloat(formData.price) || 0,
           repo_url: formData.repoUrl,
           branch: formData.branch,
           build_command: formData.buildCommand,
@@ -134,6 +135,13 @@ export default function CreateMCPPage() {
                 value={formData.serviceDescription} onChange={handleChange} required
                 placeholder="Describe what your tool does (e.g., 'A generic PDF parser...')" />
               <div className="description">Detailed description for the AI search engine and RAG chatbot.</div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="price">Price (ETH)</label>
+              <input type="number" step="0.0001" min="0" className="form-control" name="price"
+                value={formData.price} onChange={handleChange} required />
+              <div className="description">Cost for users to unlock and use your tool (set to 0 for free)</div>
             </div>
 
             <div className="form-group">
