@@ -12,6 +12,7 @@ class ToolBase(BaseModel):
     build_command: str = "npm install && npm run build"
     start_command: str = "npm start"
     root_dir: str = ""
+    readme: Optional[str] = None
 
 class ToolCreate(ToolBase):
     env_vars: Optional[dict] = None 
@@ -32,6 +33,7 @@ class Tool(ToolBase):
     author: Optional[str] = None
     author_tools_count: int = 0
     status: str = "live"
+    readme: Optional[str] = None
     reviews: List[Review] = []
     
     model_config = ConfigDict(from_attributes=True) 
