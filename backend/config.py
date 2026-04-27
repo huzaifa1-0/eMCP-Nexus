@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     def __init__(self, **values):
         super().__init__(**values)
-        # If DATABASE_URL is provided in environment, ensure it uses the asyncpg driver
+        if self.DATABASE_URL:
             # Clean up potential whitespace or trailing colons
             self.DATABASE_URL = self.DATABASE_URL.strip()
             
