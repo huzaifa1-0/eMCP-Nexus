@@ -33,9 +33,10 @@ async def lifespan(app: FastAPI):
     # Initialize database
     try:
         await init_db()
-        print("Database tables initialized.")
+        print("✅ Database tables initialized successfully.")
     except Exception as e:
-        print(f"Database initialization error: {e}")
+        print(f"❌ CRITICAL: Database initialization error: {e}")
+        print("The application will attempt to continue, but DB-dependent features will fail.")
     
     # Load FAISS index and Re-index to ensure sync
     try:

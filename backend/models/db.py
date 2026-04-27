@@ -35,6 +35,7 @@ class DBTool(Base):
     url: Mapped[str] = mapped_column(String)
     tool_definitions: Mapped[dict] = mapped_column(JSON, nullable=True)
     deploy_id: Mapped[str] = mapped_column(String, nullable=True)
+    readme: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     subscriptions: Mapped[List["DBSubscription"]] = relationship("DBSubscription", back_populates="tool")
     
     owner: Mapped["DBUser"] = relationship("DBUser", back_populates="tools")

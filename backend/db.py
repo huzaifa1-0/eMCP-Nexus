@@ -7,6 +7,8 @@ from backend.config import settings
 engine = create_async_engine(
     settings.DATABASE_URL, 
     echo=True, 
+    pool_pre_ping=True, # Verify connection liveness
+    pool_recycle=300,   # Refresh connections every 5 minutes
 )
 async_session_factory = async_sessionmaker(
     bind=engine, 
@@ -69,7 +71,11 @@ async def init_db():
             return
         except Exception as e:
             if attempt == max_retries:
-                print(f"❌ Could not connect to database after {max_retries} attempts: {e}")
+                print(f"❌ Could not connect to database after {max_retries} attempts.")
+                print(f"Error details: {str(e)}")
+                if "SSL" in str(e):
+                    print("TIP: This looks like an SSL error. Check if your DATABASE_URL needs 'ssl=require'.")
                 raise e
-            print(f"⚠️ Connection attempt {attempt}/{max_retries} failed. Retrying in {retry_delay}s...")
+            print(f"⚠️ Connection attempt {attempt}/{max_retries} failed: {str(e)[:100]}...")
+            print(f"Retrying in {retry_delay}s...")
             await asyncio.sleep(retry_delay)

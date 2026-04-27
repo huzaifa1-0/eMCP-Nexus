@@ -18,7 +18,9 @@ class Settings(BaseSettings):
     def __init__(self, **values):
         super().__init__(**values)
         # If DATABASE_URL is provided in environment, ensure it uses the asyncpg driver
-        if self.DATABASE_URL:
+            # Clean up potential whitespace or trailing colons
+            self.DATABASE_URL = self.DATABASE_URL.strip()
+            
             # Handle protocol first
             if self.DATABASE_URL.startswith("postgres://"):
                 self.DATABASE_URL = self.DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
@@ -26,19 +28,16 @@ class Settings(BaseSettings):
                 self.DATABASE_URL = self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
 
             # Clean up empty ports (e.g., "host:" followed by nothing or a slash)
-            # We split to avoid removing the colon from the "://" protocol part
             if "://" in self.DATABASE_URL:
                 prefix, rest = self.DATABASE_URL.split("://", 1)
                 import re
-                # Only remove the colon if it's at the end of the host/port part (followed by / or ?)
-                # This prevents stripping the colon from the user:pass section
                 rest = re.sub(r':(?=[/?]|$)', '', rest)
                 self.DATABASE_URL = f"{prefix}://{rest}"
             
-            # Handle SSL for Railway Public URLs
-            # WARNING: Internal Railway networking does NOT support SSL.
-            # We ONLY add ssl=require if it's a public .railway.app domain.
-            if (".railway.app" in self.DATABASE_URL) and "ssl=" not in self.DATABASE_URL:
+            # Handle SSL for Railway/Render Public URLs
+            # Railway uses both .railway.app and .rlwy.net
+            is_railway = ".railway.app" in self.DATABASE_URL or ".rlwy.net" in self.DATABASE_URL
+            if is_railway and "ssl=" not in self.DATABASE_URL:
                 separator = "&" if "?" in self.DATABASE_URL else "?"
                 self.DATABASE_URL += f"{separator}ssl=require"
         else:
