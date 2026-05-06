@@ -5,7 +5,7 @@ from backend.models.pydantic import ToolCreate, UserCreate, TransactionCreate
 from sqlalchemy import func
 
 
-async def get_user(db: AsyncSession, user_id: str):
+async def get_user(db: AsyncSession, user_id: int):
     """Fetch a single user by their ID."""
     result = await db.execute(select(DBUser).filter(DBUser.id == user_id))
     return result.scalars().first()
@@ -34,7 +34,7 @@ async def create_user(db: AsyncSession, user: UserCreate):
     await db.refresh(db_user)
     return db_user
 
-async def update_user_password(db: AsyncSession, user_id: str, new_password: str):
+async def update_user_password(db: AsyncSession, user_id: int, new_password: str):
     """Update a user's password with a new hash."""
     from backend.security import get_password_hash
     hashed_password = get_password_hash(new_password)

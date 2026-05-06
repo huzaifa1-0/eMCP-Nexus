@@ -57,6 +57,7 @@ async def init_db():
                         await conn.execute(text("ALTER TABLE ratings ADD COLUMN IF NOT EXISTS comment TEXT;"))
                         await conn.execute(text("ALTER TABLE tools ADD COLUMN IF NOT EXISTS readme TEXT;"))
                         await conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS api_key VARCHAR;"))
+                        await conn.execute(text("ALTER TABLE tools ADD COLUMN IF NOT EXISTS created_at TIMESTAMP;"))
                     else:
                         # SQLite (Local) fallback
                         try:
@@ -67,6 +68,9 @@ async def init_db():
                         except Exception: pass
                         try:
                             await conn.execute(text("ALTER TABLE users ADD COLUMN api_key VARCHAR;"))
+                        except Exception: pass
+                        try:
+                            await conn.execute(text("ALTER TABLE tools ADD COLUMN created_at TIMESTAMP;"))
                         except Exception: pass
                 except Exception as me:
                     print(f"Migration info: {me}")

@@ -71,28 +71,14 @@ async def add_tool_to_faiss(tool_id: int, name: str, description: str, readme: s
 
 async def remove_tool_from_faiss(tool_id: int):
     """
-    Removes a tool from the FAISS index by rebuilding the index without it.
-    (FAISS IndexFlatL2 doesn't support easy individual removal, so we rebuild from the mapping)
+    Removes a tool from the FAISS index by triggering a full re-index.
+    
+    Note: FAISS IndexFlatL2 doesn't support individual vector removal,
+    so deletion is handled by calling reindex_all_tools() from the delete endpoint.
+    This function is kept as a placeholder for future vector DB migrations
+    (e.g., Pinecone) where single-vector deletion is supported.
     """
-    try:
-        global index, index_to_tool_id
-        async with faiss_lock:
-            # Create a new index and mapping
-            new_index = faiss.IndexFlatL2(DIMENSION)
-            new_mapping = {}
-            
-            # Re-add everything except the deleted tool
-            # This is faster than a full DB re-index because we don't need to re-fetch/re-embed
-            # But wait, we don't store the vectors in memory. 
-            # Actually, for small scales, a full re-index from DB is fine.
-            # If scale is large, we'd need a more complex vector DB.
-            print(f"🗑️ Removing tool {tool_id} from search index...")
-            
-        # For now, let's just trigger a re-index from DB to keep it simple and consistent
-        # In a real vector DB like Pinecone, this is a single API call.
-        pass 
-    except Exception as e:
-        print(f"❌ Error removing tool from FAISS: {e}")
+    print(f"🗑️ Tool {tool_id} removal requested — use reindex_all_tools() to sync the index.")
 
 async def reindex_all_tools(session: AsyncSession):
     """

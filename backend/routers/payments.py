@@ -21,7 +21,7 @@ class PaymentRequest(BaseModel):
     user_id: int
     amount: float
     currency: str = "USD"
-    method: str = "crypto" or "stripe"
+    method: str = "crypto"  # Accepted values: "crypto" or "stripe"
 
 class ReputationResponse(BaseModel):
     tool_id: int
@@ -39,7 +39,8 @@ async def process_payment(
         success = random.choice([True, False]) 
         processing_time = time.time() - start_time
         tx = await payments.handle_payment(request)
-        log_tool_usage(
+        await log_tool_usage(
+            db=session,
             tool_id=request.tool_id, 
             user_id=request.user_id,
             success=success,

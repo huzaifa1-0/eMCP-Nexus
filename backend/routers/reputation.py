@@ -1,14 +1,12 @@
-from fastapi import APIRouter
-from backend.ai_services import reputation
+from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from typing import List
-from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from backend.ai_services.monitoring import get_tool_usage
+from backend.ai_services import reputation
 from backend.db import get_async_session
 from backend.models.db import DBTransaction, DBRating
-from backend.models.pydantic import BaseModel
 
 router = APIRouter()
 

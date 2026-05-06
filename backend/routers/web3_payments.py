@@ -8,7 +8,7 @@ from backend.db import get_async_session
 from backend.models.db import DBTool, DBSubscription, DBUser
 from backend.services.crypto import verify_payment
 from backend.config import settings
-from backend.routers.auth import get_current_user
+from backend.security import get_current_user
 
 router = APIRouter()
 

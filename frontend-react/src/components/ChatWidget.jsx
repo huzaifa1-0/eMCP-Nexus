@@ -55,8 +55,11 @@ export default function ChatWidget() {
 
           <div className="chat-messages" ref={messagesRef}>
             {messages.map((m, i) => (
-              <div key={i} className={`chat-bubble ${m.sender}`}
-                dangerouslySetInnerHTML={{ __html: m.text.replace(/\n/g, '<br>') }} />
+              <div key={i} className={`chat-bubble ${m.sender}`}>
+                {m.text.split('\n').map((line, j) => (
+                  <span key={j}>{line}{j < m.text.split('\n').length - 1 && <br />}</span>
+                ))}
+              </div>
             ))}
           </div>
 
@@ -65,7 +68,7 @@ export default function ChatWidget() {
               className="chat-input"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+              onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
               placeholder="Ask me anything..."
             />
             <button className="chat-send" onClick={sendMessage}>

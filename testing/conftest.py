@@ -11,7 +11,8 @@ from sqlalchemy.orm import sessionmaker
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from backend.main import app
-from backend.db import get_async_session, Base
+from backend.db import get_async_session
+from backend.models.db import Base
 
 
 TEST_DATABASE_URL = "sqlite+aiosqlite:///./test.db"

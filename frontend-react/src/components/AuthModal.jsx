@@ -104,7 +104,7 @@ export default function AuthModal({ isOpen, onClose }) {
     e.preventDefault();
     setSuccess('');
     setError('');
-    setSuccess('Reset instructions sent! Check your email.');
+    setError('Password reset is not yet available. Please contact support or create a new account.');
   };
 
   const handleGithubLogin = () => {

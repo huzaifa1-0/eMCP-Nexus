@@ -62,7 +62,7 @@ async def proxy_messages(
 
     try:
         body = await request.json()
-    except:
+    except Exception:
         raise HTTPException(status_code=400, detail="Invalid JSON")
 
     # === PAYMENT LOGIC ===
