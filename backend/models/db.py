@@ -61,7 +61,7 @@ class DBTool(Base):
         ]
 
     status: Mapped[str] = mapped_column(String, default="deploying")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
 
 class DBTransaction(Base):
     __tablename__ = "transactions"
@@ -69,7 +69,7 @@ class DBTransaction(Base):
     amount: Mapped[float] = mapped_column(Float)
     currency: Mapped[str] = mapped_column(String)
     method: Mapped[str] = mapped_column(String)
-    timestamp: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
     
     tool_id: Mapped[int] = mapped_column(Integer, ForeignKey("tools.id"))
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
@@ -86,7 +86,7 @@ class DBRating(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     rating: Mapped[int] = mapped_column(Integer)
     comment: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    timestamp: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
     tool_id: Mapped[int] = mapped_column(Integer, ForeignKey("tools.id")) # Corrected to Integer
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id")) # Corrected to Integer
 
@@ -98,7 +98,7 @@ class DBUsageLog(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     tool_id: Mapped[int] = mapped_column(Integer, ForeignKey("tools.id"))
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
-    timestamp: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
     success: Mapped[bool] = mapped_column(default=True)
     processing_time: Mapped[float] = mapped_column(Float)
 
@@ -115,7 +115,7 @@ class DBSubscription(Base):
     stripe_subscription_id: Mapped[str] = mapped_column(String, nullable=True)
     plan: Mapped[str] = mapped_column(String)  # weekly, monthly, yearly
     status: Mapped[str] = mapped_column(String, default="pending")  # pending, active, cancelled
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
     
     # Relationships
     user: Mapped["DBUser"] = relationship("DBUser", back_populates="subscriptions")
