@@ -30,8 +30,8 @@ export default function ConfigModal({ tool, onClose }) {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(configText);
-      showToast('Configuration copied!', 'success');
+      await navigator.clipboard.writeText(proxyUrl);
+      showToast('Connector URL copied!', 'success');
     } catch {
       showToast('Failed to copy', 'error');
     }
@@ -129,14 +129,14 @@ export default function ConfigModal({ tool, onClose }) {
           <div className="modal-grid-layout">
             {/* Left Column: Configuration */}
             <div className="modal-column">
-              <h3 className="section-title"><i className="fas fa-code"></i> JSON Configuration</h3>
-              <p className="section-subtitle">Copy this into your Claude config file.</p>
+              <h3 className="section-title"><i className="fas fa-link"></i> Remote Connector URL</h3>
+              <p className="section-subtitle">Use this URL to connect Claude to this remote tool.</p>
               
               {showConfig ? (
                 <div className="config-block-wrapper">
-                  <div className="config-block">{configText}</div>
+                  <div className="config-block" style={{ wordBreak: 'break-all', fontFamily: 'monospace', fontSize: '14px', lineHeight: '1.6' }}>{proxyUrl}</div>
                   <button className="btn btn-primary btn-copy-floating" onClick={handleCopy}>
-                    <i className="fas fa-copy"></i> Copy to Clipboard
+                    <i className="fas fa-copy"></i> Copy URL
                   </button>
                 </div>
               ) : (
@@ -169,31 +169,31 @@ export default function ConfigModal({ tool, onClose }) {
 
             {/* Right Column: Instructions */}
             <div className="modal-column">
-              <h3 className="section-title"><i className="fas fa-magic"></i> Setup Guide</h3>
-              <p className="section-subtitle">Get started in seconds.</p>
+              <h3 className="section-title"><i className="fas fa-plug"></i> Connect to Claude</h3>
+              <p className="section-subtitle">Add as a custom connector.</p>
               
               <div className="guide-steps-container">
                 <div className="guide-step">
                   <div className="step-number">1</div>
                   <div className="step-text-small">
-                    <strong>Locate Config</strong>
-                    <p>Open <code>claude_desktop_config.json</code> in your AppData folder.</p>
+                    <strong>Copy URL</strong>
+                    <p>Copy the Remote Connector URL from the left panel.</p>
                   </div>
                 </div>
 
                 <div className="guide-step">
                   <div className="step-number">2</div>
                   <div className="step-text-small">
-                    <strong>Copy & Paste</strong>
-                    <p>Copy the JSON block from the left and paste it under <code>mcpServers</code>.</p>
+                    <strong>Add Connector</strong>
+                    <p>In Claude, go to <b>Settings &gt; Connectors</b> and click <b>Add custom connector</b>.</p>
                   </div>
                 </div>
 
                 <div className="guide-step">
                   <div className="step-number">3</div>
                   <div className="step-text-small">
-                    <strong>Restart</strong>
-                    <p>Restart Claude to activate.</p>
+                    <strong>Paste & Save</strong>
+                    <p>Paste the URL and give your tool a name to activate it.</p>
                   </div>
                 </div>
               </div>
@@ -201,8 +201,8 @@ export default function ConfigModal({ tool, onClose }) {
               <div className="pro-tip-modern">
                 <div className="pro-tip-icon"><i className="fas fa-lightbulb"></i></div>
                 <div className="pro-tip-content">
-                  <strong>Developer Tip</strong>
-                  <p>Update Claude if tools don't appear.</p>
+                  <strong>Marketplace Tip</strong>
+                  <p>Paid tools require a one-time payment to generate a unique Connector URL with your API key.</p>
                 </div>
               </div>
             </div>
