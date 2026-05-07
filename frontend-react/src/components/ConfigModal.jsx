@@ -21,7 +21,7 @@ export default function ConfigModal({ tool, onClose }) {
   const config = {
     mcpServers: {
       [tool.name.toLowerCase().replace(/\s+/g, '-')]: {
-        url: proxyUrl,
+        url: displayUrl,
         transport: 'sse',
       },
     },
