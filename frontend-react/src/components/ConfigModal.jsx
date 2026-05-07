@@ -17,7 +17,7 @@ export default function ConfigModal({ tool, onClose }) {
   const isPaidTool = tool.cost > 0;
   const showConfig = !isPaidTool || apiKey;
 
-  const proxyUrl = `${window.location.origin}/api/proxy/${tool.id}/sse${apiKey ? `?api_key=${apiKey}` : ''}`;
+  const displayUrl = `${(tool.url || '').replace(/\/$/, '')}/sse${apiKey ? `?api_key=${apiKey}` : ''}`;
   const config = {
     mcpServers: {
       [tool.name.toLowerCase().replace(/\s+/g, '-')]: {
@@ -30,7 +30,7 @@ export default function ConfigModal({ tool, onClose }) {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(proxyUrl);
+      await navigator.clipboard.writeText(displayUrl);
       showToast('Connector URL copied!', 'success');
     } catch {
       showToast('Failed to copy', 'error');
@@ -134,7 +134,7 @@ export default function ConfigModal({ tool, onClose }) {
               
               {showConfig ? (
                 <div className="config-block-wrapper">
-                  <div className="config-block" style={{ wordBreak: 'break-all', fontFamily: 'monospace', fontSize: '14px', lineHeight: '1.6' }}>{proxyUrl}</div>
+                  <div className="config-block" style={{ wordBreak: 'break-all', fontFamily: 'monospace', fontSize: '14px', lineHeight: '1.6' }}>{displayUrl}</div>
                   <button className="btn btn-primary btn-copy-floating" onClick={handleCopy}>
                     <i className="fas fa-copy"></i> Copy URL
                   </button>
