@@ -1,0 +1,64 @@
+name: Actionable issue
+description: Create a complete, actionable issue with clear scope and acceptance criteria.
+title: "[Issue]: "
+labels:
+  - needs-triage
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Short summary
+      description: Describe the problem or request in 1-3 sentences.
+      placeholder: A concise statement of what needs to be fixed or built.
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Provide relevant background, links, and impacted areas.
+      placeholder: |
+        - Repository area(s):
+        - Why this matters:
+        - Related links/issues/PRs:
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-behavior
+    attributes:
+      label: Current behavior
+      description: Describe what happens now.
+      placeholder: What is the existing behavior or gap?
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: Describe what should happen instead.
+      placeholder: What outcome is expected after this issue is resolved?
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: List clear, testable criteria for completion.
+      placeholder: |
+        - [ ] Criterion 1
+        - [ ] Criterion 2
+        - [ ] Criterion 3
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-notes
+    attributes:
+      label: Additional notes
+      description: Optional implementation notes, constraints, or edge cases.
+      placeholder: Any extra details that could help contributors.
+
